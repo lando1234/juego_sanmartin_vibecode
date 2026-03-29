@@ -22,6 +22,25 @@ describe("spriteAnimation", () => {
     expect(resolvePlayerSpriteState(snapshot.player)).toBe("attack");
 
     snapshot.player.attack.activeMs = 0;
+    snapshot.player.actionState = "attack_2";
+    expect(resolvePlayerSpriteState(snapshot.player)).toBe("attack_2");
+
+    snapshot.player.actionState = "attack_3";
+    expect(resolvePlayerSpriteState(snapshot.player)).toBe("attack_3");
+
+    snapshot.player.actionState = "special";
+    expect(resolvePlayerSpriteState(snapshot.player)).toBe("special");
+
+    snapshot.player.actionState = "dash";
+    expect(resolvePlayerSpriteState(snapshot.player)).toBe("dash");
+
+    snapshot.player.actionState = "grab";
+    expect(resolvePlayerSpriteState(snapshot.player)).toBe("grab");
+
+    snapshot.player.actionState = "throw";
+    expect(resolvePlayerSpriteState(snapshot.player)).toBe("throw");
+
+    snapshot.player.actionState = "idle";
     snapshot.player.hurtCooldownMs = 180;
     expect(resolvePlayerSpriteState(snapshot.player)).toBe("hurt");
   });
@@ -79,10 +98,14 @@ describe("spriteAnimation", () => {
 
   it("returns transformed draw data for attack and defeat states", () => {
     const attack = getSpriteTransform("attack", 0, 10, 20, 100, 180);
+    const attack3 = getSpriteTransform("attack_3", 0, 10, 20, 100, 180);
+    const special = getSpriteTransform("special", 0, 10, 20, 100, 180);
     const defeated = getSpriteTransform("defeated", 0, 10, 20, 100, 180);
 
     expect(attack.x).toBeGreaterThan(10);
     expect(attack.width).toBeGreaterThan(100);
+    expect(attack3.width).toBeGreaterThan(attack.width);
+    expect(special.height).toBeGreaterThan(attack.height);
     expect(defeated.rotation).toBeGreaterThan(1);
     expect(defeated.height).toBeLessThan(180);
   });

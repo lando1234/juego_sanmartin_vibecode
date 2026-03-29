@@ -6,6 +6,12 @@ describe("spriteManifest", () => {
   it("uses multi-frame sequences for the main converted characters", () => {
     expect(spriteManifest.ricky.frames.idle).toHaveLength(2);
     expect(spriteManifest.ricky.frames.walk).toHaveLength(2);
+    expect(spriteManifest.ricky.frames.attack_2).toEqual([
+      "/sprites/characters/ricky/attack-02.png",
+    ]);
+    expect(spriteManifest.ricky.frames.attack_3).toEqual([
+      "/sprites/characters/ricky/attack-03.png",
+    ]);
     expect(spriteManifest.colado.frames.walk).toHaveLength(2);
     expect(spriteManifest.durmiente.frames.idle).toHaveLength(2);
     expect(spriteManifest.senoraBolsos.frames.walk).toHaveLength(2);
@@ -17,9 +23,21 @@ describe("spriteManifest", () => {
       "/sprites/characters/ricky/idle-01.png",
       "/sprites/characters/ricky/idle-02.png",
     ]);
+    expect(getSpriteFramePaths("ricky", "special")).toEqual([
+      "/sprites/characters/ricky/special-01.png",
+    ]);
+    expect(getSpriteFramePaths("ricky", "dash")).toEqual([
+      "/sprites/characters/ricky/dash-01.png",
+    ]);
+    expect(getSpriteFramePaths("ricky", "throw")).toEqual([
+      "/sprites/characters/ricky/throw-01.png",
+    ]);
 
     expect(getSpriteFramePaths("boss_fisura_bici", "attack")).toEqual([
       "/sprites/characters/boss_fisura_bici/attack-01.png",
+    ]);
+    expect(getSpriteFramePaths("colado", "special")).toEqual([
+      "/sprites/characters/colado/attack-01.png",
     ]);
 
     expect(getSpriteFramePaths("borracho", "hurt")).toEqual([

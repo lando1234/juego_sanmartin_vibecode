@@ -24,6 +24,24 @@ export const spriteManifest = {
       attack: [
         "/sprites/characters/ricky/attack-01.png",
       ],
+      attack_2: [
+        "/sprites/characters/ricky/attack-02.png",
+      ],
+      attack_3: [
+        "/sprites/characters/ricky/attack-03.png",
+      ],
+      special: [
+        "/sprites/characters/ricky/special-01.png",
+      ],
+      dash: [
+        "/sprites/characters/ricky/dash-01.png",
+      ],
+      grab: [
+        "/sprites/characters/ricky/grab-01.png",
+      ],
+      throw: [
+        "/sprites/characters/ricky/throw-01.png",
+      ],
       hurt: [
         "/sprites/characters/ricky/hurt-01.png",
       ],
@@ -234,5 +252,18 @@ export function getSpriteFramesByCharacterId(characterId: string) {
 }
 
 export function getSpriteFramePaths(characterId: string, state: SpriteAnimationState) {
-  return getSpriteFramesByCharacterId(characterId)?.[state] ?? [];
+  const frames = getSpriteFramesByCharacterId(characterId);
+
+  if (!frames) {
+    return [];
+  }
+
+  return (
+    frames[state] ??
+    (state === "attack_2" || state === "attack_3" || state === "special" || state === "grab" || state === "throw"
+      ? frames.attack
+      : state === "dash"
+        ? frames.walk
+        : [])
+  );
 }

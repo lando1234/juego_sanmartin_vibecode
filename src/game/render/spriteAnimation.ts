@@ -1,11 +1,28 @@
 import type { EnemyState, PlayerState } from "@/game/types/gameTypes";
 
-export type SpriteAnimationState = "idle" | "walk" | "attack" | "hurt" | "defeated";
+export type SpriteAnimationState =
+  | "idle"
+  | "walk"
+  | "attack"
+  | "attack_2"
+  | "attack_3"
+  | "special"
+  | "dash"
+  | "grab"
+  | "throw"
+  | "hurt"
+  | "defeated";
 
 export type SpriteFrameSet = {
   idle: string[];
   walk: string[];
   attack: string[];
+  attack_2?: string[];
+  attack_3?: string[];
+  special?: string[];
+  dash?: string[];
+  grab?: string[];
+  throw?: string[];
   hurt: string[];
   defeated: string[];
 };
@@ -28,15 +45,31 @@ export function resolvePlayerSpriteState(player: PlayerState): SpriteAnimationSt
     return "defeated";
   }
 
-  if (
-    player.actionState === "attack_1" ||
-    player.actionState === "attack_2" ||
-    player.actionState === "attack_3" ||
-    player.actionState === "special" ||
-    player.actionState === "grab" ||
-    player.actionState === "throw" ||
-    player.attack.activeMs > 0
-  ) {
+  if (player.actionState === "attack_3") {
+    return "attack_3";
+  }
+
+  if (player.actionState === "attack_2") {
+    return "attack_2";
+  }
+
+  if (player.actionState === "special") {
+    return "special";
+  }
+
+  if (player.actionState === "dash") {
+    return "dash";
+  }
+
+  if (player.actionState === "grab" || player.grabTargetId !== null) {
+    return "grab";
+  }
+
+  if (player.actionState === "throw") {
+    return "throw";
+  }
+
+  if (player.actionState === "attack_1" || player.attack.activeMs > 0) {
     return "attack";
   }
 
@@ -81,7 +114,17 @@ export function getAnimatedSpriteFrame(
 
   if (stateFrames && stateFrames.length > 0) {
     const frameDurationMs =
-      state === "walk" ? 120 : state === "attack" ? 80 : state === "hurt" ? 140 : 220;
+      state === "walk"
+        ? 120
+        : state === "attack" || state === "attack_2" || state === "attack_3"
+          ? 80
+          : state === "dash"
+            ? 70
+            : state === "grab" || state === "throw" || state === "special"
+              ? 100
+              : state === "hurt"
+                ? 140
+                : 220;
     const frameIndex = Math.floor(timeMs / frameDurationMs) % stateFrames.length;
 
     return stateFrames[frameIndex];
@@ -122,6 +165,48 @@ export function getSpriteTransform(
       transform.width *= 1.08;
       transform.height *= 1.04;
       transform.rotation = 0.08 + Math.sin(timeMs / 70) * 0.02;
+      break;
+    case "attack_2":
+      transform.x += 18;
+      transform.y -= 5;
+      transform.width *= 1.1;
+      transform.height *= 1.05;
+      transform.rotation = 0.1 + Math.sin(timeMs / 65) * 0.025;
+      break;
+    case "attack_3":
+      transform.x += 22;
+      transform.y -= 8;
+      transform.width *= 1.14;
+      transform.height *= 1.08;
+      transform.rotation = 0.14 + Math.sin(timeMs / 55) * 0.03;
+      break;
+    case "special":
+      transform.x += 24;
+      transform.y -= 10;
+      transform.width *= 1.18;
+      transform.height *= 1.12;
+      transform.rotation = 0.16;
+      break;
+    case "dash":
+      transform.x += Math.sin(timeMs / 45) * 3 + 10;
+      transform.y -= 3;
+      transform.width *= 1.06;
+      transform.rotation = 0.04;
+      transform.alpha = 0.94;
+      break;
+    case "grab":
+      transform.x += 10;
+      transform.y -= 4;
+      transform.width *= 1.06;
+      transform.height *= 1.02;
+      transform.rotation = 0.05;
+      break;
+    case "throw":
+      transform.x += 20;
+      transform.y -= 6;
+      transform.width *= 1.12;
+      transform.height *= 1.06;
+      transform.rotation = 0.12;
       break;
     case "hurt":
       transform.x -= 12;

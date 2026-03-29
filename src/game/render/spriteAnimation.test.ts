@@ -58,6 +58,49 @@ describe("spriteAnimation", () => {
     enemy.state = "hurt";
     expect(resolveEnemySpriteState(enemy)).toBe("hurt");
 
+    const guardingEnemy = createEnemy("durmiente", 0, 0);
+    guardingEnemy.state = "recover";
+    guardingEnemy.intent = "hold";
+    expect(resolveEnemySpriteState(guardingEnemy)).toBe("guard");
+
+    const grabbedEnemy = createEnemy("senora_bolsos", 0, 0);
+    grabbedEnemy.state = "grabbed";
+    expect(resolveEnemySpriteState(grabbedEnemy)).toBe("grabbed");
+
+    const staggeredBoss = createEnemy("borracho", 0, 0);
+    staggeredBoss.state = "hurt";
+    expect(resolveEnemySpriteState(staggeredBoss)).toBe("stagger_heavy");
+
+    const telegraphBoss = createEnemy("boss_fisura_bici", 0, 0);
+    telegraphBoss.activeAttack = {
+      name: "drive_by",
+      timerMs: 500,
+      startupMs: 220,
+      activeMs: 110,
+      recoveryMs: 120,
+      damage: 10,
+      knockback: 0,
+      range: 30,
+      hitbox: {
+        shape: "rectangle",
+        width: 40,
+        height: 30,
+        offsetX: 20,
+        offsetY: 10,
+        activeFrames: [2, 3],
+      },
+      projectile: false,
+      projectileSpeed: 0,
+      aoe: false,
+      radius: null,
+      effect: null,
+      durationMs: null,
+      hits: 1,
+      damageApplied: false,
+      projectileSpawned: false,
+    };
+    expect(resolveEnemySpriteState(telegraphBoss)).toBe("attack_telegraph");
+
     enemy.state = "defeated";
     expect(resolveEnemySpriteState(enemy)).toBe("defeated");
 
@@ -98,14 +141,18 @@ describe("spriteAnimation", () => {
 
   it("returns transformed draw data for attack and defeat states", () => {
     const attack = getSpriteTransform("attack", 0, 10, 20, 100, 180);
+    const telegraph = getSpriteTransform("attack_telegraph", 0, 10, 20, 100, 180);
     const attack3 = getSpriteTransform("attack_3", 0, 10, 20, 100, 180);
     const special = getSpriteTransform("special", 0, 10, 20, 100, 180);
+    const stagger = getSpriteTransform("stagger_heavy", 0, 10, 20, 100, 180);
     const defeated = getSpriteTransform("defeated", 0, 10, 20, 100, 180);
 
     expect(attack.x).toBeGreaterThan(10);
+    expect(telegraph.width).toBeGreaterThan(100);
     expect(attack.width).toBeGreaterThan(100);
     expect(attack3.width).toBeGreaterThan(attack.width);
     expect(special.height).toBeGreaterThan(attack.height);
+    expect(stagger.rotation).toBeLessThan(0);
     expect(defeated.rotation).toBeGreaterThan(1);
     expect(defeated.height).toBeLessThan(180);
   });

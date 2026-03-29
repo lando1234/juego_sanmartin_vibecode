@@ -14,8 +14,20 @@ describe("spriteManifest", () => {
     ]);
     expect(spriteManifest.colado.frames.walk).toHaveLength(2);
     expect(spriteManifest.durmiente.frames.idle).toHaveLength(2);
+    expect(spriteManifest.durmiente.frames.guard).toEqual([
+      "/sprites/characters/durmiente/guard-01.png",
+    ]);
+    expect(spriteManifest.mochilero.frames.stagger_heavy).toEqual([
+      "/sprites/characters/mochilero/stagger-heavy-01.png",
+    ]);
     expect(spriteManifest.senoraBolsos.frames.walk).toHaveLength(2);
+    expect(spriteManifest.senoraBolsos.frames.grabbed).toEqual([
+      "/sprites/characters/senora_bolsos/grabbed-01.png",
+    ]);
     expect(spriteManifest.bossFisuraBici.frames.idle).toHaveLength(2);
+    expect(spriteManifest.bossFisuraBici.frames.attack_telegraph).toEqual([
+      "/sprites/characters/boss_fisura_bici/attack-telegraph-01.png",
+    ]);
   });
 
   it("resolves the paths for a given state", () => {
@@ -36,8 +48,20 @@ describe("spriteManifest", () => {
     expect(getSpriteFramePaths("boss_fisura_bici", "attack")).toEqual([
       "/sprites/characters/boss_fisura_bici/attack-01.png",
     ]);
+    expect(getSpriteFramePaths("boss_fisura_bici", "attack_telegraph")).toEqual([
+      "/sprites/characters/boss_fisura_bici/attack-telegraph-01.png",
+    ]);
     expect(getSpriteFramePaths("colado", "special")).toEqual([
       "/sprites/characters/colado/attack-01.png",
+    ]);
+    expect(getSpriteFramePaths("senora_bolsos", "grabbed")).toEqual([
+      "/sprites/characters/senora_bolsos/grabbed-01.png",
+    ]);
+    expect(getSpriteFramePaths("durmiente", "guard")).toEqual([
+      "/sprites/characters/durmiente/guard-01.png",
+    ]);
+    expect(getSpriteFramePaths("borracho", "stagger_heavy")).toEqual([
+      "/sprites/characters/borracho/stagger-heavy-01.png",
     ]);
 
     expect(getSpriteFramePaths("borracho", "hurt")).toEqual([

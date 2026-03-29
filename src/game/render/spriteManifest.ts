@@ -90,6 +90,12 @@ export const spriteManifest = {
       attack: [
         "/sprites/characters/durmiente/attack-01.png",
       ],
+      guard: [
+        "/sprites/characters/durmiente/guard-01.png",
+      ],
+      grabbed: [
+        "/sprites/characters/durmiente/grabbed-01.png",
+      ],
       hurt: [
         "/sprites/characters/durmiente/hurt-01.png",
       ],
@@ -113,6 +119,12 @@ export const spriteManifest = {
       ],
       attack: [
         "/sprites/characters/mochilero/attack-01.png",
+      ],
+      grabbed: [
+        "/sprites/characters/mochilero/grabbed-01.png",
+      ],
+      stagger_heavy: [
+        "/sprites/characters/mochilero/stagger-heavy-01.png",
       ],
       hurt: [
         "/sprites/characters/mochilero/hurt-01.png",
@@ -162,6 +174,12 @@ export const spriteManifest = {
       attack: [
         "/sprites/characters/senora_bolsos/attack-01.png",
       ],
+      guard: [
+        "/sprites/characters/senora_bolsos/guard-01.png",
+      ],
+      grabbed: [
+        "/sprites/characters/senora_bolsos/grabbed-01.png",
+      ],
       hurt: [
         "/sprites/characters/senora_bolsos/hurt-01.png",
       ],
@@ -210,6 +228,9 @@ export const spriteManifest = {
       attack: [
         "/sprites/characters/borracho/attack-01.png",
       ],
+      stagger_heavy: [
+        "/sprites/characters/borracho/stagger-heavy-01.png",
+      ],
       hurt: [
         "/sprites/characters/borracho/hurt-01.png",
       ],
@@ -233,6 +254,12 @@ export const spriteManifest = {
       ],
       attack: [
         "/sprites/characters/boss_fisura_bici/attack-01.png",
+      ],
+      attack_telegraph: [
+        "/sprites/characters/boss_fisura_bici/attack-telegraph-01.png",
+      ],
+      stagger_heavy: [
+        "/sprites/characters/boss_fisura_bici/stagger-heavy-01.png",
       ],
       hurt: [
         "/sprites/characters/boss_fisura_bici/hurt-01.png",
@@ -260,8 +287,17 @@ export function getSpriteFramePaths(characterId: string, state: SpriteAnimationS
 
   return (
     frames[state] ??
-    (state === "attack_2" || state === "attack_3" || state === "special" || state === "grab" || state === "throw"
+    (state === "attack_2" ||
+    state === "attack_3" ||
+    state === "special" ||
+    state === "grab" ||
+    state === "throw" ||
+    state === "attack_telegraph"
       ? frames.attack
+      : state === "guard"
+        ? frames.idle
+        : state === "grabbed" || state === "stagger_heavy"
+          ? frames.hurt
       : state === "dash"
         ? frames.walk
         : [])

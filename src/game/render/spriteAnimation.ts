@@ -4,12 +4,16 @@ export type SpriteAnimationState =
   | "idle"
   | "walk"
   | "attack"
+  | "attack_telegraph"
   | "attack_2"
   | "attack_3"
   | "special"
   | "dash"
   | "grab"
   | "throw"
+  | "guard"
+  | "grabbed"
+  | "stagger_heavy"
   | "hurt"
   | "defeated";
 
@@ -17,12 +21,16 @@ export type SpriteFrameSet = {
   idle: string[];
   walk: string[];
   attack: string[];
+  attack_telegraph?: string[];
   attack_2?: string[];
   attack_3?: string[];
   special?: string[];
   dash?: string[];
   grab?: string[];
   throw?: string[];
+  guard?: string[];
+  grabbed?: string[];
+  stagger_heavy?: string[];
   hurt: string[];
   defeated: string[];
 };
@@ -89,11 +97,40 @@ export function resolveEnemySpriteState(enemy: EnemyState): SpriteAnimationState
     return "defeated";
   }
 
+  if (
+    enemy.activeAttack &&
+    enemy.isBoss &&
+    enemy.activeAttack.timerMs >
+      enemy.activeAttack.activeMs + enemy.activeAttack.recoveryMs
+  ) {
+    return "attack_telegraph";
+  }
+
+  if (enemy.state === "grabbed") {
+    return "grabbed";
+  }
+
+  if (
+    enemy.state === "recover" &&
+    enemy.intent === "hold" &&
+    (enemy.modifiers.guardChance ?? 0) > 0
+  ) {
+    return "guard";
+  }
+
   if (enemy.state === "attack") {
     return "attack";
   }
 
   if (enemy.state === "hurt") {
+    if (
+      enemy.isBoss ||
+      enemy.role === "mini_boss" ||
+      (enemy.modifiers.poiseHits ?? 0) >= 3
+    ) {
+      return "stagger_heavy";
+    }
+
     return "hurt";
   }
 
@@ -116,11 +153,19 @@ export function getAnimatedSpriteFrame(
     const frameDurationMs =
       state === "walk"
         ? 120
-        : state === "attack" || state === "attack_2" || state === "attack_3"
+        : state === "attack" ||
+            state === "attack_telegraph" ||
+            state === "attack_2" ||
+            state === "attack_3"
           ? 80
-          : state === "dash"
+        : state === "dash"
             ? 70
-            : state === "grab" || state === "throw" || state === "special"
+            : state === "grab" ||
+                state === "throw" ||
+                state === "special" ||
+                state === "guard" ||
+                state === "grabbed" ||
+                state === "stagger_heavy"
               ? 100
               : state === "hurt"
                 ? 140
@@ -166,6 +211,13 @@ export function getSpriteTransform(
       transform.height *= 1.04;
       transform.rotation = 0.08 + Math.sin(timeMs / 70) * 0.02;
       break;
+    case "attack_telegraph":
+      transform.x += 8;
+      transform.y -= 6;
+      transform.width *= 1.12;
+      transform.height *= 1.06;
+      transform.rotation = -0.08 + Math.sin(timeMs / 120) * 0.02;
+      break;
     case "attack_2":
       transform.x += 18;
       transform.y -= 5;
@@ -207,6 +259,24 @@ export function getSpriteTransform(
       transform.width *= 1.12;
       transform.height *= 1.06;
       transform.rotation = 0.12;
+      break;
+    case "guard":
+      transform.y -= 2;
+      transform.width *= 1.02;
+      transform.rotation = -0.04;
+      break;
+    case "grabbed":
+      transform.x -= 6;
+      transform.y += 3;
+      transform.width *= 0.98;
+      transform.rotation = -0.08;
+      break;
+    case "stagger_heavy":
+      transform.x -= 18;
+      transform.y += 4;
+      transform.width *= 1.04;
+      transform.rotation = -0.18;
+      transform.alpha = 0.88;
       break;
     case "hurt":
       transform.x -= 12;

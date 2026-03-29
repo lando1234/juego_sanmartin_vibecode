@@ -7,6 +7,8 @@ import type {
   GameState,
 } from "@/game/types/gameTypes";
 
+import { clampXToArena, clampYToArena } from "./arenaBounds";
+
 function distanceToPlayer(enemy: EnemyState, state: GameState) {
   const playerCenterX = state.player.x + state.player.width / 2;
   const playerCenterY = state.player.y + state.player.depth / 2;
@@ -23,7 +25,8 @@ function distanceToPlayer(enemy: EnemyState, state: GameState) {
 }
 
 function resolveSpeedMultiplier(enemy: EnemyState) {
-  return enemy.modifiers.speedMultiplier ?? 1;
+  const aggression = enemy.modifiers.aggression ?? 1;
+  return (enemy.modifiers.speedMultiplier ?? 1) * (1 + (aggression - 1) * 0.12);
 }
 
 function applyEnemyPhases(enemy: EnemyState) {
@@ -73,12 +76,16 @@ function chooseAttack(enemy: EnemyState, distanceX: number): EnemyAttackDefiniti
 }
 
 function createEnemyAttackState(enemy: EnemyState, attack: EnemyAttackDefinition): ActiveEnemyAttackState {
+  const aggression = enemy.modifiers.aggression ?? 1;
+  const startupMs = Math.round(attack.startupMs * Math.max(0.75, 1 - (aggression - 1) * 0.08));
+  const recoveryMs = Math.round(attack.recoveryMs * Math.max(0.68, 1 - (aggression - 1) * 0.12));
+
   return {
     name: attack.name,
-    timerMs: attack.startupMs + attack.activeMs + attack.recoveryMs,
-    startupMs: attack.startupMs,
+    timerMs: startupMs + attack.activeMs + recoveryMs,
+    startupMs,
     activeMs: attack.activeMs,
-    recoveryMs: attack.recoveryMs,
+    recoveryMs,
     damage: Math.round(attack.damage * (enemy.modifiers.damageMultiplier ?? 1)),
     knockback: attack.knockback ?? 0,
     range: Math.max(enemy.attackRange, attack.radius ?? 0),
@@ -100,9 +107,10 @@ function createEnemyAttackState(enemy: EnemyState, attack: EnemyAttackDefinition
 }
 
 function updateApproach(enemy: EnemyState, state: GameState, dt: number, targetX: number, targetY: number) {
+  const aggression = enemy.modifiers.aggression ?? 1;
   const speed = enemy.speed * resolveSpeedMultiplier(enemy);
   enemy.vx = clamp(targetX, -1, 1) * speed;
-  enemy.vy = clamp(targetY, -1, 1) * speed * 0.55;
+  enemy.vy = clamp(targetY, -1, 1) * speed * (0.55 + (aggression - 1) * 0.06);
 
   if (enemy.modifiers.zigzagMovement) {
     enemy.vy += Math.sin((state.hud.elapsedMs + enemy.x) / 120) * 70;
@@ -117,13 +125,14 @@ function updateApproach(enemy: EnemyState, state: GameState, dt: number, targetX
 }
 
 function updateCircle(enemy: EnemyState, state: GameState, dt: number, targetX: number, targetY: number) {
-  const slotOffset = enemy.engagementSlot === "back" ? -64 : 64;
+  const aggression = enemy.modifiers.aggression ?? 1;
+  const slotOffset = enemy.engagementSlot === "back" ? -52 : 52;
   const desiredX = state.player.x + slotOffset - enemy.x;
-  const desiredY = targetY + (enemy.engagementSlot === "back" ? 26 : -26);
-  const speed = enemy.speed * resolveSpeedMultiplier(enemy) * 0.82;
+  const desiredY = targetY + (enemy.engagementSlot === "back" ? 18 : -18);
+  const speed = enemy.speed * resolveSpeedMultiplier(enemy) * (0.88 + (aggression - 1) * 0.05);
 
   enemy.vx = clamp(desiredX, -1, 1) * speed;
-  enemy.vy = clamp(desiredY, -1, 1) * speed * 0.58;
+  enemy.vy = clamp(desiredY, -1, 1) * speed * 0.62;
   enemy.x += enemy.vx * dt;
   enemy.y += enemy.vy * dt;
 }
@@ -160,6 +169,8 @@ export function updateEnemies(state: GameState, dtMs: number) {
       enemy.vy = 0;
       enemy.state = "defeated";
       enemy.activeAttack = null;
+      enemy.x = clampXToArena(state, enemy.x, enemy.width);
+      enemy.y = clampYToArena(state, enemy.y, enemy.depth);
       continue;
     }
 
@@ -172,13 +183,17 @@ export function updateEnemies(state: GameState, dtMs: number) {
       enemy.vx = 0;
       enemy.vy = 0;
       enemy.state = "hurt";
+      enemy.x = clampXToArena(state, enemy.x, enemy.width);
+      enemy.y = clampYToArena(state, enemy.y, enemy.depth);
       continue;
     }
 
     if (enemy.activeAttack) {
       enemy.vx = 0;
       enemy.vy = 0;
-      enemy.state = enemy.activeAttack.timerMs > enemy.activeAttack.recoveryMs ? "attack" : "recover";
+      enemy.state = enemy.activeAttack.timerMs > enemy.activeAttack.recoveryMs * 0.6 ? "attack" : "recover";
+      enemy.x = clampXToArena(state, enemy.x, enemy.width);
+      enemy.y = clampYToArena(state, enemy.y, enemy.depth);
       continue;
     }
 
@@ -186,12 +201,14 @@ export function updateEnemies(state: GameState, dtMs: number) {
       enemy.vx = 0;
       enemy.vy = 0;
       enemy.state = "idle";
+      enemy.x = clampXToArena(state, enemy.x, enemy.width);
+      enemy.y = clampYToArena(state, enemy.y, enemy.depth);
       continue;
     }
 
     const isClose = distance.absoluteX < enemyAiRules.distanceLogic.close;
     const isFar = distance.absoluteX > enemyAiRules.distanceLogic.far;
-    const inAttackLane = distance.absoluteY <= 56;
+    const inAttackLane = distance.absoluteY <= 72;
     const canAttack =
       enemy.attackCooldownMs === 0 &&
       distance.absoluteX <= enemy.attackRange &&
@@ -199,10 +216,7 @@ export function updateEnemies(state: GameState, dtMs: number) {
       engagedIds.has(enemy.id);
 
     if (canAttack) {
-      enemy.activeAttack = createEnemyAttackState(
-        enemy,
-        chooseAttack(enemy, distance.absoluteX),
-      );
+      enemy.activeAttack = createEnemyAttackState(enemy, chooseAttack(enemy, distance.absoluteX));
       enemy.vx = 0;
       enemy.vy = 0;
       enemy.state = "attack";
@@ -213,6 +227,8 @@ export function updateEnemies(state: GameState, dtMs: number) {
       enemy.vx = 0;
       enemy.vy = 0;
       enemy.state = "idle";
+      enemy.x = clampXToArena(state, enemy.x, enemy.width);
+      enemy.y = clampYToArena(state, enemy.y, enemy.depth);
       continue;
     }
 
@@ -232,7 +248,8 @@ export function updateEnemies(state: GameState, dtMs: number) {
       updateApproach(enemy, state, dt, distance.x, distance.y);
     }
 
-    enemy.x = clamp(enemy.x, 0, state.levelBounds.width - enemy.width);
-    enemy.y = clamp(enemy.y, 0, state.levelBounds.depth - enemy.depth);
+    enemy.x = clampXToArena(state, enemy.x, enemy.width);
+    enemy.y = clampYToArena(state, enemy.y, enemy.depth);
   }
+
 }

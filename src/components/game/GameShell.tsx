@@ -88,6 +88,11 @@ export function GameShell() {
     snapshot.phase === "victory" ||
     snapshot.phase === "game_over";
   const showPauseOverlay = snapshot.phase === "paused";
+  const activePickupLabel = snapshot.hud.activePickup
+    ? snapshot.hud.activePickup.remainingMs === null
+      ? `${snapshot.hud.activePickup.name} · ${snapshot.hud.activePickup.effect} · instantaneo`
+      : `${snapshot.hud.activePickup.name} · ${snapshot.hud.activePickup.effect} · ${Math.ceil(snapshot.hud.activePickup.remainingMs / 1000)}s`
+    : null;
 
   return (
     <main className="relative min-h-dvh w-full overflow-hidden bg-[radial-gradient(circle_at_top,rgba(255,240,205,0.86),rgba(241,216,168,0.72)_34%,rgba(214,175,112,0.42)_58%,rgba(68,48,35,0.98)_100%)] text-[#f7ead4]">
@@ -135,6 +140,14 @@ export function GameShell() {
                   snapshot={snapshot}
                   className="absolute inset-0 h-full w-full rounded-none border-0 bg-[#2b211d] shadow-none ring-0"
                 />
+
+                {activePickupLabel ? (
+                  <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center px-3 pt-3 sm:px-4 sm:pt-4">
+                    <div className="max-w-[min(92%,780px)] rounded-[18px] border border-[#f4c992]/25 bg-[linear-gradient(180deg,rgba(59,33,18,0.9),rgba(24,14,10,0.88))] px-4 py-2 text-center text-xs font-semibold text-[#ffe7c5] shadow-[0_18px_50px_rgba(12,8,7,0.3)] backdrop-blur-md sm:text-sm">
+                      {activePickupLabel}
+                    </div>
+                  </div>
+                ) : null}
 
                 <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,240,220,0.08),transparent_24%,rgba(0,0,0,0.08)_72%,rgba(12,8,7,0.16)_100%)] mix-blend-soft-light" />
                 <div className="pointer-events-none absolute inset-0 opacity-[0.14] [background-image:radial-gradient(rgba(255,255,255,0.18)_0.8px,transparent_0.8px)] [background-size:10px_10px]" />

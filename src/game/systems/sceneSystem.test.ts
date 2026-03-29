@@ -18,6 +18,14 @@ function runUntil(
   throw new Error("Condition not reached in test");
 }
 describe("sceneSystem", () => {
+  it("uses the same arena width for the boss as the standard combat area", () => {
+    const layout = campaignLevels[0].layout;
+
+    expect(layout.bossGateEndX - layout.bossGateStartX).toBe(
+      layout.gate2EndX - layout.gate2StartX,
+    );
+  });
+
   it("triggers the second wave after advancing past the first arena", () => {
     const engine = createGameEngine({ now: () => 1000 });
     engine.sendCommand({ type: "start" });

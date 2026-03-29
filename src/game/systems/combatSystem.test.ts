@@ -103,6 +103,26 @@ describe("combatSystem", () => {
     expect(["playing", "game_over"]).toContain(engine.getSnapshot().phase);
   });
 
+  it("keeps enemies inside the closed combat arena after knockback", () => {
+    const engine = createGameEngine({ now: () => 1000 });
+    spawnWave(engine);
+    const snapshot = engine.getSnapshot();
+    const enemy = snapshot.enemies[0];
+
+    engine.sendCommand({
+      type: "debug-set-player-position",
+      payload: { x: snapshot.levelLayout.gate1StartX + 8, y: enemy.y },
+    });
+
+    enemy.x = snapshot.levelLayout.gate1StartX + 2;
+    engine.sendInput({ attack: true });
+    engine.step(16);
+
+    expect(engine.getSnapshot().enemies[0].x).toBeGreaterThanOrEqual(
+      engine.getSnapshot().levelLayout.gate1StartX,
+    );
+  });
+
   it("opens the gate after defeating the wave and reaches victory at the exit", () => {
     const engine = createGameEngine({ now: () => 1000 });
     spawnWave(engine);

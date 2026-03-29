@@ -55,12 +55,12 @@ export const enemyHitboxTemplate: HitboxState = {
 
 export const enemyAiRules = {
   engagement: {
-    maxAttackers: 2,
+    maxAttackers: 3,
     flankPositions: ["front", "back"] as const,
   },
   distanceLogic: {
-    far: 120,
-    close: 40,
+    far: 132,
+    close: 52,
   },
   behaviorSwitch: {
     far: "approach",
@@ -80,10 +80,10 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     hp: 60,
     damage: 8,
     behavior: {
-      aggroRange: 120,
-      attackRange: 20,
+      aggroRange: 150,
+      attackRange: 28,
       pattern: "rush",
-      cooldownMs: 1200,
+      cooldownMs: 880,
     },
     attacks: [
       createAttack({
@@ -106,10 +106,10 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     hp: 90,
     damage: 10,
     behavior: {
-      aggroRange: 60,
-      attackRange: 15,
+      aggroRange: 92,
+      attackRange: 24,
       pattern: "idle_block",
-      cooldownMs: 2000,
+      cooldownMs: 1400,
     },
     attacks: [
       createAttack({ name: "headbutt", damage: 10, knockback: 15 }),
@@ -134,10 +134,10 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     hp: 120,
     damage: 12,
     behavior: {
-      aggroRange: 100,
-      attackRange: 25,
+      aggroRange: 126,
+      attackRange: 34,
       pattern: "tank_push",
-      cooldownMs: 1500,
+      cooldownMs: 1100,
     },
     attacks: [
       createAttack({
@@ -161,10 +161,10 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     hp: 80,
     damage: 10,
     behavior: {
-      aggroRange: 150,
-      attackRange: 80,
+      aggroRange: 182,
+      attackRange: 94,
       pattern: "hybrid",
-      cooldownMs: 1000,
+      cooldownMs: 760,
     },
     attacks: [
       createAttack({
@@ -195,10 +195,10 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     hp: 100,
     damage: 14,
     behavior: {
-      aggroRange: 100,
-      attackRange: 40,
+      aggroRange: 128,
+      attackRange: 52,
       pattern: "zone_control",
-      cooldownMs: 2000,
+      cooldownMs: 1250,
     },
     attacks: [
       createAttack({
@@ -214,7 +214,7 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
         name: "drop_trap",
         damage: 6,
         aoe: true,
-        radius: 48,
+        radius: 58,
         durationMs: 5,
         startup: 0.35,
         active: 0.35,
@@ -232,10 +232,10 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     hp: 70,
     damage: 9,
     behavior: {
-      aggroRange: 140,
-      attackRange: 20,
+      aggroRange: 168,
+      attackRange: 26,
       pattern: "erratic",
-      cooldownMs: 800,
+      cooldownMs: 560,
     },
     attacks: [
       createAttack({
@@ -270,10 +270,10 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     hp: 200,
     damage: 18,
     behavior: {
-      aggroRange: 150,
-      attackRange: 30,
+      aggroRange: 184,
+      attackRange: 42,
       pattern: "chaotic",
-      cooldownMs: 1000,
+      cooldownMs: 720,
     },
     attacks: [
       createAttack({
@@ -315,10 +315,10 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     hp: 500,
     damage: 20,
     behavior: {
-      aggroRange: 200,
-      attackRange: 60,
+      aggroRange: 240,
+      attackRange: 76,
       pattern: "multi_phase",
-      cooldownMs: 800,
+      cooldownMs: 520,
     },
     attacks: [
       createAttack({

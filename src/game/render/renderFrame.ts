@@ -1,6 +1,7 @@
 import type { GameSnapshot } from "@/game/types/gameTypes";
 
 import { drawEnemyCharacter, drawPlayerCharacter } from "./characterRenderer";
+import type { SceneArtCache } from "./loadSceneArt";
 import type { SpriteCache } from "./spriteManifest";
 import {
   getAnimatedSpriteFrame,
@@ -14,6 +15,29 @@ const LANE_DEPTH_SCALE = 0.8;
 
 function toScreenDepth(worldY: number) {
   return LANE_TOP_Y + worldY * LANE_DEPTH_SCALE;
+}
+
+function getEnemySpriteMetrics(enemy: GameSnapshot["enemies"][number]) {
+  switch (enemy.kind) {
+    case "durmiente":
+      return { offsetX: -24, offsetY: -66, width: 144, height: 204 };
+    case "mochilero":
+      return { offsetX: -30, offsetY: -74, width: 154, height: 216 };
+    case "vendedor_competencia":
+      return { offsetX: -20, offsetY: -68, width: 136, height: 192 };
+    case "senora_bolsos":
+      return { offsetX: -28, offsetY: -72, width: 150, height: 214 };
+    case "fisura":
+      return { offsetX: -18, offsetY: -64, width: 130, height: 188 };
+    case "borracho":
+      return { offsetX: -34, offsetY: -84, width: 182, height: 244 };
+    case "boss_fisura_bici":
+      return { offsetX: -48, offsetY: -102, width: 228, height: 292 };
+    default:
+      return enemy.isBoss
+        ? { offsetX: -34, offsetY: -86, width: 176, height: 238 }
+        : { offsetX: -22, offsetY: -68, width: 138, height: 196 };
+  }
 }
 
 function drawSprite(
@@ -76,10 +100,55 @@ function createGradientOrFallback(
   } as unknown as CanvasGradient;
 }
 
+function drawCombatBarrier(
+  context: CanvasRenderingContext2D,
+  x: number,
+  canvasHeight: number,
+  side: "left" | "right",
+) {
+  const barrierWidth = 28;
+  const bodyX = side === "left" ? x - barrierWidth : x;
+  const frameTop = 108;
+  const frameHeight = canvasHeight - 210;
+
+  const metalBody = createGradientOrFallback(
+    context,
+    "linear",
+    [bodyX, frameTop, bodyX + barrierWidth, frameTop],
+    "#5a4f4a",
+  );
+  metalBody.addColorStop(0, "#463a36");
+  metalBody.addColorStop(0.52, "#7f6d62");
+  metalBody.addColorStop(1, "#2e2826");
+  context.fillStyle = metalBody;
+  context.fillRect(bodyX, frameTop, barrierWidth, frameHeight);
+
+  context.fillStyle = "rgba(255, 239, 210, 0.18)";
+  context.fillRect(bodyX + (side === "left" ? 4 : 8), frameTop + 10, 4, frameHeight - 20);
+
+  context.fillStyle = "rgba(37, 31, 28, 0.38)";
+  context.fillRect(bodyX + (side === "left" ? barrierWidth - 6 : 0), frameTop, 6, frameHeight);
+
+  context.fillStyle = "#5d4a2d";
+  context.beginPath();
+  context.roundRect(bodyX + 6, canvasHeight - 178, barrierWidth - 12, 42, 10);
+  context.fill();
+
+  context.strokeStyle = "rgba(255, 244, 214, 0.12)";
+  context.lineWidth = 2;
+  context.beginPath();
+  context.moveTo(bodyX, 152);
+  context.lineTo(bodyX + barrierWidth, 152);
+  context.moveTo(bodyX, canvasHeight - 136);
+  context.lineTo(bodyX + barrierWidth, canvasHeight - 136);
+  context.stroke();
+}
+
 export function renderFrame(
   context: CanvasRenderingContext2D,
   snapshot: GameSnapshot,
   sprites: SpriteCache = {},
+  sceneArt: SceneArtCache = { background: null, items: {} },
 ) {
   const { canvas } = context;
   const timeMs = snapshot.hud.elapsedMs;
@@ -123,82 +192,86 @@ export function renderFrame(
   context.fillStyle = "#262a31";
   context.fillRect(0, canvas.height - 88, canvas.width, 88);
 
-  const carriage = createGradientOrFallback(
-    context,
-    "linear",
-    [0, 96, 0, canvas.height - 110],
-    "#b58f69",
-  );
-  carriage.addColorStop(0, "#d7b38a");
-  carriage.addColorStop(0.56, "#b58f69");
-  carriage.addColorStop(1, "#8a6d55");
-  context.fillStyle = carriage;
-  context.fillRect(44, 90, canvas.width - 88, canvas.height - 192);
+  if (sceneArt.background) {
+    context.drawImage(sceneArt.background, 44, 90, canvas.width - 88, canvas.height - 192);
+  } else {
+    const carriage = createGradientOrFallback(
+      context,
+      "linear",
+      [0, 96, 0, canvas.height - 110],
+      "#b58f69",
+    );
+    carriage.addColorStop(0, "#d7b38a");
+    carriage.addColorStop(0.56, "#b58f69");
+    carriage.addColorStop(1, "#8a6d55");
+    context.fillStyle = carriage;
+    context.fillRect(44, 90, canvas.width - 88, canvas.height - 192);
 
-  context.fillStyle = "#515b66";
-  context.fillRect(82, 118, canvas.width - 164, 46);
+    context.fillStyle = "#515b66";
+    context.fillRect(82, 118, canvas.width - 164, 46);
 
-  context.strokeStyle = "rgba(255, 244, 214, 0.18)";
-  context.lineWidth = 2;
-  context.beginPath();
-  context.moveTo(92, 118);
-  context.lineTo(canvas.width - 92, 118);
-  context.stroke();
-  context.beginPath();
-  context.moveTo(92, 164);
-  context.lineTo(canvas.width - 92, 164);
-  context.stroke();
-
-  context.fillStyle = "rgba(255, 236, 190, 0.32)";
-  for (let index = 0; index < 5; index += 1) {
-    const windowX = 120 + index * 220;
+    context.strokeStyle = "rgba(255, 244, 214, 0.18)";
+    context.lineWidth = 2;
     context.beginPath();
-    context.roundRect(windowX, 148, 148, 88, 18);
-    context.fill();
+    context.moveTo(92, 118);
+    context.lineTo(canvas.width - 92, 118);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(92, 164);
+    context.lineTo(canvas.width - 92, 164);
+    context.stroke();
 
-    const sceneryOffset = (snapshot.camera.x * 0.14 + index * 56) % 180;
-    context.fillStyle = "rgba(84, 120, 130, 0.2)";
-    context.fillRect(windowX + 18 - sceneryOffset, 164, 76, 42);
-    context.fillRect(windowX + 122 - sceneryOffset, 172, 52, 28);
     context.fillStyle = "rgba(255, 236, 190, 0.32)";
-  }
+    for (let index = 0; index < 5; index += 1) {
+      const windowX = 120 + index * 220;
+      context.beginPath();
+      context.roundRect(windowX, 148, 148, 88, 18);
+      context.fill();
 
-  context.fillStyle = "rgba(49, 41, 34, 0.22)";
-  for (let index = 0; index < 6; index += 1) {
-    context.fillRect(104 + index * 186, 120, 10, canvas.height - 206);
-  }
+      const sceneryOffset = (snapshot.camera.x * 0.14 + index * 56) % 180;
+      context.fillStyle = "rgba(84, 120, 130, 0.2)";
+      context.fillRect(windowX + 18 - sceneryOffset, 164, 76, 42);
+      context.fillRect(windowX + 122 - sceneryOffset, 172, 52, 28);
+      context.fillStyle = "rgba(255, 236, 190, 0.32)";
+    }
 
-  context.fillStyle = "#7c4f2a";
-  for (let index = 0; index < 4; index += 1) {
-    const benchX = 138 + index * 255;
+    context.fillStyle = "rgba(49, 41, 34, 0.22)";
+    for (let index = 0; index < 6; index += 1) {
+      context.fillRect(104 + index * 186, 120, 10, canvas.height - 206);
+    }
+
+    context.fillStyle = "#7c4f2a";
+    for (let index = 0; index < 4; index += 1) {
+      const benchX = 138 + index * 255;
+      context.beginPath();
+      context.roundRect(benchX, canvas.height - 170, 168, 38, 12);
+      context.fill();
+    }
+
+    context.strokeStyle = "rgba(53, 58, 64, 0.55)";
+    context.lineWidth = 4;
+    for (let index = 0; index < 6; index += 1) {
+      const handleX = 152 + index * 180;
+      context.beginPath();
+      context.moveTo(handleX, 72);
+      context.lineTo(handleX, 134);
+      context.stroke();
+      context.beginPath();
+      context.ellipse(handleX, 146, 14, 10, 0, 0, Math.PI * 2);
+      context.stroke();
+    }
+
+    context.strokeStyle = "rgba(255, 255, 255, 0.12)";
+    context.lineWidth = 1;
     context.beginPath();
-    context.roundRect(benchX, canvas.height - 170, 168, 38, 12);
-    context.fill();
-  }
-
-  context.strokeStyle = "rgba(53, 58, 64, 0.55)";
-  context.lineWidth = 4;
-  for (let index = 0; index < 6; index += 1) {
-    const handleX = 152 + index * 180;
-    context.beginPath();
-    context.moveTo(handleX, 72);
-    context.lineTo(handleX, 134);
+    context.moveTo(86, canvas.height - 114);
+    context.lineTo(canvas.width - 86, canvas.height - 114);
     context.stroke();
     context.beginPath();
-    context.ellipse(handleX, 146, 14, 10, 0, 0, Math.PI * 2);
+    context.moveTo(canvas.width * 0.5, 116);
+    context.lineTo(canvas.width * 0.5, canvas.height - 118);
     context.stroke();
   }
-
-  context.strokeStyle = "rgba(255, 255, 255, 0.12)";
-  context.lineWidth = 1;
-  context.beginPath();
-  context.moveTo(86, canvas.height - 114);
-  context.lineTo(canvas.width - 86, canvas.height - 114);
-  context.stroke();
-  context.beginPath();
-  context.moveTo(canvas.width * 0.5, 116);
-  context.lineTo(canvas.width * 0.5, canvas.height - 118);
-  context.stroke();
 
   for (const item of snapshot.items) {
     if (item.collected) {
@@ -254,7 +327,18 @@ export function renderFrame(
       context.stroke();
     }
 
-    if (item.kind === "mate_listo") {
+    const itemSprite = sceneArt.items[item.kind];
+
+    if (itemSprite) {
+      const spriteSize = item.kind === "paraguas_fierro" ? 56 : 48;
+      context.drawImage(
+        itemSprite,
+        itemCenterX - spriteSize / 2,
+        itemY - 2 + bob,
+        spriteSize,
+        spriteSize,
+      );
+    } else if (item.kind === "mate_listo") {
       context.fillStyle = "#6d8b46";
       context.beginPath();
       context.roundRect(itemX + 8, itemY + 6 + bob, 24, 30, 10);
@@ -295,8 +379,10 @@ export function renderFrame(
   const gateEnd = gateEndSource - snapshot.camera.x;
 
   if (snapshot.scene.gateClosed && gateEnd > gateStart) {
-    context.fillStyle = "rgba(122, 30, 16, 0.55)";
+    context.fillStyle = "rgba(32, 22, 18, 0.12)";
     context.fillRect(gateStart, 108, gateEnd - gateStart, canvas.height - 210);
+    drawCombatBarrier(context, gateStart, canvas.height, "left");
+    drawCombatBarrier(context, gateEnd, canvas.height, "right");
   }
 
   const floorY = canvas.height - 112;
@@ -326,13 +412,14 @@ export function renderFrame(
     context.fill();
 
     const enemySpriteState = resolveEnemySpriteState(enemy);
+    const enemyMetrics = getEnemySpriteMetrics(enemy);
     const enemyTransform = getSpriteTransform(
       enemySpriteState,
       timeMs + enemy.x,
-      enemyVisibleX - (enemy.isBoss ? 24 : 18),
-      enemyVisibleY - (enemy.isBoss ? 70 : 58),
-      enemy.isBoss ? 160 : 124,
-      enemy.isBoss ? 214 : 178,
+      enemyVisibleX + enemyMetrics.offsetX,
+      enemyVisibleY + enemyMetrics.offsetY,
+      enemyMetrics.width,
+      enemyMetrics.height,
     );
 
     const drewEnemySprite = drawSprite(
@@ -351,20 +438,6 @@ export function renderFrame(
       drawEnemyCharacter(context, enemy, enemyVisibleX, enemyVisibleY - 12, timeMs);
     }
 
-    if (enemy.hurtCooldownMs > 0) {
-      context.fillStyle = "rgba(255, 235, 145, 0.4)";
-      context.beginPath();
-      context.ellipse(
-        enemyVisibleX + enemy.width / 2,
-        enemyVisibleY + 26,
-        enemy.width * 0.8,
-        enemy.isBoss ? 78 : 62,
-        0,
-        0,
-        Math.PI * 2,
-      );
-      context.fill();
-    }
   }
 
   for (const projectile of snapshot.projectiles) {
@@ -426,49 +499,6 @@ export function renderFrame(
       visibleY - snapshot.player.z - 12,
       timeMs,
     );
-  }
-
-  if (snapshot.player.hurtCooldownMs > 0) {
-    context.fillStyle = "rgba(255, 152, 94, 0.28)";
-    context.beginPath();
-    context.ellipse(
-      visibleX + snapshot.player.width / 2,
-      visibleY + 18,
-      snapshot.player.width * 0.9,
-      68,
-      0,
-      0,
-      Math.PI * 2,
-    );
-    context.fill();
-  }
-
-  if (snapshot.player.attack.activeMs > 0) {
-    context.fillStyle = "rgba(255, 203, 94, 0.55)";
-    const attackRectWidth = snapshot.player.attack.hitbox.width;
-    const attackRectHeight = snapshot.player.attack.hitbox.height;
-    const attackOffset =
-      snapshot.player.facing === "right"
-        ? snapshot.player.width / 2 + snapshot.player.attack.hitbox.offsetX
-        : snapshot.player.width / 2 - snapshot.player.attack.hitbox.offsetX - attackRectWidth;
-    context.fillRect(
-      visibleX + attackOffset,
-      visibleY - snapshot.player.z + snapshot.player.attack.hitbox.offsetY + 6,
-      attackRectWidth,
-      attackRectHeight,
-    );
-    context.fillStyle = "rgba(255, 243, 181, 0.72)";
-    context.beginPath();
-    context.ellipse(
-      visibleX + attackOffset + attackRectWidth / 2,
-      visibleY + 30,
-      attackRectWidth * 0.36,
-      24,
-      0,
-      0,
-      Math.PI * 2,
-    );
-    context.fill();
   }
 
   const lightBand = createGradientOrFallback(

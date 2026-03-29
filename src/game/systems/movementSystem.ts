@@ -1,6 +1,8 @@
 import { clamp } from "@/lib/utils/clamp";
 import type { GameState } from "@/game/types/gameTypes";
 
+import { clampXToArena, clampYToArena } from "./arenaBounds";
+
 const MIN_DT_MS = 0;
 const MAX_DT_MS = 33;
 
@@ -60,15 +62,6 @@ export function updateMovement(state: GameState, dtMs: number) {
     }
   }
 
-  const rightLimit = state.scene.gateClosed && state.scene.gateRightX !== null
-    ? state.scene.gateRightX - state.player.width
-    : state.levelBounds.width - state.player.width;
-
-  state.player.x = clamp(state.player.x, 0, rightLimit);
-
-  state.player.y = clamp(
-    state.player.y,
-    0,
-    state.levelBounds.depth - state.player.depth,
-  );
+  state.player.x = clampXToArena(state, state.player.x, state.player.width);
+  state.player.y = clampYToArena(state, state.player.y, state.player.depth);
 }

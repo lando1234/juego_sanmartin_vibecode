@@ -42,18 +42,38 @@ function applyPickupEffect(state: GameState, item: ItemState) {
     case "mate_listo":
       state.player.speedBoostMs = EFFECT_DURATION_MS;
       state.hud.pickupMessage = "Mate listo: Ricky acelera el paso.";
+      state.hud.activePickup = {
+        name: "Mate listo",
+        effect: "Acelera el paso.",
+        remainingMs: EFFECT_DURATION_MS,
+      };
       break;
     case "tortita_negra":
       state.player.hp = Math.min(state.player.maxHp, state.player.hp + 24);
       state.hud.pickupMessage = "Tortita negra: recuperaste algo de aire.";
+      state.hud.activePickup = {
+        name: "Tortita negra",
+        effect: "Recupera vida al instante.",
+        remainingMs: null,
+      };
       break;
     case "sube_cargada":
       state.player.attackBoostMs = EFFECT_DURATION_MS;
       state.hud.pickupMessage = "SUBE cargada: los golpes pegan más fuerte.";
+      state.hud.activePickup = {
+        name: "SUBE cargada",
+        effect: "Aumenta el dano de golpe.",
+        remainingMs: EFFECT_DURATION_MS,
+      };
       break;
     case "paraguas_fierro":
       state.player.shieldMs = EFFECT_DURATION_MS;
       state.hud.pickupMessage = "Paraguas de fierro: aguantás mejor los choques.";
+      state.hud.activePickup = {
+        name: "Paraguas de fierro",
+        effect: "Reduce el dano recibido.",
+        remainingMs: EFFECT_DURATION_MS,
+      };
       break;
   }
 }
@@ -62,6 +82,20 @@ export function updateItems(state: GameState, dtMs: number) {
   state.player.speedBoostMs = Math.max(0, state.player.speedBoostMs - dtMs);
   state.player.attackBoostMs = Math.max(0, state.player.attackBoostMs - dtMs);
   state.player.shieldMs = Math.max(0, state.player.shieldMs - dtMs);
+
+  const activePickup = state.hud.activePickup;
+
+  if (activePickup && activePickup.remainingMs !== null) {
+    const nextRemainingMs = Math.max(0, activePickup.remainingMs - dtMs);
+    state.hud.activePickup = {
+      ...activePickup,
+      remainingMs: nextRemainingMs,
+    };
+
+    if (nextRemainingMs === 0) {
+      state.hud.activePickup = null;
+    }
+  }
 
   if (state.phase !== "playing") {
     return;

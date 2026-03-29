@@ -10,20 +10,21 @@ La meta no es fotorealismo puro. La meta es:
 
 - lectura excelente dentro del juego;
 - tono costumbrista del tren San Martin;
-- anatomia humana creible;
-- ropa, volumen y luz mas realistas que los SVG actuales;
+- anatomia humana simple y legible;
+- personajes en la misma familia visual del fondo del tren y los items;
 - consistencia entre protagonista, enemigos y bosses.
 
 ## Norte estetico
 
 Estilo recomendado:
 
-- `semi-realista ilustrado`;
-- pintura digital limpia;
-- volumen anatomico claro;
-- contornos suaves o casi ausentes;
-- ropa y materiales con pliegues simples;
-- expresion corporal fuerte.
+- `caricatura urbana pintada`;
+- ilustracion plana con volumen suave;
+- formas simples, redondeadas y claras;
+- pocos detalles internos;
+- sombras amplias y limpias;
+- expresion corporal fuerte;
+- acabado parecido al fondo del vagon y a los pickups, no a concept art renderizado.
 
 Lo que queremos transmitir:
 
@@ -39,6 +40,9 @@ Lo que queremos transmitir:
 - chibi;
 - pixel art;
 - caricatura extrema;
+- render hiper detallado;
+- pinceladas realistas;
+- texturas complejas de tela o piel;
 - fondos complejos metidos en el sprite;
 - props irrelevantes que rompan la silueta;
 - poses demasiado suaves que no lean a escala chica.
@@ -55,7 +59,20 @@ Todos los personajes deben compartir:
 - mismo nivel de detalle;
 - misma familia de color:
   ocres, azules gastados, grises metalicos, marrones, naranjas de acento;
+- sombras simples en bloques grandes;
+- borde limpio contra el fondo, sin halo realista ni humo de recorte;
 - fondo transparente o neutro facilmente recortable.
+
+## Regla clave de compatibilidad con el juego
+
+Los personajes tienen que sentirse dibujados para este mundo:
+
+- mismo lenguaje de formas que el interior del vagon;
+- mismo nivel de simplificacion que mate, tortita, SUBE y paraguas;
+- materiales sugeridos, no renderizados;
+- cara y manos un poco exageradas para que lean a escala chica;
+- menos detalle que una ilustracion de portada;
+- mas claridad que un concept art.
 
 ## Reglas de produccion
 
@@ -102,7 +119,7 @@ Formato:
 Resolucion de trabajo:
 
 - `1024x1024` para concepts
-- `768x1024` para sprites verticales
+- `768x1024` o `1024x1536` para sprites verticales
 
 Encuadre:
 
@@ -110,6 +127,24 @@ Encuadre:
 - pies visibles;
 - margen superior suficiente para cabeza y accesorios;
 - no cortar manos ni pies.
+
+## Paleta y acabado
+
+La paleta tiene que conversar con el juego ya existente:
+
+- azules gastados;
+- marrones de asiento;
+- cremas y ocres del vagon;
+- grises metalicos suaves;
+- acentos naranjas o rojos solo cuando el personaje lo necesita.
+
+Acabado recomendado:
+
+- cel shading suave;
+- una sombra principal;
+- una luz principal;
+- casi nada de textura fina;
+- pliegues grandes y pocos.
 
 ## Ficha visual por personaje
 

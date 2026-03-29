@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { VIEWPORT_HEIGHT, VIEWPORT_WIDTH } from "@/game/data/campaignLevels";
 import { loadCharacterSprites, getLoadedCharacterSprites } from "@/game/render/loadCharacterSprites";
+import { getLoadedSceneArt, loadSceneArt } from "@/game/render/loadSceneArt";
 import { renderFrame } from "@/game/render/renderFrame";
 import type { GameSnapshot } from "@/game/types/gameTypes";
 
@@ -19,7 +20,7 @@ export function GameCanvas({ snapshot, className }: GameCanvasProps) {
   useEffect(() => {
     let cancelled = false;
 
-    loadCharacterSprites()
+    Promise.all([loadCharacterSprites(), loadSceneArt()])
       .then(() => {
         if (!cancelled) {
           setSpritesReady(true);
@@ -49,7 +50,12 @@ export function GameCanvas({ snapshot, className }: GameCanvasProps) {
       return;
     }
 
-    renderFrame(context, snapshot, getLoadedCharacterSprites());
+    renderFrame(
+      context,
+      snapshot,
+      getLoadedCharacterSprites(),
+      getLoadedSceneArt(),
+    );
   }, [snapshot, spritesReady]);
 
   return (

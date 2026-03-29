@@ -585,6 +585,7 @@ function createLevel(index: number, config: StationConfig): CampaignLevel {
   const difficulty = index + 1;
   const shiftX = index * 18;
   const width = 2520 + shiftX;
+  const standardArenaWidth = 580;
   const wave1Count = 3 + Math.floor(index / 3);
   const wave2Count = 3 + Math.floor(index / 2);
   const wave1Spawns = createWave(index, wave1Count, 970 + shiftX);
@@ -603,11 +604,11 @@ function createLevel(index: number, config: StationConfig): CampaignLevel {
     wave2TriggerX: 1500 + shiftX,
     gate2StartX: 1560 + shiftX,
     gate2EndX: 2140 + shiftX,
-    bossTriggerX: 2200 + shiftX,
-    bossGateStartX: 2240 + shiftX,
-    bossGateEndX: 2400 + shiftX,
-    exitTriggerX: 2300 + shiftX,
-    exitX: 2430 + shiftX,
+    bossTriggerX: 2120 + shiftX,
+    bossGateStartX: 2470 + shiftX - standardArenaWidth,
+    bossGateEndX: 2470 + shiftX,
+    exitTriggerX: 2350 + shiftX,
+    exitX: 2440 + shiftX,
     wave1Spawns,
     wave2Spawns,
     bossSpawn,
@@ -733,6 +734,7 @@ export function applyLevelToState(
   state.hud.completionTitle = null;
   state.hud.completionSummary = null;
   state.hud.pickupMessage = null;
+  state.hud.activePickup = null;
   if (!preserveElapsedRun) {
     state.hud.elapsedMs = 0;
   }

@@ -105,6 +105,7 @@ export function createInitialGameState(): GameState {
       completionTitle: null,
       completionSummary: null,
       pickupMessage: null,
+      activePickup: null,
     },
   };
 

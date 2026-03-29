@@ -217,6 +217,11 @@ export type HudState = {
   completionTitle: string | null;
   completionSummary: string | null;
   pickupMessage: string | null;
+  activePickup: {
+    name: string;
+    effect: string;
+    remainingMs: number | null;
+  } | null;
 };
 
 export type ItemState = {

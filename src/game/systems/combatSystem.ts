@@ -7,6 +7,8 @@ import type {
   ProjectileState,
 } from "@/game/types/gameTypes";
 
+import { clampXToArena, clampYToArena } from "./arenaBounds";
+
 type Rect = {
   x: number;
   y: number;
@@ -52,6 +54,7 @@ function getAttackRect(
 }
 
 function applyDamageToEnemy(
+  state: GameState,
   playerX: number,
   enemy: EnemyState,
   damage: number,
@@ -60,6 +63,8 @@ function applyDamageToEnemy(
   enemy.hurtCooldownMs = 220;
   enemy.state = enemy.hp === 0 ? "defeated" : "hurt";
   enemy.x += playerX < enemy.x ? 24 : -24;
+  enemy.x = clampXToArena(state, enemy.x, enemy.width);
+  enemy.y = clampYToArena(state, enemy.y, enemy.depth);
 }
 
 function applyDamageToPlayer(state: GameState, damage: number, knockback = 0, sourceFacing: Facing) {
@@ -72,6 +77,8 @@ function applyDamageToPlayer(state: GameState, damage: number, knockback = 0, so
   state.player.hp = Math.max(0, state.player.hp - incomingDamage);
   state.player.hurtCooldownMs = 380;
   state.player.x += sourceFacing === "right" ? knockback : -knockback;
+  state.player.x = clampXToArena(state, state.player.x, state.player.width);
+  state.player.y = clampYToArena(state, state.player.y, state.player.depth);
 
   if (state.player.hp === 0) {
     state.phase = "game_over";
@@ -195,7 +202,9 @@ function updateEnemyAttack(state: GameState, enemy: EnemyState, dtMs: number) {
   }
 
   if (attack.timerMs === 0) {
-    enemy.attackCooldownMs = enemy.attackIntervalMs;
+    const aggression = enemy.modifiers.aggression ?? 1;
+    const cooldownMultiplier = aggression >= 1 ? Math.max(0.58, 1 - (aggression - 1) * 0.18) : 1;
+    enemy.attackCooldownMs = Math.round(enemy.attackIntervalMs * cooldownMultiplier);
     enemy.activeAttack = null;
     enemy.state = "recover";
   }
@@ -288,7 +297,7 @@ export function updateCombat(state: GameState, dtMs: number) {
       const enemyRect = getBodyRect(enemy.x, enemy.y, enemy.width, enemy.depth);
 
       if (intersects(playerAttackRect, enemyRect)) {
-        applyDamageToEnemy(state.player.x, enemy, attackDamage);
+        applyDamageToEnemy(state, state.player.x, enemy, attackDamage);
         state.player.attack.struckEnemyIds.push(enemy.id);
       }
     }

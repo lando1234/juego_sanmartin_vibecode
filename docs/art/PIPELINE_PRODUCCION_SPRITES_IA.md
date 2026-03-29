@@ -6,6 +6,17 @@ Fecha: 2026-03-27
 
 Pasar de ideas de personaje a sprites listos para integrar en el juego sin perder consistencia.
 
+## Regla nueva de estilo
+
+Antes de generar cualquier frame, asumir esto:
+
+- los personajes deben verse hechos para este juego;
+- no para un concept art aparte;
+- misma familia visual que el fondo del tren;
+- misma simplicidad y acabado que los items;
+- menos render;
+- mas lectura inmediata.
+
 ## Flujo recomendado
 
 ### Paso 1: elegir tres personajes piloto
@@ -93,6 +104,13 @@ Si un frame esta cerca pero no perfecto:
 - editar o regenerar solo ese frame;
 - no reiniciar toda la hoja.
 
+Si un frame se siente de otro juego:
+
+- regenerar con menos textura;
+- regenerar con sombras mas grandes;
+- regenerar con menos detalle de cara, ropa y materiales;
+- pedir explicitamente `flat painted game art` y `same visual family as the train interior and pickup items`.
+
 ## Paso 6: normalizacion tecnica
 
 Antes de integrar al juego:
@@ -135,6 +153,13 @@ Ajustes tipicos:
 - reforzar accesorio principal;
 - reducir detalle fino;
 - aclarar sombras.
+
+Y ahora sumar:
+
+- bajar realismo de materiales;
+- sacar textura innecesaria;
+- convertir pliegues chicos en masas grandes;
+- hacer que el sprite lea como parte del escenario pintado.
 
 ## Checklist de aprobacion
 

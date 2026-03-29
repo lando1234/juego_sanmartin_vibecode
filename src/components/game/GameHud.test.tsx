@@ -24,6 +24,11 @@ describe("GameHud", () => {
     snapshot.player.speedBoostMs = 4000;
     snapshot.player.attackBoostMs = 3000;
     snapshot.hud.pickupMessage = "Mate listo: Ricky acelera el paso.";
+    snapshot.hud.activePickup = {
+      name: "Mate listo",
+      effect: "Acelera el paso.",
+      remainingMs: 4000,
+    };
 
     render(<GameHud snapshot={snapshot} />);
 

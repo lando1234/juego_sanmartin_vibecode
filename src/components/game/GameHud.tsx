@@ -30,7 +30,6 @@ export function GameHud({ snapshot, variant = "panel" }: GameHudProps) {
       : snapshot.scene.type === "boss_intro"
         ? "Antesala del capo"
         : "Pasillo central";
-
   if (variant === "overlay") {
     return (
       <div className="grid gap-2 rounded-[24px] border border-white/12 bg-[linear-gradient(180deg,rgba(35,25,20,0.86),rgba(16,12,10,0.88))] p-3 text-[#f7ead4] shadow-[0_18px_60px_rgba(20,15,12,0.35)] backdrop-blur-xl">

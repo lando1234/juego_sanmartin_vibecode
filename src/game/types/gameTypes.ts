@@ -82,6 +82,8 @@ export type HudState = {
   hints: string[];
   enemyCount: number;
   objective: string;
+  completionTitle: string | null;
+  completionSummary: string | null;
 };
 
 export type EnemyState = {
@@ -140,6 +142,8 @@ export type LevelLayout = {
 
 export type GameState = {
   phase: GamePhase;
+  currentLevelIndex: number;
+  totalLevels: number;
   scene: SceneState;
   player: PlayerState;
   enemies: EnemyState[];
@@ -158,6 +162,7 @@ export type GameSnapshot = Readonly<GameState>;
 export type GameCommand =
   | { type: "start" }
   | { type: "pause-toggle" }
+  | { type: "next-level" }
   | { type: "reset" }
   | { type: "input"; payload: Partial<InputState> }
   | { type: "debug-set-player-position"; payload: { x: number; y?: number } }

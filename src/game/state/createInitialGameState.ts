@@ -1,9 +1,10 @@
 import {
-  levelCofradiaPasillo,
-  levelLayoutCofradiaPasillo,
+  applyLevelToState,
+  campaignLevels,
+  getCampaignLevel,
   VIEWPORT_HEIGHT,
   VIEWPORT_WIDTH,
-} from "@/game/data/levelCofradiaPasillo";
+} from "@/game/data/campaignLevels";
 import { resetEnemySeed } from "@/game/entities/createEnemy";
 import type { GameState } from "@/game/types/gameTypes";
 
@@ -15,9 +16,12 @@ const baseHints = [
 
 export function createInitialGameState(): GameState {
   resetEnemySeed();
+  const firstLevel = getCampaignLevel(0);
 
-  return {
+  const state: GameState = {
     phase: "title",
+    currentLevelIndex: 0,
+    totalLevels: campaignLevels.length,
     scene: {
       type: "carriage_intro",
       gateClosed: false,
@@ -31,8 +35,8 @@ export function createInitialGameState(): GameState {
     player: {
       id: "ricky",
       name: "Ricky Ferreyra",
-      x: levelLayoutCofradiaPasillo.entryX,
-      y: 158,
+      x: firstLevel.layout.entryX,
+      y: firstLevel.entryY,
       z: 0,
       vx: 0,
       vy: 0,
@@ -71,17 +75,22 @@ export function createInitialGameState(): GameState {
       attack: false,
       pause: false,
     },
-    levelBounds: levelCofradiaPasillo,
-    levelLayout: levelLayoutCofradiaPasillo,
+    levelBounds: firstLevel.bounds,
+    levelLayout: firstLevel.layout,
     lastDtMs: 0,
     startedAtMs: null,
     updatedAtMs: null,
     hud: {
-      levelName: "La Cofradia del Pasillo",
+      levelName: firstLevel.name,
       elapsedMs: 0,
       hints: baseHints,
       enemyCount: 0,
-      objective: "Subite al vagon y abrí paso entre dos oleadas hasta el furgon.",
+      objective: firstLevel.openingObjective,
+      completionTitle: null,
+      completionSummary: null,
     },
   };
+
+  applyLevelToState(state, 0, false);
+  return state;
 }

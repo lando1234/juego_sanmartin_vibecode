@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { VIEWPORT_HEIGHT, VIEWPORT_WIDTH } from "@/game/data/levelCofradiaPasillo";
+import { VIEWPORT_HEIGHT, VIEWPORT_WIDTH } from "@/game/data/campaignLevels";
 import { loadCharacterSprites, getLoadedCharacterSprites } from "@/game/render/loadCharacterSprites";
 import { renderFrame } from "@/game/render/renderFrame";
 import type { GameSnapshot } from "@/game/types/gameTypes";

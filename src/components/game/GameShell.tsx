@@ -38,7 +38,7 @@ export function GameShell() {
     };
   }, []);
 
-  const sendCommand = (type: "start" | "pause-toggle" | "reset") => {
+  const sendCommand = (type: "start" | "pause-toggle" | "reset" | "next-level") => {
     engineRef.current?.sendCommand({ type });
   };
 
@@ -50,6 +50,7 @@ export function GameShell() {
             snapshot={snapshot}
             onStart={() => sendCommand("start")}
             onPauseToggle={() => sendCommand("pause-toggle")}
+            onNextLevel={() => sendCommand("next-level")}
             onReset={() => sendCommand("reset")}
           />
           <GameHud snapshot={snapshot} />
@@ -63,9 +64,9 @@ export function GameShell() {
               El viaje
             </p>
             <div className="grid gap-2 text-sm text-black/72">
-              <p>Moreno, hora pico, un vagón cargado de personajes pesados.</p>
+              <p>Moreno, hora pico, diez vagones con tensión creciente.</p>
               <p>Ricky avanza entre empujones, vendedores y bloqueos del pasillo.</p>
-              <p>Al fondo lo espera el Capo del Pasillo y la entrada al furgón.</p>
+              <p>Cada jefe abre el paso al siguiente tramo hasta llegar al furgón final.</p>
             </div>
           </section>
         </div>

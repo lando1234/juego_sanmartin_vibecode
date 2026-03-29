@@ -23,7 +23,9 @@ export function GameHud({ snapshot }: GameHudProps) {
       <div className="grid gap-3">
         <div className="flex items-center justify-between gap-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#f4c992]">
           <span>{snapshot.hud.levelName}</span>
-          <span>{stageLabel}</span>
+          <span>
+            Nivel {snapshot.currentLevelIndex + 1}/{snapshot.totalLevels} · {stageLabel}
+          </span>
         </div>
         <div className="grid gap-2 rounded-[22px] border border-white/10 bg-black/18 p-3">
           <div className="flex items-center justify-between gap-3 text-sm font-semibold">

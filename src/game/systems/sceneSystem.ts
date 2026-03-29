@@ -1,7 +1,10 @@
+import { getCampaignLevel } from "@/game/data/campaignLevels";
 import { createEnemy } from "@/game/entities/createEnemy";
 import type { GameState } from "@/game/types/gameTypes";
 
 export function updateScene(state: GameState) {
+  const currentLevel = getCampaignLevel(state.currentLevelIndex);
+
   if (state.phase !== "playing") {
     return;
   }
@@ -18,7 +21,7 @@ export function updateScene(state: GameState) {
     state.enemies = state.levelLayout.wave1Spawns.map((spawn) =>
       createEnemy(spawn.kind, spawn.x, spawn.y),
     );
-    state.hud.objective = "Limpiá el pasillo y abrí el paso al siguiente tramo.";
+    state.hud.objective = currentLevel.firstWaveObjective;
   }
 
   if (
@@ -28,8 +31,7 @@ export function updateScene(state: GameState) {
   ) {
     state.scene.gateClosed = false;
     state.scene.gateRightX = null;
-    state.hud.objective =
-      "Primera oleada limpia. Metete más adentro del vagon.";
+    state.hud.objective = currentLevel.firstWaveClearedObjective;
   }
 
   if (
@@ -45,7 +47,7 @@ export function updateScene(state: GameState) {
     state.enemies = state.levelLayout.wave2Spawns.map((spawn) =>
       createEnemy(spawn.kind, spawn.x, spawn.y),
     );
-    state.hud.objective = "La segunda manga se pudrió. Abrite paso al fondo.";
+    state.hud.objective = currentLevel.secondWaveObjective;
   }
 
   if (
@@ -56,7 +58,7 @@ export function updateScene(state: GameState) {
   ) {
     state.scene.gateClosed = false;
     state.scene.gateRightX = null;
-    state.hud.objective = "Se abrió el fondo del vagon. El Capo te está esperando.";
+    state.hud.objective = currentLevel.secondWaveClearedObjective;
   }
 
   if (
@@ -76,7 +78,7 @@ export function updateScene(state: GameState) {
         state.levelLayout.bossSpawn.y,
       ),
     ];
-    state.hud.objective = "Boss fight: tumbá al Capo del Pasillo.";
+    state.hud.objective = currentLevel.bossObjective;
   }
 
   if (
@@ -87,14 +89,14 @@ export function updateScene(state: GameState) {
     state.scene.gateClosed = false;
     state.scene.gateRightX = null;
     state.scene.victoryWalkTriggered = true;
-    state.hud.objective = "El Capo cayó. Caminá al furgon y cerrá el nivel.";
+    state.hud.objective = currentLevel.victoryObjective;
   }
 
   if (
     state.scene.victoryWalkTriggered &&
     state.player.x >= state.levelLayout.exitTriggerX
   ) {
-    state.hud.objective = "Saliste del cuello de botella. El vagon es tuyo.";
+    state.hud.objective = currentLevel.exitObjective;
   }
 
   if (
@@ -102,5 +104,7 @@ export function updateScene(state: GameState) {
     state.player.x >= state.levelLayout.exitX
   ) {
     state.phase = "victory";
+    state.hud.completionTitle = currentLevel.completionTitle;
+    state.hud.completionSummary = currentLevel.completionSummary;
   }
 }

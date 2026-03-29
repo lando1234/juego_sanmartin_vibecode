@@ -6,6 +6,7 @@ type GameOverlayProps = {
   snapshot: GameSnapshot;
   onStart: () => void;
   onPauseToggle: () => void;
+  onNextLevel: () => void;
   onReset: () => void;
 };
 
@@ -13,6 +14,7 @@ export function GameOverlay({
   snapshot,
   onStart,
   onPauseToggle,
+  onNextLevel,
   onReset,
 }: GameOverlayProps) {
   if (snapshot.phase === "title") {
@@ -46,7 +48,7 @@ export function GameOverlay({
             Reiniciar estado
           </button>
           <div className="text-sm text-[#f7ead4]/74">
-            Objetivo inicial: limpiar el pasillo, recuperar terreno y llegar al furgón.
+            Objetivo inicial: limpiar diez vagones, recuperar terreno y llegar al furgón.
           </div>
         </div>
       </div>
@@ -54,14 +56,50 @@ export function GameOverlay({
   }
 
   if (snapshot.phase === "victory") {
+    const currentLevelNumber = snapshot.currentLevelIndex + 1;
+    const isFinalLevel = currentLevelNumber >= snapshot.totalLevels;
+
+    if (!isFinalLevel) {
+      return (
+        <div className="grid gap-4 rounded-[32px] border border-white/20 bg-[linear-gradient(180deg,rgba(71,54,34,0.94),rgba(34,28,20,0.94))] p-6 text-[#f7ead4] shadow-[0_28px_90px_rgba(20,15,12,0.35)] backdrop-blur-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#f4c992]">
+            Vagón {currentLevelNumber} despejado
+          </p>
+          <h1 className="text-3xl font-black tracking-tight">
+            {snapshot.hud.completionTitle ?? "Ricky limpió el vagón."}
+          </h1>
+          <p className="text-[#f7ead4]/78">
+            {snapshot.hud.completionSummary ??
+              "El tren sigue cargado y todavía queda camino por delante."}
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={onNextLevel}
+              className="rounded-full bg-[linear-gradient(90deg,#e06a2c,#c44310)] px-5 py-3 font-semibold text-white transition hover:brightness-110"
+            >
+              Seguir al siguiente vagón
+            </button>
+            <button
+              type="button"
+              onClick={onReset}
+              className="rounded-full border border-white/18 px-5 py-3 font-semibold text-[#f7ead4] transition hover:bg-white/8"
+            >
+              Reiniciar campaña
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="grid gap-4 rounded-[32px] border border-white/20 bg-[linear-gradient(180deg,rgba(71,54,34,0.94),rgba(34,28,20,0.94))] p-6 text-[#f7ead4] shadow-[0_28px_90px_rgba(20,15,12,0.35)] backdrop-blur-sm">
         <h1 className="text-3xl font-black tracking-tight">
-          Ricky limpió las dos oleadas y bajó al Capo del Pasillo.
+          Ricky limpió los diez vagones y se quedó con el furgón final.
         </h1>
         <p className="text-[#f7ead4]/78">
-          El vagón quedó despejado. La mochila sigue en juego y el tren no
-          afloja.
+          El tren quedó despejado de punta a punta. La mochila sigue viva y el
+          recorrido también.
         </p>
         <div className="flex flex-wrap gap-3">
           <button

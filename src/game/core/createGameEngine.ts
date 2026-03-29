@@ -1,3 +1,4 @@
+import { applyLevelToState } from "@/game/data/campaignLevels";
 import { createInitialGameState } from "@/game/state/createInitialGameState";
 import { updateCombat } from "@/game/systems/combatSystem";
 import { updateCamera } from "@/game/systems/cameraSystem";
@@ -103,6 +104,22 @@ export function createGameEngine(options: EngineOptions = {}): GameEngine {
 
     state.phase = "playing";
     state.scene.type = "carriage_combat";
+    state.hud.completionTitle = null;
+    state.hud.completionSummary = null;
+  };
+
+  const advanceToNextLevel = () => {
+    const nextLevelIndex = state.currentLevelIndex + 1;
+
+    if (nextLevelIndex >= state.totalLevels) {
+      return;
+    }
+
+    applyLevelToState(state, nextLevelIndex);
+    state.phase = "playing";
+    state.scene.type = "carriage_combat";
+    state.hud.completionTitle = null;
+    state.hud.completionSummary = null;
   };
 
   const sendCommand = (command: GameCommand) => {
@@ -116,6 +133,12 @@ export function createGameEngine(options: EngineOptions = {}): GameEngine {
           startRun();
         } else {
           state.phase = state.phase === "paused" ? "playing" : "paused";
+        }
+        emit();
+        return;
+      case "next-level":
+        if (state.phase === "victory") {
+          advanceToNextLevel();
         }
         emit();
         return;

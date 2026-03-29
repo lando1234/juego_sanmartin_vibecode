@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { createGameEngine } from "@/game/core/createGameEngine";
+import { campaignLevels } from "@/game/data/campaignLevels";
 
 describe("createGameEngine", () => {
   it("boots with the expected initial snapshot", () => {
@@ -13,6 +14,8 @@ describe("createGameEngine", () => {
     expect(snapshot.camera.x).toBe(0);
     expect(snapshot.enemies).toHaveLength(0);
     expect(snapshot.scene.secondWaveTriggered).toBe(false);
+    expect(snapshot.totalLevels).toBe(campaignLevels.length);
+    expect(snapshot.currentLevelIndex).toBe(0);
   });
 
   it("starts only once and stops cleanly", () => {
@@ -45,5 +48,15 @@ describe("createGameEngine", () => {
     expect(engine.getSnapshot().phase).toBe("title");
     expect(engine.getSnapshot().player.x).toBe(180);
     expect(engine.getSnapshot().startedAtMs).toBeNull();
+  });
+
+  it("ignores next-level outside victory", () => {
+    const engine = createGameEngine({ now: () => 1000 });
+
+    engine.sendCommand({ type: "next-level" });
+
+    expect(engine.getSnapshot().phase).toBe("title");
+    expect(engine.getSnapshot().currentLevelIndex).toBe(0);
+    expect(engine.getSnapshot().hud.levelName).toBe(campaignLevels[0].name);
   });
 });

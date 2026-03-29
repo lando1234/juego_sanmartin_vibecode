@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { createGameEngine } from "@/game/core/createGameEngine";
+import { campaignLevels } from "@/game/data/campaignLevels";
 
 function runUntil(
   engine: ReturnType<typeof createGameEngine>,
@@ -59,5 +60,47 @@ describe("sceneSystem", () => {
     expect(engine.getSnapshot().scene.type).toBe("boss_combat");
     expect(engine.getSnapshot().enemies[0].kind).toBe("capo_pasillo");
     expect(engine.getSnapshot().enemies[0].isBoss).toBe(true);
+  });
+
+  it("completes a level and advances to the next one", () => {
+    const engine = createGameEngine({ now: () => 1000 });
+    engine.sendCommand({ type: "start" });
+    engine.sendCommand({
+      type: "debug-set-player-position",
+      payload: { x: engine.getSnapshot().levelLayout.wave1TriggerX + 8 },
+    });
+    runUntil(engine, () => engine.getSnapshot().scene.waveTriggered);
+
+    engine.sendCommand({ type: "debug-defeat-enemies" });
+    engine.step(16);
+    engine.sendCommand({
+      type: "debug-set-player-position",
+      payload: { x: engine.getSnapshot().levelLayout.wave2TriggerX + 8 },
+    });
+    runUntil(engine, () => engine.getSnapshot().scene.secondWaveTriggered);
+
+    engine.sendCommand({ type: "debug-defeat-enemies" });
+    engine.step(16);
+    engine.sendCommand({
+      type: "debug-set-player-position",
+      payload: { x: engine.getSnapshot().levelLayout.bossTriggerX + 8 },
+    });
+    runUntil(engine, () => engine.getSnapshot().scene.bossTriggered);
+
+    engine.sendCommand({ type: "debug-defeat-enemies" });
+    engine.step(16);
+    engine.sendCommand({
+      type: "debug-set-player-position",
+      payload: { x: engine.getSnapshot().levelLayout.exitX + 8 },
+    });
+    runUntil(engine, () => engine.getSnapshot().phase === "victory");
+
+    expect(engine.getSnapshot().hud.completionTitle).toBeTruthy();
+
+    engine.sendCommand({ type: "next-level" });
+
+    expect(engine.getSnapshot().phase).toBe("playing");
+    expect(engine.getSnapshot().currentLevelIndex).toBe(1);
+    expect(engine.getSnapshot().hud.levelName).toBe(campaignLevels[1].name);
   });
 });

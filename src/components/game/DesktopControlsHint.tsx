@@ -17,6 +17,7 @@ export function DesktopControlsHint({
     "Especial: K, gasta vida recuperable",
     "Agarrar / lanzar: L, y L otra vez para soltar",
     "Esquive: Shift para reposicionarte",
+    "Bloquear: I de frente al golpe",
     "Pausa: P",
   ];
 
@@ -26,8 +27,8 @@ export function DesktopControlsHint({
         <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#f4c992]">
           Controles
         </p>
-        <ul className="grid gap-1 text-xs text-[#f7ead4]/80">
-          {controlGuide.slice(0, 5).map((hint) => (
+        <ul className="grid gap-1 text-[11px] text-[#f7ead4]/80">
+          {controlGuide.map((hint) => (
             <li key={hint}>{hint}</li>
           ))}
         </ul>

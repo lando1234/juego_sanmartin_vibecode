@@ -110,7 +110,7 @@ export function MobileControls({
             className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-[#ff6842]/55 bg-[radial-gradient(circle_at_35%_30%,rgba(255,105,75,0.92),rgba(173,11,11,0.94))] text-lg font-black text-white shadow-[0_0_28px_rgba(255,61,28,0.34)] transition active:scale-[0.96]"
           />
         </div>
-      <div className="pointer-events-auto grid grid-cols-5 gap-3 pb-1">
+        <div className="pointer-events-auto grid grid-cols-6 gap-3 pb-1">
           <ControlButton
             ariaLabel="Esquivar"
             keyName="dash"
@@ -140,6 +140,13 @@ export function MobileControls({
             className="mb-4 flex h-[4.25rem] w-[4.25rem] items-center justify-center rounded-full border border-[#fff0cf]/28 bg-[radial-gradient(circle_at_30%_30%,rgba(255,210,145,0.95),rgba(171,95,20,0.9))] text-xl font-black text-white shadow-[0_0_30px_rgba(255,180,72,0.28)] transition active:scale-[0.96]"
           />
           <ControlButton
+            ariaLabel="Bloquear"
+            keyName="block"
+            label="G"
+            onInput={onInput}
+            className="mb-1 flex h-[4.15rem] w-[4.15rem] items-center justify-center rounded-full border border-[#cde2ff]/28 bg-[radial-gradient(circle_at_30%_30%,rgba(149,187,255,0.95),rgba(48,89,173,0.9))] text-xl font-black text-white shadow-[0_0_30px_rgba(81,143,255,0.28)] transition active:scale-[0.96]"
+          />
+          <ControlButton
             ariaLabel="Golpear"
             keyName="attack"
             label="B"
@@ -148,7 +155,7 @@ export function MobileControls({
           />
         </div>
         <div className="pointer-events-none absolute bottom-[5.25rem] right-4 rounded-[18px] border border-white/10 bg-black/30 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#f8e5c6]/78 shadow-[0_12px_30px_rgba(0,0,0,0.24)]">
-          B x3 combo · S especial · C agarrar/lanzar · D esquive
+          B x3 combo · S especial · C agarrar · G bloqueo · D esquive
         </div>
       </div>
     );
@@ -192,7 +199,7 @@ export function MobileControls({
             className="rounded-2xl border border-black/8 bg-black/8 px-4 py-3 font-semibold transition active:scale-[0.98] active:bg-black/12"
           />
         </div>
-        <div className="grid grid-cols-5 gap-2">
+        <div className="grid grid-cols-6 gap-2">
           <ControlButton
             ariaLabel="Esquivar"
             keyName="dash"
@@ -222,6 +229,13 @@ export function MobileControls({
             className="rounded-2xl border border-black/8 bg-[color:rgba(166,101,24,0.95)] px-4 py-3 font-semibold text-white shadow-[0_12px_28px_rgba(99,58,4,0.24)] transition active:scale-[0.98]"
           />
           <ControlButton
+            ariaLabel="Bloquear"
+            keyName="block"
+            label="Bloquear"
+            onInput={onInput}
+            className="rounded-2xl border border-black/8 bg-[color:rgba(72,113,196,0.95)] px-4 py-3 font-semibold text-white shadow-[0_12px_28px_rgba(34,66,128,0.24)] transition active:scale-[0.98]"
+          />
+          <ControlButton
             ariaLabel="Golpear"
             keyName="attack"
             label="Golpe"
@@ -234,6 +248,7 @@ export function MobileControls({
         <p>Combo: Golpe x3</p>
         <p>Especial: Especial, gasta vida recuperable</p>
         <p>Agarre: Agarrar y repetir para lanzar</p>
+        <p>Bloqueo: mantener Bloquear de frente</p>
         <p>Esquive: toque corto para salir de presion</p>
       </div>
     </section>

@@ -415,8 +415,21 @@ function applyDamageToPlayer(
     return;
   }
 
+  const sourceSide = sourceFacing === "right" ? "left" : "right";
+  const manualBlockActive =
+    state.input.block &&
+    state.player.actionState === "block" &&
+    state.player.facing === sourceSide &&
+    sourceType !== "hazard" &&
+    sourceType !== "aoe";
   const incomingDamage =
-    state.player.shieldMs > 0 ? Math.ceil(damage * 0.55) : damage;
+    manualBlockActive && state.player.shieldMs > 0
+      ? Math.ceil(damage * 0.2)
+      : manualBlockActive
+        ? Math.ceil(damage * 0.35)
+        : state.player.shieldMs > 0
+          ? Math.ceil(damage * 0.55)
+          : damage;
   state.player.hp = Math.max(0, state.player.hp - incomingDamage);
   state.runStats.stationDamageTaken += incomingDamage;
   state.player.hurtCooldownMs = 380;
@@ -434,7 +447,8 @@ function applyDamageToPlayer(
   state.player.attack.attackWindowMs = 0;
   state.player.attack.struckEnemyIds = [];
   state.player.grabTargetId = null;
-  state.player.x += sourceFacing === "right" ? knockback : -knockback;
+  const appliedKnockback = manualBlockActive ? Math.round(knockback * 0.35) : knockback;
+  state.player.x += sourceFacing === "right" ? appliedKnockback : -appliedKnockback;
   state.player.x = clampXToArena(state, state.player.x, state.player.width);
   state.player.y = clampYToArena(state, state.player.y, state.player.depth);
 
@@ -671,7 +685,8 @@ export function updateCombat(state: GameState, dtMs: number) {
     state.phase === "playing" &&
     state.input.grab &&
     state.player.hurtCooldownMs === 0 &&
-    state.player.actionState !== "dash"
+    state.player.actionState !== "dash" &&
+    state.player.actionState !== "block"
   ) {
     if (state.player.grabTargetId) {
       throwHeldEnemy(state);
@@ -688,6 +703,7 @@ export function updateCombat(state: GameState, dtMs: number) {
     state.player.attack.currentAction === null &&
     state.player.hurtCooldownMs === 0 &&
     state.player.actionState !== "dash" &&
+    state.player.actionState !== "block" &&
     state.player.grabTargetId === null
   ) {
     startPlayerSpecial(state);
@@ -819,6 +835,7 @@ export function updateCombat(state: GameState, dtMs: number) {
     state.player.attack.currentAction === null &&
     state.player.hurtCooldownMs === 0 &&
     state.player.actionState !== "dash" &&
+    state.player.actionState !== "block" &&
     state.player.grabTargetId === null
   ) {
     startPlayerAttack(state, "attack_1");

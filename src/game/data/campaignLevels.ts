@@ -810,6 +810,7 @@ export function applyLevelToState(
     special: false,
     grab: false,
     dash: false,
+    block: false,
     pause: false,
   };
   state.hud.levelName = level.name;
@@ -819,6 +820,7 @@ export function applyLevelToState(
     "Especial: K",
     "Agarrar / lanzar: L, L otra vez",
     "Esquive: Shift",
+    "Bloquear: I",
     "Pausa: P",
   ];
   state.hud.enemyCount = 0;

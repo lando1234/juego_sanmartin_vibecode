@@ -15,6 +15,7 @@ const baseHints = [
   "Especial: K",
   "Agarrar / lanzar: L, L otra vez",
   "Esquive: Shift",
+  "Bloquear: I",
   "Pausa: P",
 ];
 
@@ -112,6 +113,7 @@ export function createInitialGameState(mode: GameMode = "campaign"): GameState {
       special: false,
       grab: false,
       dash: false,
+      block: false,
       pause: false,
     },
     levelBounds: firstLevel.bounds,

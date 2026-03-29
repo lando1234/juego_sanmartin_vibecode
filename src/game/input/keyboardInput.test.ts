@@ -50,6 +50,7 @@ describe("attachKeyboardInput", () => {
       special: false,
       grab: false,
       dash: false,
+      block: false,
       pause: false,
     });
     expect(onInput).toHaveBeenNthCalledWith(2, {
@@ -62,6 +63,7 @@ describe("attachKeyboardInput", () => {
       special: false,
       grab: false,
       dash: false,
+      block: false,
       pause: false,
     });
   });
@@ -83,8 +85,22 @@ describe("attachKeyboardInput", () => {
       special: false,
       grab: false,
       dash: false,
+      block: false,
       pause: false,
     });
+
+    detach();
+  });
+
+  it("maps the block key", () => {
+    const onInput = vi.fn();
+    const detach = attachKeyboardInput(window, onInput);
+
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "i", code: "KeyI" }));
+    window.dispatchEvent(new KeyboardEvent("keyup", { key: "i", code: "KeyI" }));
+
+    expect(onInput).toHaveBeenNthCalledWith(1, { block: true });
+    expect(onInput).toHaveBeenNthCalledWith(2, { block: false });
 
     detach();
   });

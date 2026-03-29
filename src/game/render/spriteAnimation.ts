@@ -3,6 +3,7 @@ import type { EnemyState, PlayerState } from "@/game/types/gameTypes";
 export type SpriteAnimationState =
   | "idle"
   | "walk"
+  | "block"
   | "attack"
   | "attack_telegraph"
   | "attack_2"
@@ -20,6 +21,7 @@ export type SpriteAnimationState =
 export type SpriteFrameSet = {
   idle: string[];
   walk: string[];
+  block?: string[];
   attack: string[];
   attack_telegraph?: string[];
   attack_2?: string[];
@@ -55,6 +57,10 @@ export function resolvePlayerSpriteState(player: PlayerState): SpriteAnimationSt
 
   if (player.actionState === "attack_3") {
     return "attack_3";
+  }
+
+  if (player.actionState === "block") {
+    return "block";
   }
 
   if (player.actionState === "attack_2") {
@@ -153,6 +159,8 @@ export function getAnimatedSpriteFrame(
     const frameDurationMs =
       state === "walk"
         ? 120
+        : state === "block"
+          ? 120
         : state === "attack" ||
             state === "attack_telegraph" ||
             state === "attack_2" ||
@@ -203,6 +211,11 @@ export function getSpriteTransform(
       transform.y += Math.abs(walkCycle) * 6 - 2;
       transform.x += walkCycle * 4;
       transform.rotation = walkCycle * 0.03;
+      break;
+    case "block":
+      transform.y -= 1;
+      transform.width *= 1.02;
+      transform.rotation = -0.04;
       break;
     case "attack":
       transform.x += 14;

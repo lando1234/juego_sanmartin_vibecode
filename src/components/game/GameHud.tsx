@@ -35,7 +35,9 @@ export function GameHud({ snapshot, variant = "panel" }: GameHudProps) {
         enemy.activeAttack.timerMs <= enemy.activeAttack.startupMs,
     ).length;
   const combatStateLabel =
-    snapshot.player.attack.currentAction === "special"
+    snapshot.player.actionState === "block"
+      ? "Bloqueo"
+      : snapshot.player.attack.currentAction === "special"
       ? "Especial"
       : snapshot.player.attack.currentAction === "grab"
         ? "Agarre"

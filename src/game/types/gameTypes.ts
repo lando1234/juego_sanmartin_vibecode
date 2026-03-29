@@ -69,6 +69,7 @@ export type InputState = {
   special: boolean;
   grab: boolean;
   dash: boolean;
+  block: boolean;
   pause: boolean;
 };
 
@@ -103,6 +104,7 @@ export type AttackState = {
 export type PlayerActionState =
   | "idle"
   | "walk"
+  | "block"
   | "attack_1"
   | "attack_2"
   | "attack_3"

@@ -34,6 +34,9 @@ describe("spriteAnimation", () => {
     snapshot.player.actionState = "dash";
     expect(resolvePlayerSpriteState(snapshot.player)).toBe("dash");
 
+    snapshot.player.actionState = "block";
+    expect(resolvePlayerSpriteState(snapshot.player)).toBe("block");
+
     snapshot.player.actionState = "grab";
     expect(resolvePlayerSpriteState(snapshot.player)).toBe("grab");
 
@@ -141,6 +144,7 @@ describe("spriteAnimation", () => {
 
   it("returns transformed draw data for attack and defeat states", () => {
     const attack = getSpriteTransform("attack", 0, 10, 20, 100, 180);
+    const block = getSpriteTransform("block", 0, 10, 20, 100, 180);
     const telegraph = getSpriteTransform("attack_telegraph", 0, 10, 20, 100, 180);
     const attack3 = getSpriteTransform("attack_3", 0, 10, 20, 100, 180);
     const special = getSpriteTransform("special", 0, 10, 20, 100, 180);
@@ -148,6 +152,7 @@ describe("spriteAnimation", () => {
     const defeated = getSpriteTransform("defeated", 0, 10, 20, 100, 180);
 
     expect(attack.x).toBeGreaterThan(10);
+    expect(block.width).toBeGreaterThan(100);
     expect(telegraph.width).toBeGreaterThan(100);
     expect(attack.width).toBeGreaterThan(100);
     expect(attack3.width).toBeGreaterThan(attack.width);

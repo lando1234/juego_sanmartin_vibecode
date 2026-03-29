@@ -325,6 +325,48 @@ describe("combatSystem", () => {
     expect(state.enemies[0].poiseHp).toBe(0);
   });
 
+  it("reduces frontal damage when Ricky is blocking", () => {
+    const state = createInitialGameState();
+    state.phase = "playing";
+    state.player.actionState = "block";
+    state.player.facing = "left";
+    state.input.block = true;
+    const enemy = createEnemy("colado", 236, state.player.y);
+    enemy.facing = "right";
+    enemy.activeAttack = {
+      name: "push",
+      timerMs: 80,
+      startupMs: 0,
+      activeMs: 80,
+      recoveryMs: 0,
+      damage: 12,
+      knockback: 20,
+      range: 40,
+      hitbox: {
+        shape: "rectangle",
+        width: 40,
+        height: 30,
+        offsetX: 20,
+        offsetY: 10,
+        activeFrames: [2, 3],
+      },
+      projectile: false,
+      projectileSpeed: 0,
+      aoe: false,
+      radius: null,
+      effect: null,
+      durationMs: null,
+      hits: 1,
+      damageApplied: false,
+      projectileSpawned: false,
+    };
+    state.enemies = [enemy];
+
+    updateCombat(state, 16);
+
+    expect(state.player.hp).toBeGreaterThan(90);
+  });
+
   it("loses recoverable health if Ricky gets hit before cashing it back", () => {
     const state = createInitialGameState();
     state.phase = "playing";

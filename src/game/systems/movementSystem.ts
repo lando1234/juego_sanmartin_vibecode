@@ -5,10 +5,10 @@ import { clampXToArena, clampYToArena } from "./arenaBounds";
 
 const MIN_DT_MS = 0;
 const MAX_DT_MS = 33;
-const DASH_DURATION_MS = 170;
-const DASH_RECOVERY_MS = 90;
-const DASH_INVULNERABLE_MS = 95;
-const DASH_SPEED = 980;
+const DASH_DURATION_MS = 320;
+const DASH_RECOVERY_MS = 55;
+const DASH_INVULNERABLE_MS = 170;
+const DASH_SPEED = 1180;
 
 export function clampDeltaTime(dtMs: number) {
   return clamp(dtMs, MIN_DT_MS, MAX_DT_MS);
@@ -28,6 +28,7 @@ export function updateMovement(state: GameState, dtMs: number) {
 
   const speedMultiplier = state.player.speedBoostMs > 0 ? 1.22 : 1;
   const playerIsCommittedToAction =
+    state.player.actionState === "block" ||
     state.player.actionState === "attack_1" ||
     state.player.actionState === "attack_2" ||
     state.player.actionState === "attack_3" ||
@@ -44,6 +45,13 @@ export function updateMovement(state: GameState, dtMs: number) {
     state.player.hurtCooldownMs > 0 ||
     state.player.grabTargetId !== null;
   const canStartDash = state.input.dash && !isBusyForDash;
+  const canBlock =
+    state.input.block &&
+    state.player.hurtCooldownMs === 0 &&
+    state.player.grabTargetId === null &&
+    state.player.attack.currentAction === null &&
+    state.player.actionState !== "dash" &&
+    state.player.actionState !== "throw";
   const attackMoveMultiplier =
     isStartingAttack || playerIsCommittedToAction
       ? 0.14
@@ -72,7 +80,15 @@ export function updateMovement(state: GameState, dtMs: number) {
     normalizedIntent;
   state.player.isMoving = horizontalIntent !== 0 || verticalIntent !== 0;
 
-  if (!playerIsCommittedToAction && state.player.hurtCooldownMs === 0) {
+  if (canBlock) {
+    state.player.vx = 0;
+    state.player.vy = 0;
+    state.player.isMoving = false;
+    state.player.actionState = "block";
+    state.player.actionTimerMs = 0;
+  }
+
+  if (!playerIsCommittedToAction && !canBlock && state.player.hurtCooldownMs === 0) {
     state.player.actionState = state.player.isMoving ? "walk" : "idle";
   }
 

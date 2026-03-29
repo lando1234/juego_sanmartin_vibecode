@@ -287,7 +287,9 @@ export function getSpriteFramePaths(characterId: string, state: SpriteAnimationS
 
   return (
     frames[state] ??
-    (state === "attack_2" ||
+    (state === "block"
+      ? frames.idle
+      : state === "attack_2" ||
     state === "attack_3" ||
     state === "special" ||
     state === "grab" ||

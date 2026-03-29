@@ -67,4 +67,16 @@ describe("MobileControls", () => {
     expect(onInput).toHaveBeenNthCalledWith(1, { special: true });
     expect(onInput).toHaveBeenNthCalledWith(2, { special: false });
   });
+
+  it("renders a block control and maps its pointer events", () => {
+    const onInput = vi.fn();
+    render(<MobileControls variant="overlay" onInput={onInput} />);
+
+    const blockButton = screen.getByRole("button", { name: "Bloquear" });
+    fireEvent.pointerDown(blockButton);
+    fireEvent.pointerUp(blockButton);
+
+    expect(onInput).toHaveBeenNthCalledWith(1, { block: true });
+    expect(onInput).toHaveBeenNthCalledWith(2, { block: false });
+  });
 });

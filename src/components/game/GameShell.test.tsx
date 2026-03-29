@@ -35,6 +35,17 @@ describe("GameShell", () => {
     expect(screen.getAllByText(/Fase: playing/i)).toHaveLength(2);
   });
 
+  it("shows the block control hint once the run starts", async () => {
+    const user = userEvent.setup();
+    render(<GameShell />);
+
+    await user.click(screen.getByRole("button", { name: "Empezar partida" }));
+
+    expect(
+      screen.getAllByText(/Bloquear: I de frente al golpe/i).length,
+    ).toBeGreaterThan(0);
+  });
+
   it("cleans up engine listeners on unmount", () => {
     const removeEventListenerSpy = vi.spyOn(window, "removeEventListener");
     const { unmount } = render(<GameShell />);

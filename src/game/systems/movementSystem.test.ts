@@ -81,7 +81,17 @@ describe("movementSystem", () => {
     engine.step(16);
 
     expect(engine.getSnapshot().player.actionState).toBe("dash");
-    expect(engine.getSnapshot().player.x).toBeGreaterThan(190);
+    expect(engine.getSnapshot().player.x).toBeGreaterThan(198);
+  });
+
+  it("lets Ricky enter a blocking stance and stop moving", () => {
+    const engine = createGameEngine({ now: () => 1000 });
+    engine.sendCommand({ type: "start" });
+    engine.sendInput({ right: true, block: true });
+    engine.step(16);
+
+    expect(engine.getSnapshot().player.actionState).toBe("block");
+    expect(engine.getSnapshot().player.isMoving).toBe(false);
   });
 
   it("blocks progress past the combat gate while the wave is active", () => {

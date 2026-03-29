@@ -15,6 +15,7 @@ const keyMap: Record<string, keyof InputState> = {
   KeyL: "grab",
   ShiftLeft: "dash",
   ShiftRight: "dash",
+  KeyI: "block",
   KeyP: "pause",
   a: "left",
   d: "right",
@@ -25,6 +26,7 @@ const keyMap: Record<string, keyof InputState> = {
   j: "attack",
   k: "special",
   l: "grab",
+  i: "block",
   p: "pause",
 };
 
@@ -38,6 +40,7 @@ const clearState: InputState = {
   special: false,
   grab: false,
   dash: false,
+  block: false,
   pause: false,
 };
 

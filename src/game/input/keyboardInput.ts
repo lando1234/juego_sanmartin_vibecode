@@ -5,6 +5,13 @@ const keyMap: Record<string, keyof InputState> = {
   ArrowRight: "right",
   ArrowUp: "up",
   ArrowDown: "down",
+  KeyA: "left",
+  KeyD: "right",
+  KeyW: "up",
+  KeyS: "down",
+  Space: "jump",
+  KeyJ: "attack",
+  KeyP: "pause",
   a: "left",
   d: "right",
   w: "up",
@@ -15,52 +22,74 @@ const keyMap: Record<string, keyof InputState> = {
   p: "pause",
 };
 
+const clearState: InputState = {
+  left: false,
+  right: false,
+  up: false,
+  down: false,
+  jump: false,
+  attack: false,
+  pause: false,
+};
+
 export function attachKeyboardInput(
   target: Window,
   onInput: (input: Partial<InputState>) => void,
 ) {
-  const handleKeyDown = (event: KeyboardEvent) => {
-    const key = keyMap[event.key];
+  const activeKeys = new Set<string>();
 
-    if (!key) {
+  const resolveKey = (event: KeyboardEvent) =>
+    keyMap[event.code] ?? keyMap[event.key];
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    const key = resolveKey(event);
+
+    if (!key || event.repeat || activeKeys.has(event.code || event.key)) {
       return;
     }
 
+    activeKeys.add(event.code || event.key);
     event.preventDefault();
     onInput({ [key]: true });
   };
 
   const handleKeyUp = (event: KeyboardEvent) => {
-    const key = keyMap[event.key];
+    const key = resolveKey(event);
+    const identity = event.code || event.key;
 
     if (!key) {
       return;
     }
 
+    activeKeys.delete(identity);
     event.preventDefault();
     onInput({ [key]: false });
   };
 
   const clearInput = () => {
-    onInput({
-      left: false,
-      right: false,
-      up: false,
-      down: false,
-      jump: false,
-      attack: false,
-      pause: false,
-    });
+    activeKeys.clear();
+    onInput(clearState);
+  };
+
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === "hidden") {
+      clearInput();
+    }
   };
 
   target.addEventListener("keydown", handleKeyDown);
   target.addEventListener("keyup", handleKeyUp);
   target.addEventListener("blur", clearInput);
+  target.document.addEventListener("visibilitychange", handleVisibilityChange);
 
   return () => {
     target.removeEventListener("keydown", handleKeyDown);
     target.removeEventListener("keyup", handleKeyUp);
     target.removeEventListener("blur", clearInput);
+    target.document.removeEventListener(
+      "visibilitychange",
+      handleVisibilityChange,
+    );
     clearInput();
   };
 }

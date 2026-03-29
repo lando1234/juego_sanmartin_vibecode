@@ -65,9 +65,9 @@ export function GameShell() {
               El viaje
             </p>
             <div className="grid gap-2 text-sm text-black/72">
-              <p>Moreno, hora pico, diez vagones con tensión creciente.</p>
+              <p>Dr. Cabred a Retiro, 18 estaciones con presión creciente.</p>
               <p>Ricky avanza entre empujones, vendedores y bloqueos del pasillo.</p>
-              <p>Cada jefe abre el paso al siguiente tramo hasta llegar al furgón final.</p>
+              <p>Cada estación suma más enemigos y variedad hasta la terminal final.</p>
             </div>
           </section>
         </div>

@@ -17,8 +17,10 @@ export function DesktopControlsHint({ snapshot }: DesktopControlsHintProps) {
         {snapshot.hud.hints.map((hint) => (
           <li key={hint}>{hint}</li>
         ))}
-        <li>Golpe: J</li>
-        <li>Mobile: d-pad virtual + salto + golpe</li>
+        <li>Moverse: mantener apretado, soltar para frenar</li>
+        <li>Golpe: J o click/tap en Golpear</li>
+        <li>Pausa: P una sola vez, sin dejarla apretada</li>
+        <li>Mobile: d-pad virtual con captura de toque</li>
         <li>Pickups: mate, tortita, SUBE y paraguas repartidos por el vagón</li>
       </ul>
     </aside>

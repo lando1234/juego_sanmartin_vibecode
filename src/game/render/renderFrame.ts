@@ -122,6 +122,15 @@ export function renderFrame(
 
     const itemX = item.x - snapshot.camera.x;
     const itemY = 152 + item.y;
+    const playerCenterX = snapshot.player.x + snapshot.player.width / 2 - snapshot.camera.x;
+    const playerCenterY = 152 + snapshot.player.y + snapshot.player.depth / 2;
+    const itemCenterX = itemX + item.width / 2;
+    const itemCenterY = itemY + item.depth / 2;
+    const dx = playerCenterX - itemCenterX;
+    const dy = playerCenterY - itemCenterY;
+    const distance = Math.max(1, Math.hypot(dx, dy));
+    const magnetStrength = Math.max(0, 1 - distance / 132);
+    const bob = Math.sin((timeMs + item.x * 3) / 260) * 3;
     const glowColor =
       item.kind === "mate_listo"
         ? "rgba(117, 168, 96, 0.42)"
@@ -134,44 +143,59 @@ export function renderFrame(
     context.fillStyle = glowColor;
     context.beginPath();
     context.ellipse(
-      itemX + item.width / 2,
-      itemY + item.depth + 16,
-      item.width * 0.7,
-      item.depth * 0.55,
+      itemCenterX,
+      itemCenterY + item.depth + 14 + bob,
+      item.width * (0.68 + magnetStrength * 0.18),
+      item.depth * (0.55 + magnetStrength * 0.22),
       0,
       0,
       Math.PI * 2,
     );
     context.fill();
 
+    if (magnetStrength > 0) {
+      context.strokeStyle =
+        item.kind === "mate_listo"
+          ? "rgba(131, 191, 98, 0.34)"
+          : item.kind === "tortita_negra"
+            ? "rgba(110, 76, 45, 0.3)"
+            : item.kind === "sube_cargada"
+              ? "rgba(104, 158, 232, 0.3)"
+              : "rgba(145, 133, 174, 0.3)";
+      context.lineWidth = 2;
+      context.beginPath();
+      context.arc(itemCenterX, itemCenterY + bob, item.width * (0.72 + magnetStrength * 0.3), 0, Math.PI * 2);
+      context.stroke();
+    }
+
     if (item.kind === "mate_listo") {
       context.fillStyle = "#6d8b46";
       context.beginPath();
-      context.roundRect(itemX + 8, itemY + 6, 24, 30, 10);
+      context.roundRect(itemX + 8, itemY + 6 + bob, 24, 30, 10);
       context.fill();
       context.fillStyle = "#d8e3a1";
-      context.fillRect(itemX + 27, itemY - 2, 4, 18);
+      context.fillRect(itemX + 27, itemY - 2 + bob, 4, 18);
     } else if (item.kind === "tortita_negra") {
       context.fillStyle = "#4e2f20";
       context.beginPath();
-      context.roundRect(itemX + 4, itemY + 14, 34, 18, 8);
+      context.roundRect(itemX + 4, itemY + 14 + bob, 34, 18, 8);
       context.fill();
       context.fillStyle = "#29170f";
-      context.fillRect(itemX + 8, itemY + 10, 26, 8);
+      context.fillRect(itemX + 8, itemY + 10 + bob, 26, 8);
     } else if (item.kind === "sube_cargada") {
       context.fillStyle = "#2f5dab";
       context.beginPath();
-      context.roundRect(itemX + 4, itemY + 10, 36, 24, 8);
+      context.roundRect(itemX + 4, itemY + 10 + bob, 36, 24, 8);
       context.fill();
       context.fillStyle = "#eef4ff";
-      context.fillRect(itemX + 10, itemY + 18, 20, 4);
+      context.fillRect(itemX + 10, itemY + 18 + bob, 20, 4);
     } else {
       context.fillStyle = "#4f465c";
       context.beginPath();
-      context.roundRect(itemX + 8, itemY + 6, 16, 34, 8);
+      context.roundRect(itemX + 8, itemY + 6 + bob, 16, 34, 8);
       context.fill();
-      context.fillRect(itemX + 22, itemY + 6, 4, 32);
-      context.fillRect(itemX + 26, itemY + 6, 6, 10);
+      context.fillRect(itemX + 22, itemY + 6 + bob, 4, 32);
+      context.fillRect(itemX + 26, itemY + 6 + bob, 6, 10);
     }
   }
 

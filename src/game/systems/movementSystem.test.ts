@@ -94,6 +94,21 @@ describe("movementSystem", () => {
     expect(engine.getSnapshot().player.isMoving).toBe(false);
   });
 
+  it("leaves block immediately when the button is released", () => {
+    const engine = createGameEngine({ now: () => 1000 });
+    engine.sendCommand({ type: "start" });
+    engine.sendInput({ block: true });
+    engine.step(16);
+
+    expect(engine.getSnapshot().player.actionState).toBe("block");
+
+    engine.sendInput({ block: false, right: true });
+    engine.step(16);
+
+    expect(engine.getSnapshot().player.actionState).toBe("walk");
+    expect(engine.getSnapshot().player.x).toBeGreaterThan(180);
+  });
+
   it("blocks progress past the combat gate while the wave is active", () => {
     const engine = createGameEngine({ now: () => 1000 });
     engine.sendCommand({ type: "start" });

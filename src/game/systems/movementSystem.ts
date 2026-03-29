@@ -27,8 +27,8 @@ export function updateMovement(state: GameState, dtMs: number) {
   }
 
   const speedMultiplier = state.player.speedBoostMs > 0 ? 1.22 : 1;
+  const isActivelyBlocking = state.player.actionState === "block" && state.input.block;
   const playerIsCommittedToAction =
-    state.player.actionState === "block" ||
     state.player.actionState === "attack_1" ||
     state.player.actionState === "attack_2" ||
     state.player.actionState === "attack_3" ||
@@ -53,7 +53,7 @@ export function updateMovement(state: GameState, dtMs: number) {
     state.player.actionState !== "dash" &&
     state.player.actionState !== "throw";
   const attackMoveMultiplier =
-    isStartingAttack || playerIsCommittedToAction
+    isStartingAttack || playerIsCommittedToAction || isActivelyBlocking
       ? 0.14
       : state.player.actionRecoveryMs > 0
         ? 0.48
@@ -88,7 +88,17 @@ export function updateMovement(state: GameState, dtMs: number) {
     state.player.actionTimerMs = 0;
   }
 
-  if (!playerIsCommittedToAction && !canBlock && state.player.hurtCooldownMs === 0) {
+  if (state.player.actionState === "block" && !state.input.block) {
+    state.player.actionState = state.player.isMoving ? "walk" : "idle";
+    state.player.actionRecoveryMs = 0;
+  }
+
+  if (
+    !playerIsCommittedToAction &&
+    state.player.actionState !== "block" &&
+    !canBlock &&
+    state.player.hurtCooldownMs === 0
+  ) {
     state.player.actionState = state.player.isMoving ? "walk" : "idle";
   }
 

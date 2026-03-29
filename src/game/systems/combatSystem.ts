@@ -24,6 +24,9 @@ function damageEnemy(playerX: number, playerWidth: number, enemy: EnemyState, da
 }
 
 export function updateCombat(state: GameState, dtMs: number) {
+  const attackDamage =
+    state.player.attack.damage + (state.player.attackBoostMs > 0 ? 10 : 0);
+
   state.player.attack.activeMs = Math.max(0, state.player.attack.activeMs - dtMs);
   state.player.attack.cooldownMs = Math.max(
     0,
@@ -68,7 +71,7 @@ export function updateCombat(state: GameState, dtMs: number) {
       inFront &&
       areInSameLane(state.player.y, state.player.depth, enemy.y, enemy.depth)
     ) {
-      damageEnemy(state.player.x, state.player.width, enemy, state.player.attack.damage);
+      damageEnemy(state.player.x, state.player.width, enemy, attackDamage);
     }
   }
 }

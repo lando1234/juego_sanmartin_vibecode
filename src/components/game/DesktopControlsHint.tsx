@@ -8,7 +8,8 @@ type DesktopControlsHintProps = {
 
 export function DesktopControlsHint({ snapshot }: DesktopControlsHintProps) {
   return (
-    <aside className="rounded-[24px] border border-black/10 bg-[var(--panel)] p-5 shadow-[0_20px_60px_var(--shadow)] backdrop-blur-sm">
+    <aside className="relative overflow-hidden rounded-[26px] border border-black/10 bg-[linear-gradient(180deg,rgba(255,248,233,0.92),rgba(247,231,198,0.82))] p-5 shadow-[0_24px_70px_var(--shadow)] backdrop-blur-sm">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[4.5rem] bg-[linear-gradient(180deg,rgba(255,219,148,0.26),transparent)]" />
       <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--accent-strong)]">
         Controles
       </p>
@@ -18,6 +19,7 @@ export function DesktopControlsHint({ snapshot }: DesktopControlsHintProps) {
         ))}
         <li>Golpe: J</li>
         <li>Mobile: d-pad virtual + salto + golpe</li>
+        <li>Pickups: mate, tortita, SUBE y paraguas repartidos por el vagón</li>
       </ul>
     </aside>
   );

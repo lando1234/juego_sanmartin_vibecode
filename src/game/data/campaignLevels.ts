@@ -1,6 +1,7 @@
 import type {
   EnemyKind,
   GameState,
+  ItemKind,
   LevelBounds,
   LevelLayout,
   SceneState,
@@ -11,6 +12,12 @@ export const VIEWPORT_HEIGHT = 720;
 
 type Spawn = {
   kind: EnemyKind;
+  x: number;
+  y: number;
+};
+
+type ItemPlacement = {
+  kind: ItemKind;
   x: number;
   y: number;
 };
@@ -32,6 +39,7 @@ export type CampaignLevel = {
   exitObjective: string;
   completionTitle: string;
   completionSummary: string;
+  items: ItemPlacement[];
 };
 
 const baseBounds: LevelBounds = {
@@ -94,6 +102,7 @@ function createLevel(
   firstWave: Array<[EnemyKind, number, number]>,
   secondWave: Array<[EnemyKind, number, number]>,
   boss: [EnemyKind, number, number],
+  items: Array<[ItemKind, number, number]>,
 ): CampaignLevel {
   const shiftX = index * 18;
   const wave1Spawns = createShiftedSpawns(shiftX, firstWave);
@@ -121,6 +130,7 @@ function createLevel(
     exitObjective: intro,
     completionTitle: `${name} despejado`,
     completionSummary: `Ricky recuperó terreno en ${name.toLowerCase()} y todavía faltan más vagones por limpiar.`,
+    items: items.map(([kind, x, y]) => ({ kind, x: x + shiftX, y })),
   };
 }
 
@@ -141,6 +151,11 @@ export const campaignLevels: CampaignLevel[] = [
       ["bloqueador_puerta", 1960, 132],
     ],
     ["capo_pasillo", 2220, 130],
+    [
+      ["mate_listo", 470, 92],
+      ["tortita_negra", 1490, 214],
+      ["sube_cargada", 2060, 88],
+    ],
   ),
   createLevel(
     1,
@@ -158,6 +173,11 @@ export const campaignLevels: CampaignLevel[] = [
       ["empujador_hora_pico", 1940, 142],
     ],
     ["capo_pasillo", 2230, 124],
+    [
+      ["paraguas_fierro", 540, 180],
+      ["tortita_negra", 1600, 84],
+      ["mate_listo", 2070, 196],
+    ],
   ),
   createLevel(
     2,
@@ -175,6 +195,11 @@ export const campaignLevels: CampaignLevel[] = [
       ["bloqueador_puerta", 1980, 144],
     ],
     ["capo_pasillo", 2220, 136],
+    [
+      ["sube_cargada", 500, 198],
+      ["mate_listo", 1480, 92],
+      ["tortita_negra", 2030, 190],
+    ],
   ),
   createLevel(
     3,
@@ -192,6 +217,11 @@ export const campaignLevels: CampaignLevel[] = [
       ["empujador_hora_pico", 1980, 136],
     ],
     ["capo_pasillo", 2235, 132],
+    [
+      ["tortita_negra", 480, 86],
+      ["paraguas_fierro", 1550, 202],
+      ["sube_cargada", 2040, 96],
+    ],
   ),
   createLevel(
     4,
@@ -209,6 +239,11 @@ export const campaignLevels: CampaignLevel[] = [
       ["empujador_hora_pico", 1970, 128],
     ],
     ["capo_pasillo", 2230, 128],
+    [
+      ["mate_listo", 520, 204],
+      ["sube_cargada", 1510, 90],
+      ["tortita_negra", 2060, 198],
+    ],
   ),
   createLevel(
     5,
@@ -226,6 +261,11 @@ export const campaignLevels: CampaignLevel[] = [
       ["vendedor_relampago", 1980, 144],
     ],
     ["capo_pasillo", 2235, 126],
+    [
+      ["paraguas_fierro", 520, 90],
+      ["mate_listo", 1500, 202],
+      ["sube_cargada", 2050, 96],
+    ],
   ),
   createLevel(
     6,
@@ -243,6 +283,11 @@ export const campaignLevels: CampaignLevel[] = [
       ["empujador_hora_pico", 1970, 138],
     ],
     ["capo_pasillo", 2230, 130],
+    [
+      ["tortita_negra", 500, 188],
+      ["paraguas_fierro", 1500, 96],
+      ["mate_listo", 2060, 198],
+    ],
   ),
   createLevel(
     7,
@@ -260,6 +305,11 @@ export const campaignLevels: CampaignLevel[] = [
       ["bloqueador_puerta", 1970, 146],
     ],
     ["capo_pasillo", 2235, 130],
+    [
+      ["sube_cargada", 520, 94],
+      ["tortita_negra", 1510, 202],
+      ["paraguas_fierro", 2065, 106],
+    ],
   ),
   createLevel(
     8,
@@ -277,6 +327,11 @@ export const campaignLevels: CampaignLevel[] = [
       ["bloqueador_puerta", 1985, 148],
     ],
     ["capo_pasillo", 2235, 126],
+    [
+      ["mate_listo", 500, 90],
+      ["sube_cargada", 1510, 196],
+      ["tortita_negra", 2070, 112],
+    ],
   ),
   createLevel(
     9,
@@ -294,11 +349,44 @@ export const campaignLevels: CampaignLevel[] = [
       ["vendedor_relampago", 1985, 144],
     ],
     ["capo_pasillo", 2240, 128],
+    [
+      ["paraguas_fierro", 520, 194],
+      ["mate_listo", 1515, 96],
+      ["sube_cargada", 2070, 204],
+    ],
   ),
 ];
 
 export function getCampaignLevel(index: number): CampaignLevel {
   return campaignLevels[index] ?? campaignLevels[0];
+}
+
+function createLevelItems(level: CampaignLevel) {
+  return level.items.map((item, index) => ({
+    id: `${level.id}-item-${index + 1}`,
+    kind: item.kind,
+    name:
+      item.kind === "mate_listo"
+        ? "Mate listo"
+        : item.kind === "tortita_negra"
+          ? "Tortita negra"
+          : item.kind === "sube_cargada"
+            ? "SUBE cargada"
+            : "Paraguas de fierro",
+    description:
+      item.kind === "mate_listo"
+        ? "Velocidad arriba por unos segundos."
+        : item.kind === "tortita_negra"
+          ? "Recupera aire y algo de vida."
+          : item.kind === "sube_cargada"
+            ? "Pega más fuerte por un rato."
+            : "Amortigua parte del daño recibido.",
+    x: item.x,
+    y: item.y,
+    width: 44,
+    depth: 28,
+    collected: false,
+  }));
 }
 
 export function applyLevelToState(
@@ -312,6 +400,7 @@ export function applyLevelToState(
   state.totalLevels = campaignLevels.length;
   state.scene = baseScene();
   state.enemies = [];
+  state.items = createLevelItems(level);
   state.levelBounds = { ...level.bounds };
   state.levelLayout = {
     ...level.layout,
@@ -332,6 +421,9 @@ export function applyLevelToState(
   state.player.attack.activeMs = 0;
   state.player.attack.cooldownMs = 0;
   state.player.hurtCooldownMs = 0;
+  state.player.speedBoostMs = 0;
+  state.player.attackBoostMs = 0;
+  state.player.shieldMs = 0;
   state.camera.x = 0;
   state.input = {
     left: false,
@@ -350,6 +442,9 @@ export function applyLevelToState(
   ];
   state.hud.enemyCount = 0;
   state.hud.objective = level.openingObjective;
+  state.hud.completionTitle = null;
+  state.hud.completionSummary = null;
+  state.hud.pickupMessage = null;
   if (!preserveElapsedRun) {
     state.hud.elapsedMs = 0;
   }

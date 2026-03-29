@@ -12,6 +12,11 @@ export type EnemyKind =
   | "empujador_hora_pico"
   | "vendedor_relampago"
   | "capo_pasillo";
+export type ItemKind =
+  | "mate_listo"
+  | "tortita_negra"
+  | "sube_cargada"
+  | "paraguas_fierro";
 
 export type InputState = {
   left: boolean;
@@ -57,6 +62,9 @@ export type PlayerState = {
   isMoving: boolean;
   attack: AttackState;
   hurtCooldownMs: number;
+  speedBoostMs: number;
+  attackBoostMs: number;
+  shieldMs: number;
 };
 
 export type CameraState = {
@@ -84,6 +92,19 @@ export type HudState = {
   objective: string;
   completionTitle: string | null;
   completionSummary: string | null;
+  pickupMessage: string | null;
+};
+
+export type ItemState = {
+  id: string;
+  kind: ItemKind;
+  name: string;
+  description: string;
+  x: number;
+  y: number;
+  width: number;
+  depth: number;
+  collected: boolean;
 };
 
 export type EnemyState = {
@@ -147,6 +168,7 @@ export type GameState = {
   scene: SceneState;
   player: PlayerState;
   enemies: EnemyState[];
+  items: ItemState[];
   camera: CameraState;
   input: InputState;
   levelBounds: LevelBounds;

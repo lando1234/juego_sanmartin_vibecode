@@ -56,7 +56,7 @@ export function GameCanvas({ snapshot }: GameCanvasProps) {
       ref={canvasRef}
       width={VIEWPORT_WIDTH}
       height={VIEWPORT_HEIGHT}
-      className="h-auto w-full rounded-[28px] border border-black/15 bg-[#3b302b] shadow-[0_18px_70px_rgba(30,24,20,0.25)]"
+      className="h-auto w-full rounded-[30px] border border-black/15 bg-[#3b302b] shadow-[0_24px_90px_rgba(30,24,20,0.3)] ring-1 ring-white/18"
       aria-label="Lienzo del juego"
     />
   );

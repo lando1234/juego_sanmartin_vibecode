@@ -46,7 +46,9 @@ export function updateEnemies(state: GameState, dtMs: number) {
       enemy.state = "attack";
 
       if (enemy.attackCooldownMs === 0 && state.player.hurtCooldownMs === 0) {
-        state.player.hp = Math.max(0, state.player.hp - enemy.damage);
+        const incomingDamage =
+          state.player.shieldMs > 0 ? Math.ceil(enemy.damage * 0.55) : enemy.damage;
+        state.player.hp = Math.max(0, state.player.hp - incomingDamage);
         state.player.hurtCooldownMs = 380;
         enemy.attackCooldownMs = enemy.attackIntervalMs;
       }

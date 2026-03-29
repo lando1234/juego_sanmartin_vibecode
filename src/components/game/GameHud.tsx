@@ -10,7 +10,19 @@ export function GameHud({ snapshot }: GameHudProps) {
   const hpPercent = (snapshot.player.hp / snapshot.player.maxHp) * 100;
   const seconds = Math.floor(snapshot.hud.elapsedMs / 1000);
   const boss = snapshot.enemies.find((enemy) => enemy.isBoss && enemy.hp > 0);
+  const availableItems = snapshot.items.filter((item) => !item.collected).length;
   const bossHpPercent = boss ? (boss.hp / boss.maxHp) * 100 : 0;
+  const activeEffects = [
+    snapshot.player.speedBoostMs > 0
+      ? `Mate ${Math.ceil(snapshot.player.speedBoostMs / 1000)}s`
+      : null,
+    snapshot.player.attackBoostMs > 0
+      ? `SUBE ${Math.ceil(snapshot.player.attackBoostMs / 1000)}s`
+      : null,
+    snapshot.player.shieldMs > 0
+      ? `Paraguas ${Math.ceil(snapshot.player.shieldMs / 1000)}s`
+      : null,
+  ].filter(Boolean);
   const stageLabel =
     snapshot.scene.type === "boss_combat"
       ? "Furgon en disputa"
@@ -19,7 +31,7 @@ export function GameHud({ snapshot }: GameHudProps) {
         : "Pasillo central";
 
   return (
-    <div className="grid gap-4 rounded-[28px] border border-white/20 bg-[linear-gradient(180deg,rgba(63,45,33,0.94),rgba(30,24,20,0.94))] p-4 text-[#f7ead4] shadow-[0_28px_80px_rgba(25,18,15,0.35)] backdrop-blur-sm md:grid-cols-[1.3fr_0.7fr]">
+    <div className="relative grid gap-4 overflow-hidden rounded-[30px] border border-white/18 bg-[linear-gradient(180deg,rgba(63,45,33,0.96),rgba(24,20,16,0.96))] p-4 text-[#f7ead4] shadow-[0_34px_100px_rgba(25,18,15,0.4)] backdrop-blur-sm before:pointer-events-none before:absolute before:inset-0 before:rounded-[30px] before:bg-[radial-gradient(circle_at_top,rgba(255,211,150,0.14),transparent_44%)] md:grid-cols-[1.25fr_0.75fr]">
       <div className="grid gap-3">
         <div className="flex items-center justify-between gap-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#f4c992]">
           <span>{snapshot.hud.levelName}</span>
@@ -53,6 +65,26 @@ export function GameHud({ snapshot }: GameHudProps) {
             </div>
           </div>
         ) : null}
+        <div className="grid gap-2 rounded-[22px] border border-white/10 bg-black/18 p-3">
+          <div className="flex items-center justify-between gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#f4c992]">
+            <span>Items del vagón</span>
+            <span>{availableItems} activos</span>
+          </div>
+          <div className="flex flex-wrap gap-2 text-xs text-[#f7ead4]/82">
+            <span className="rounded-full border border-[#7ca464]/35 bg-[#7ca464]/12 px-2 py-1">
+              Mate
+            </span>
+            <span className="rounded-full border border-[#6a4127]/35 bg-[#6a4127]/12 px-2 py-1">
+              Tortita
+            </span>
+            <span className="rounded-full border border-[#4b6da0]/35 bg-[#4b6da0]/12 px-2 py-1">
+              SUBE
+            </span>
+            <span className="rounded-full border border-[#76678a]/35 bg-[#76678a]/12 px-2 py-1">
+              Paraguas
+            </span>
+          </div>
+        </div>
       </div>
       <div className="grid gap-3 rounded-[22px] border border-white/10 bg-black/16 p-3 text-sm text-[#f7ead4]">
         <div className="grid gap-1">
@@ -62,6 +94,7 @@ export function GameHud({ snapshot }: GameHudProps) {
           <span>Fase: {snapshot.phase}</span>
           <span>Tiempo: {seconds}s</span>
           <span>En vagón: {snapshot.hud.enemyCount} rivales</span>
+          <span>Pickups visibles: {availableItems}</span>
         </div>
         <div className="grid gap-1">
           <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#f4c992]">
@@ -69,6 +102,17 @@ export function GameHud({ snapshot }: GameHudProps) {
           </span>
           <span>{snapshot.hud.objective}</span>
         </div>
+        <div className="grid gap-1">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#f4c992]">
+            Buffs activos
+          </span>
+          <span>{activeEffects.length > 0 ? activeEffects.join(" · ") : "Sin boosts activos"}</span>
+        </div>
+        {snapshot.hud.pickupMessage ? (
+          <div className="rounded-[18px] border border-[#f4c992]/18 bg-[#f4c992]/8 p-3 text-sm text-[#ffe7c5]">
+            {snapshot.hud.pickupMessage}
+          </div>
+        ) : null}
       </div>
     </div>
   );

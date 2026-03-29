@@ -59,8 +59,12 @@ export function createInitialGameState(): GameState {
         width: 88,
       },
       hurtCooldownMs: 0,
+      speedBoostMs: 0,
+      attackBoostMs: 0,
+      shieldMs: 0,
     },
     enemies: [],
+    items: [],
     camera: {
       x: 0,
       viewportWidth: VIEWPORT_WIDTH,
@@ -88,6 +92,7 @@ export function createInitialGameState(): GameState {
       objective: firstLevel.openingObjective,
       completionTitle: null,
       completionSummary: null,
+      pickupMessage: null,
     },
   };
 

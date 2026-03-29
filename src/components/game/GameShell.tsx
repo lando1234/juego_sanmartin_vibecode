@@ -59,7 +59,8 @@ export function GameShell() {
         </div>
         <div className="grid content-start gap-4">
           <DesktopControlsHint snapshot={snapshot} />
-          <section className="rounded-[24px] border border-black/10 bg-[var(--panel)] p-5 shadow-[0_20px_60px_var(--shadow)] backdrop-blur-sm">
+          <section className="relative overflow-hidden rounded-[26px] border border-black/10 bg-[linear-gradient(180deg,rgba(255,246,225,0.92),rgba(244,223,185,0.82))] p-5 shadow-[0_24px_70px_var(--shadow)] backdrop-blur-sm">
+            <div className="pointer-events-none absolute right-[-36px] top-[-28px] h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(224,106,44,0.26),transparent_68%)]" />
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--accent-strong)]">
               El viaje
             </p>

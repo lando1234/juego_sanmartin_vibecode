@@ -38,4 +38,17 @@ describe("GameHud", () => {
     expect(screen.getByText("El Capo del Pasillo")).toBeInTheDocument();
     expect(screen.getByText("120 HP")).toBeInTheDocument();
   });
+
+  it("shows active buffs and pickup feedback", () => {
+    const snapshot = createInitialGameState();
+    snapshot.player.speedBoostMs = 4000;
+    snapshot.player.attackBoostMs = 3000;
+    snapshot.hud.pickupMessage = "Mate listo: Ricky acelera el paso.";
+
+    render(<GameHud snapshot={snapshot} />);
+
+    expect(screen.getByText(/Mate 4s/i)).toBeInTheDocument();
+    expect(screen.getByText(/SUBE 3s/i)).toBeInTheDocument();
+    expect(screen.getByText(/Ricky acelera el paso/i)).toBeInTheDocument();
+  });
 });

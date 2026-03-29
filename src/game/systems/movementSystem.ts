@@ -20,13 +20,16 @@ export function updateMovement(state: GameState, dtMs: number) {
     return;
   }
 
+  const speedMultiplier = state.player.speedBoostMs > 0 ? 1.22 : 1;
   const horizontalIntent = Number(state.input.right) - Number(state.input.left);
   const verticalIntent = Number(state.input.down) - Number(state.input.up);
   const normalizedIntent =
     horizontalIntent !== 0 && verticalIntent !== 0 ? Math.SQRT1_2 : 1;
 
-  state.player.vx = horizontalIntent * state.player.speed * normalizedIntent;
-  state.player.vy = verticalIntent * state.player.speed * normalizedIntent;
+  state.player.vx =
+    horizontalIntent * state.player.speed * speedMultiplier * normalizedIntent;
+  state.player.vy =
+    verticalIntent * state.player.speed * speedMultiplier * normalizedIntent;
   state.player.isMoving = horizontalIntent !== 0 || verticalIntent !== 0;
 
   if (horizontalIntent < 0) {

@@ -4,6 +4,7 @@ import { updateCombat } from "@/game/systems/combatSystem";
 import { updateCamera } from "@/game/systems/cameraSystem";
 import { updateEnemies } from "@/game/systems/enemySystem";
 import { updateHud } from "@/game/systems/hudSystem";
+import { updateItems } from "@/game/systems/itemSystem";
 import { updateMovement } from "@/game/systems/movementSystem";
 import { updateScene } from "@/game/systems/sceneSystem";
 import type {
@@ -51,6 +52,7 @@ export function createGameEngine(options: EngineOptions = {}): GameEngine {
     scene: { ...state.scene },
     player: { ...state.player },
     enemies: state.enemies.map((enemy) => ({ ...enemy })),
+    items: state.items.map((item) => ({ ...item })),
     camera: { ...state.camera },
     input: { ...state.input },
     levelBounds: { ...state.levelBounds },
@@ -92,6 +94,7 @@ export function createGameEngine(options: EngineOptions = {}): GameEngine {
     updateScene(state);
     updateCombat(state, dtMs);
     updateEnemies(state, dtMs);
+    updateItems(state, dtMs);
     updateCamera(state);
     updateHud(state, now());
     emit();

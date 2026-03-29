@@ -115,6 +115,66 @@ export function renderFrame(
     context.stroke();
   }
 
+  for (const item of snapshot.items) {
+    if (item.collected) {
+      continue;
+    }
+
+    const itemX = item.x - snapshot.camera.x;
+    const itemY = 152 + item.y;
+    const glowColor =
+      item.kind === "mate_listo"
+        ? "rgba(117, 168, 96, 0.42)"
+        : item.kind === "tortita_negra"
+          ? "rgba(91, 54, 29, 0.38)"
+          : item.kind === "sube_cargada"
+            ? "rgba(88, 137, 216, 0.38)"
+            : "rgba(95, 88, 110, 0.4)";
+
+    context.fillStyle = glowColor;
+    context.beginPath();
+    context.ellipse(
+      itemX + item.width / 2,
+      itemY + item.depth + 16,
+      item.width * 0.7,
+      item.depth * 0.55,
+      0,
+      0,
+      Math.PI * 2,
+    );
+    context.fill();
+
+    if (item.kind === "mate_listo") {
+      context.fillStyle = "#6d8b46";
+      context.beginPath();
+      context.roundRect(itemX + 8, itemY + 6, 24, 30, 10);
+      context.fill();
+      context.fillStyle = "#d8e3a1";
+      context.fillRect(itemX + 27, itemY - 2, 4, 18);
+    } else if (item.kind === "tortita_negra") {
+      context.fillStyle = "#4e2f20";
+      context.beginPath();
+      context.roundRect(itemX + 4, itemY + 14, 34, 18, 8);
+      context.fill();
+      context.fillStyle = "#29170f";
+      context.fillRect(itemX + 8, itemY + 10, 26, 8);
+    } else if (item.kind === "sube_cargada") {
+      context.fillStyle = "#2f5dab";
+      context.beginPath();
+      context.roundRect(itemX + 4, itemY + 10, 36, 24, 8);
+      context.fill();
+      context.fillStyle = "#eef4ff";
+      context.fillRect(itemX + 10, itemY + 18, 20, 4);
+    } else {
+      context.fillStyle = "#4f465c";
+      context.beginPath();
+      context.roundRect(itemX + 8, itemY + 6, 16, 34, 8);
+      context.fill();
+      context.fillRect(itemX + 22, itemY + 6, 4, 32);
+      context.fillRect(itemX + 26, itemY + 6, 6, 10);
+    }
+  }
+
   const gateStartSource = snapshot.scene.type === "boss_combat"
     ? snapshot.levelLayout.bossGateStartX
     : snapshot.scene.waveIndex === 2

@@ -544,6 +544,12 @@ Avoid: photorealism, background scene, abstract geometry, fantasy props
 
 ### combo burst
 
+Quién lo usa: sistema global de combo y golpes encadenados, principalmente Ricky y opcionalmente finishers de boss o miniboss
+
+Dónde aparece: sobre el punto de impacto o cerca del contador de combo dentro del playfield
+
+Archivo sugerido: `public/sprites/ui/combo-burst.png`
+
 ```text
 Use case: stylized-concept
 Asset type: UI effect sprite
@@ -560,6 +566,12 @@ Avoid: neon anime impact, comic-book word art, photoreal explosion
 ```
 
 ### special flash
+
+Quién lo usa: principalmente Ricky cuando activa `special`; opcionalmente reusable para ataques especiales del boss final si más adelante querés unificarlos visualmente
+
+Dónde aparece: superpuesto al arranque o al impacto principal del special, centrado cerca del cuerpo o del frente del ataque
+
+Archivo sugerido: `public/sprites/ui/special-flash.png`
 
 ```text
 Use case: stylized-concept
@@ -578,6 +590,12 @@ Avoid: neon anime aura, sci-fi energy grid, photoreal light bloom
 
 ### danger telegraph
 
+Quién lo usa: enemigos peligrosos, minibosses, `boss_fisura_bici` y cualquier peligro de escenario que necesite aviso previo
+
+Dónde aparece: en el piso, alrededor del objetivo o delante del enemigo durante el startup de ataques peligrosos
+
+Archivo sugerido: `public/sprites/ui/danger-telegraph.png`
+
 ```text
 Use case: stylized-concept
 Asset type: UI warning effect sprite
@@ -594,6 +612,12 @@ Avoid: neon sci-fi warning UI, abstract geometry, photoreal overlays
 ```
 
 ### recoverable health highlight
+
+Quién lo usa: HUD del jugador, específicamente la barra de vida de Ricky cuando acumula vida recuperable por usar `special`
+
+Dónde aparece: dentro o detrás del segmento recuperable de la barra de HP, nunca sobre el centro del playfield
+
+Archivo sugerido: `public/sprites/ui/recoverable-health-highlight.png`
 
 ```text
 Use case: stylized-concept

@@ -49,6 +49,17 @@ body {
   overflow-x: hidden;
 }
 
+.mobile-landscape-shell {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 100dvh;
+  height: 100vw;
+  transform: translate(-50%, -50%) rotate(90deg);
+  transform-origin: center center;
+  overflow: hidden;
+}
+
 button,
 input,
 textarea,

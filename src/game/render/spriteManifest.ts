@@ -1,4 +1,8 @@
-import type { SpriteAnimationState, SpriteAnimationCache, SpriteFrameSet } from "./spriteAnimation";
+import type {
+  SpriteAnimationState,
+  SpriteAnimationCache,
+  SpriteFrameSet,
+} from "./spriteAnimation";
 
 type SpriteManifestEntry = {
   id: string;
@@ -274,7 +278,9 @@ export const spriteManifest = {
 export type SpriteAssetKey = keyof typeof spriteManifest;
 export type SpriteCache = SpriteAnimationCache;
 
-export function getSpriteFramesByCharacterId(characterId: string) {
+export function getSpriteFramesByCharacterId(
+  characterId: string,
+): SpriteFrameSet | undefined {
   return Object.values(spriteManifest).find((asset) => asset.id === characterId)?.frames;
 }
 

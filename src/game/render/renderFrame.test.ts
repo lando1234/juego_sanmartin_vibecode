@@ -109,4 +109,16 @@ describe("renderFrame", () => {
 
     expect(context.drawImage).toHaveBeenCalled();
   });
+
+  it("does not apply a full-screen white flash when the player attacks", () => {
+    const context = createMockContext();
+    const snapshot = createInitialGameState();
+    snapshot.phase = "playing";
+    snapshot.player.attack.activeMs = 120;
+    snapshot.player.actionState = "attack_1";
+
+    renderFrame(context, snapshot);
+
+    expect(context.fillStyle).not.toMatch(/rgba\(255, 228, 180/i);
+  });
 });

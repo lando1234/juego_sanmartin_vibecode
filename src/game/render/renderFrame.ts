@@ -843,19 +843,6 @@ export function renderFrame(
   context.fillStyle = lightBand;
   context.fillRect(62, 126, canvas.width - 124, 28);
 
-  const hitstopSource =
-    Math.max(snapshot.player.attack.activeMs > 0 ? snapshot.player.attack.activeMs : 0, 0) ||
-    Math.max(snapshot.player.hurtCooldownMs, 0) ||
-    Math.max(
-      ...snapshot.enemies.map((enemy) => (enemy.hurtCooldownMs > 0 ? enemy.hurtCooldownMs : 0)),
-      0,
-    );
-  if (hitstopSource > 0) {
-    const flashAlpha = clamp(hitstopSource / 380, 0.04, 0.16);
-    context.fillStyle = `rgba(255, 228, 180, ${flashAlpha})`;
-    context.fillRect(0, 0, canvas.width, canvas.height);
-  }
-
   if (snapshot.player.blindMs > 0) {
     context.fillStyle = "rgba(214, 221, 224, 0.22)";
     context.fillRect(0, 0, canvas.width, canvas.height);

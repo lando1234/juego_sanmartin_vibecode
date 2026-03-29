@@ -1,0 +1,21 @@
+<svg width="256" height="384" viewBox="0 0 256 384" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="128" cy="351" rx="64" ry="18" fill="#1A1513" fill-opacity="0.2"/>
+  <rect x="79" y="103" width="98" height="146" rx="28" fill="#20262C"/>
+  <rect x="93" y="121" width="72" height="114" rx="20" fill="#454C55"/>
+  <rect x="100" y="239" width="56" height="74" rx="20" fill="#6D7A88"/>
+  <path d="M80 137L57 177L69 188L94 161L101 173L104 141L80 137Z" fill="#20262C"/>
+  <path d="M176 137L200 177L188 188L162 161L155 173L152 141L176 137Z" fill="#20262C"/>
+  <circle cx="60" cy="188" r="14" fill="#D6A67F"/>
+  <circle cx="196" cy="188" r="14" fill="#D6A67F"/>
+  <rect x="98" y="302" width="26" height="56" rx="13" fill="#6D7A88"/>
+  <rect x="132" y="304" width="26" height="54" rx="13" fill="#6D7A88"/>
+  <rect x="88" y="348" width="40" height="14" rx="7" fill="#201916"/>
+  <rect x="128" y="348" width="40" height="14" rx="7" fill="#201916"/>
+  <circle cx="128" cy="64" r="40" fill="#D6A67F"/>
+  <path d="M88 61C88 38.9086 105.909 21 128 21C150.091 21 168 38.9086 168 61V71H88V61Z" fill="#2D221F"/>
+  <path d="M94 56C104 37 121 27 141 28C152.411 28.5706 163.8 32.6 171 42L159 46L145 41L133 45L120 40L104 48L94 56Z" fill="#2D221F"/>
+  <circle cx="113" cy="65" r="4.5" fill="#1E1612"/>
+  <circle cx="144" cy="66" r="4.5" fill="#1E1612"/>
+  <path d="M112 86C122.667 91.3333 133.333 91.3333 144 86" stroke="#9A6645" stroke-width="4" stroke-linecap="round"/>
+  <rect x="93" y="137" width="70" height="14" rx="7" fill="#D9C27D"/>
+</svg>

@@ -1,0 +1,289 @@
+import type { GameSnapshot } from "@/game/types/gameTypes";
+
+import { drawEnemyCharacter, drawPlayerCharacter } from "./characterRenderer";
+import type { SpriteCache } from "./spriteManifest";
+import {
+  getAnimatedSpriteFrame,
+  getSpriteTransform,
+  resolveEnemySpriteState,
+  resolvePlayerSpriteState,
+} from "./spriteAnimation";
+
+function drawSprite(
+  context: CanvasRenderingContext2D,
+  sprite: CanvasImageSource | undefined,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  facing: "left" | "right",
+  rotation = 0,
+  alpha = 1,
+) {
+  if (!sprite) {
+    return false;
+  }
+
+  context.save();
+  context.globalAlpha = alpha;
+
+  if (facing === "left") {
+    context.translate(x + width / 2, y + height / 2);
+    context.scale(-1, 1);
+    context.rotate(rotation);
+    context.drawImage(sprite, -width / 2, -height / 2, width, height);
+  } else {
+    context.translate(x + width / 2, y + height / 2);
+    context.rotate(rotation);
+    context.drawImage(sprite, -width / 2, -height / 2, width, height);
+  }
+
+  context.restore();
+  return true;
+}
+
+export function renderFrame(
+  context: CanvasRenderingContext2D,
+  snapshot: GameSnapshot,
+  sprites: SpriteCache = {},
+) {
+  const { canvas } = context;
+  const timeMs = snapshot.hud.elapsedMs;
+
+  context.clearRect(0, 0, canvas.width, canvas.height);
+
+  const background = context.createLinearGradient(0, 0, 0, canvas.height);
+  background.addColorStop(0, "#b47a3a");
+  background.addColorStop(0.45, "#8a6242");
+  background.addColorStop(1, "#4d3b35");
+  context.fillStyle = background;
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  const vignette = context.createLinearGradient(0, 0, canvas.width, canvas.height);
+  vignette.addColorStop(0, "rgba(0, 0, 0, 0.14)");
+  vignette.addColorStop(0.5, "rgba(0, 0, 0, 0)");
+  vignette.addColorStop(1, "rgba(0, 0, 0, 0.22)");
+  context.fillStyle = vignette;
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  context.fillStyle = "#2b3138";
+  context.fillRect(0, canvas.height - 84, canvas.width, 84);
+
+  context.fillStyle = "#bea282";
+  context.fillRect(48, 88, canvas.width - 96, canvas.height - 184);
+
+  context.fillStyle = "#59646e";
+  context.fillRect(86, 120, canvas.width - 172, 44);
+
+  context.fillStyle = "rgba(255, 236, 190, 0.32)";
+  for (let index = 0; index < 5; index += 1) {
+    const windowX = 120 + index * 220;
+    context.beginPath();
+    context.roundRect(windowX, 148, 148, 88, 18);
+    context.fill();
+
+    const sceneryOffset = (snapshot.camera.x * 0.14 + index * 56) % 180;
+    context.fillStyle = "rgba(84, 120, 130, 0.2)";
+    context.fillRect(windowX + 18 - sceneryOffset, 164, 76, 42);
+    context.fillRect(windowX + 122 - sceneryOffset, 172, 52, 28);
+    context.fillStyle = "rgba(255, 236, 190, 0.32)";
+  }
+
+  context.fillStyle = "rgba(49, 41, 34, 0.18)";
+  for (let index = 0; index < 6; index += 1) {
+    context.fillRect(104 + index * 186, 120, 10, canvas.height - 206);
+  }
+
+  context.fillStyle = "#8d5a31";
+  for (let index = 0; index < 4; index += 1) {
+    const benchX = 138 + index * 255;
+    context.beginPath();
+    context.roundRect(benchX, canvas.height - 170, 168, 38, 12);
+    context.fill();
+  }
+
+  context.strokeStyle = "rgba(53, 58, 64, 0.45)";
+  context.lineWidth = 4;
+  for (let index = 0; index < 6; index += 1) {
+    const handleX = 152 + index * 180;
+    context.beginPath();
+    context.moveTo(handleX, 72);
+    context.lineTo(handleX, 134);
+    context.stroke();
+    context.beginPath();
+    context.ellipse(handleX, 146, 14, 10, 0, 0, Math.PI * 2);
+    context.stroke();
+  }
+
+  const gateStartSource = snapshot.scene.type === "boss_combat"
+    ? snapshot.levelLayout.bossGateStartX
+    : snapshot.scene.waveIndex === 2
+      ? snapshot.levelLayout.gate2StartX
+      : snapshot.levelLayout.gate1StartX;
+  const gateEndSource = snapshot.scene.gateRightX ?? gateStartSource;
+  const gateStart = gateStartSource - snapshot.camera.x;
+  const gateEnd = gateEndSource - snapshot.camera.x;
+
+  if (snapshot.scene.gateClosed && gateEnd > gateStart) {
+    context.fillStyle = "rgba(122, 30, 16, 0.55)";
+    context.fillRect(gateStart, 108, gateEnd - gateStart, canvas.height - 210);
+  }
+
+  const floorY = canvas.height - 112;
+  for (const enemy of snapshot.enemies) {
+    if (enemy.hp <= 0) {
+      continue;
+    }
+
+    const enemyVisibleX = enemy.x - snapshot.camera.x;
+    const enemyVisibleY = 140 + enemy.y;
+
+    context.fillStyle = "rgba(20, 17, 10, 0.25)";
+    context.beginPath();
+    context.ellipse(
+      enemyVisibleX + enemy.width / 2,
+      floorY + enemy.depth / 2,
+      enemy.width / 2,
+      enemy.depth / 2.3,
+      0,
+      0,
+      Math.PI * 2,
+    );
+    context.fill();
+
+    const enemySpriteState = resolveEnemySpriteState(enemy);
+    const enemyTransform = getSpriteTransform(
+      enemySpriteState,
+      timeMs + enemy.x,
+      enemyVisibleX - (enemy.isBoss ? 24 : 18),
+      enemyVisibleY - (enemy.isBoss ? 70 : 58),
+      enemy.isBoss ? 160 : 124,
+      enemy.isBoss ? 214 : 178,
+    );
+
+    const drewEnemySprite = drawSprite(
+      context,
+      getAnimatedSpriteFrame(sprites, enemy.kind, enemySpriteState, timeMs + enemy.x),
+      enemyTransform.x,
+      enemyTransform.y,
+      enemyTransform.width,
+      enemyTransform.height,
+      enemy.facing,
+      enemyTransform.rotation,
+      enemyTransform.alpha,
+    );
+
+    if (!drewEnemySprite) {
+      drawEnemyCharacter(context, enemy, enemyVisibleX, enemyVisibleY - 12, timeMs);
+    }
+
+    if (enemy.hurtCooldownMs > 0) {
+      context.fillStyle = "rgba(255, 235, 145, 0.4)";
+      context.beginPath();
+      context.ellipse(
+        enemyVisibleX + enemy.width / 2,
+        enemyVisibleY + 26,
+        enemy.width * 0.8,
+        enemy.isBoss ? 78 : 62,
+        0,
+        0,
+        Math.PI * 2,
+      );
+      context.fill();
+    }
+  }
+
+  const visibleX = snapshot.player.x - snapshot.camera.x;
+  const visibleY = 140 + snapshot.player.y;
+  const playerSpriteState = resolvePlayerSpriteState(snapshot.player);
+  const playerTransform = getSpriteTransform(
+    playerSpriteState,
+    timeMs,
+    visibleX - 22,
+    visibleY - snapshot.player.z - 68,
+    132,
+    194,
+  );
+
+  context.fillStyle = "rgba(20, 17, 10, 0.25)";
+  context.beginPath();
+  context.ellipse(
+    visibleX + snapshot.player.width / 2,
+    floorY + snapshot.player.depth / 2,
+    snapshot.player.width / 2,
+    snapshot.player.depth / 2.2,
+    0,
+    0,
+    Math.PI * 2,
+  );
+  context.fill();
+
+  const drewPlayerSprite = drawSprite(
+    context,
+    getAnimatedSpriteFrame(
+      sprites,
+      snapshot.player.id,
+      playerSpriteState,
+      timeMs,
+    ),
+    playerTransform.x,
+    playerTransform.y,
+    playerTransform.width,
+    playerTransform.height,
+    snapshot.player.facing,
+    playerTransform.rotation,
+    playerTransform.alpha,
+  );
+
+  if (!drewPlayerSprite) {
+    drawPlayerCharacter(
+      context,
+      snapshot.player,
+      visibleX,
+      visibleY - snapshot.player.z - 12,
+      timeMs,
+    );
+  }
+
+  if (snapshot.player.hurtCooldownMs > 0) {
+    context.fillStyle = "rgba(255, 152, 94, 0.28)";
+    context.beginPath();
+    context.ellipse(
+      visibleX + snapshot.player.width / 2,
+      visibleY + 18,
+      snapshot.player.width * 0.9,
+      68,
+      0,
+      0,
+      Math.PI * 2,
+    );
+    context.fill();
+  }
+
+  if (snapshot.player.attack.activeMs > 0) {
+    context.fillStyle = "rgba(255, 203, 94, 0.55)";
+    const attackOffset = snapshot.player.facing === "right" ? snapshot.player.width : -snapshot.player.attack.width;
+    context.fillRect(
+      visibleX + attackOffset,
+      visibleY - snapshot.player.z + 14,
+      snapshot.player.attack.width,
+      36,
+    );
+    context.fillStyle = "rgba(255, 243, 181, 0.72)";
+    context.beginPath();
+    context.ellipse(
+      visibleX + attackOffset + snapshot.player.attack.width / 2,
+      visibleY + 30,
+      snapshot.player.attack.width * 0.36,
+      24,
+      0,
+      0,
+      Math.PI * 2,
+    );
+    context.fill();
+  }
+
+  context.fillStyle = "#ffffff";
+  context.font = "600 24px sans-serif";
+  context.fillText(snapshot.hud.levelName, 48, 48);
+}

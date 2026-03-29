@@ -1,0 +1,25 @@
+<svg width="256" height="384" viewBox="0 0 256 384" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="128" cy="351" rx="62" ry="16" fill="#1E1816" fill-opacity="0.18"/>
+  <path d="M96 132C96 99.4152 122.415 73 155 73H159C185.585 73 207 94.4152 207 121V244H96V132Z" fill="#1F4E88"/>
+  <path d="M102 141C102 114.49 123.49 93 150 93H153C175.091 93 193 110.909 193 133V237H102V141Z" fill="#D5E0EB"/>
+  <path d="M142 91L161 125L129 125L142 91Z" fill="#D96B2E"/>
+  <rect x="108" y="236" width="82" height="67" rx="18" fill="#344454"/>
+  <rect x="112" y="228" width="74" height="18" rx="9" fill="#243240"/>
+  <path d="M93 149L120 178L128 201L113 207L99 185L88 188L93 149Z" fill="#1F4E88"/>
+  <path d="M189 150L214 175L229 211L212 216L196 188L184 194L189 150Z" fill="#1F4E88"/>
+  <circle cx="118" cy="201" r="13" fill="#EFC39D"/>
+  <circle cx="217" cy="213" r="13" fill="#EFC39D"/>
+  <rect x="114" y="301" width="27" height="56" rx="13.5" transform="rotate(-10 114 301)" fill="#344454"/>
+  <rect x="153" y="305" width="27" height="58" rx="13.5" transform="rotate(7 153 305)" fill="#344454"/>
+  <rect x="103" y="345" width="43" height="14" rx="7" transform="rotate(-8 103 345)" fill="#17110D"/>
+  <rect x="146" y="351" width="43" height="14" rx="7" transform="rotate(4 146 351)" fill="#17110D"/>
+  <circle cx="144" cy="64" r="39" fill="#EFC39D"/>
+  <path d="M106 63C106 41.4609 123.461 24 145 24H148C169.539 24 187 41.4609 187 63V72H106V63Z" fill="#251910"/>
+  <path d="M114 53C119.605 33.3602 135.486 22 152 22C166.428 22 179.858 30.129 185 48L171 44L158 49L146 42L130 49L114 53Z" fill="#251910"/>
+  <circle cx="131" cy="63" r="4.5" fill="#231915"/>
+  <circle cx="160" cy="63" r="4.5" fill="#231915"/>
+  <path d="M139 81C143.635 84.2857 149.365 84.2857 154 81" stroke="#9B5E3F" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M98 120L89 216L112 213L119 128L98 120Z" fill="#B9793E"/>
+  <rect x="83" y="112" width="24" height="26" rx="8" fill="#6A4324"/>
+  <path d="M83 115C91 109.667 99 109.667 107 115" stroke="#D2A06C" stroke-width="3" stroke-linecap="round"/>
+</svg>

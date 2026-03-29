@@ -1,0 +1,21 @@
+<svg width="256" height="384" viewBox="0 0 256 384" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="126" cy="336" rx="78" ry="20" fill="#1E1816" fill-opacity="0.18"/>
+  <g transform="rotate(86 128 214)">
+    <path d="M97 136C97 103.415 123.415 77 156 77H160C186.585 77 208 98.4152 208 125V247H97V136Z" fill="#1F4E88"/>
+    <path d="M103 145C103 118.49 124.49 97 151 97H154C176.091 97 194 114.909 194 137V240H103V145Z" fill="#D5E0EB"/>
+    <path d="M143 95L162 129L130 129L143 95Z" fill="#D96B2E"/>
+    <rect x="109" y="240" width="82" height="67" rx="18" fill="#344454"/>
+    <rect x="113" y="232" width="74" height="18" rx="9" fill="#243240"/>
+    <path d="M95 150L70 177L60 209L76 214L91 185L101 191L95 150Z" fill="#1F4E88"/>
+    <path d="M190 151L214 177L225 208L209 214L194 184L184 190L190 151Z" fill="#1F4E88"/>
+    <circle cx="64" cy="210" r="13" fill="#EFC39D"/>
+    <circle cx="221" cy="209" r="13" fill="#EFC39D"/>
+    <rect x="116" y="306" width="27" height="54" rx="13.5" fill="#344454"/>
+    <rect x="151" y="304" width="27" height="56" rx="13.5" fill="#344454"/>
+    <rect x="108" y="350" width="42" height="14" rx="7" fill="#17110D"/>
+    <rect x="145" y="350" width="42" height="14" rx="7" fill="#17110D"/>
+    <circle cx="145" cy="68" r="39" fill="#EFC39D"/>
+    <path d="M107 67C107 45.4609 124.461 28 146 28H149C170.539 28 188 45.4609 188 67V76H107V67Z" fill="#251910"/>
+    <path d="M115 57C120.605 37.3602 136.486 26 153 26C167.428 26 180.858 34.129 186 52L172 48L159 53L147 46L131 53L115 57Z" fill="#251910"/>
+  </g>
+</svg>

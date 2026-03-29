@@ -75,6 +75,27 @@ function chooseAttack(enemy: EnemyState, distanceX: number): EnemyAttackDefiniti
   return attacks.find((attack) => !attack.projectile) ?? attacks[0];
 }
 
+function resolvePlayerPressure(state: GameState) {
+  const playerCommitted =
+    state.player.actionState === "attack_1" ||
+    state.player.actionState === "attack_2" ||
+    state.player.actionState === "attack_3" ||
+    state.player.actionState === "special" ||
+    state.player.actionState === "grab" ||
+    state.player.actionState === "throw" ||
+    state.player.actionRecoveryMs > 120;
+  const playerSpammingJab =
+    state.player.actionState === "attack_1" &&
+    state.player.attack.attackChainIndex <= 1 &&
+    state.input.attack;
+
+  return {
+    playerCommitted,
+    playerSpammingJab,
+    playerPredictable: playerCommitted || playerSpammingJab,
+  };
+}
+
 function createEnemyAttackState(enemy: EnemyState, attack: EnemyAttackDefinition): ActiveEnemyAttackState {
   const aggression = enemy.modifiers.aggression ?? 1;
   const startupMs = Math.round(attack.startupMs * Math.max(0.75, 1 - (aggression - 1) * 0.08));
@@ -133,7 +154,8 @@ function updateCircle(enemy: EnemyState, state: GameState, dt: number, targetX: 
   const aggression = enemy.modifiers.aggression ?? 1;
   const playerIsCommitted =
     state.player.attack.activeMs > 0 || state.player.attack.cooldownMs > 180;
-  const slotOffset = enemy.engagementSlot === "back" ? -52 : 52;
+  const baseSlotOffset = enemy.engagementSlot === "back" ? -52 : 52;
+  const slotOffset = baseSlotOffset + (enemy.modifiers.preferredLaneOffset ?? 0);
   const desiredX = state.player.x + slotOffset - enemy.x;
   const desiredY = targetY + (enemy.engagementSlot === "back" ? 18 : -18);
   const speed =
@@ -154,8 +176,8 @@ export function updateEnemies(state: GameState, dtMs: number) {
   }
 
   const dt = dtMs / 1000;
-  const playerIsCommitted =
-    state.player.attack.activeMs > 0 || state.player.attack.cooldownMs > 180;
+  const { playerCommitted, playerPredictable, playerSpammingJab } =
+    resolvePlayerPressure(state);
   const liveEnemies = state.enemies
     .filter((enemy) => enemy.hp > 0)
     .sort(
@@ -166,7 +188,9 @@ export function updateEnemies(state: GameState, dtMs: number) {
     liveEnemies
       .slice(
         0,
-        enemyAiRules.engagement.maxAttackers + (playerIsCommitted ? 1 : 0),
+        playerCommitted
+          ? enemyAiRules.engagement.maxAttackersWhenPlayerCommitted
+          : enemyAiRules.engagement.maxAttackers,
       )
       .map((enemy) => enemy.id),
   );
@@ -218,6 +242,8 @@ export function updateEnemies(state: GameState, dtMs: number) {
     }
 
     applyEnemyPhases(enemy);
+    enemy.lastPlayerActionSeen = state.player.actionState;
+    enemy.lastPlayerActionSeenMs = state.hud.elapsedMs;
 
     const distance = distanceToPlayer(enemy, state);
     enemy.facing = distance.x >= 0 ? "right" : "left";
@@ -251,14 +277,16 @@ export function updateEnemies(state: GameState, dtMs: number) {
 
     const isClose = distance.absoluteX < enemyAiRules.distanceLogic.close;
     const isFar = distance.absoluteX > enemyAiRules.distanceLogic.far;
-    const inAttackLane = distance.absoluteY <= (playerIsCommitted ? 88 : 72);
+    const antiSpamBias = enemy.modifiers.antiSpamBias ?? 1;
+    const inAttackLane = distance.absoluteY <= (playerPredictable ? 88 : 72);
     const ignoresEngagementCap =
-      playerIsCommitted &&
-      enemy.combatStyle !== "melee" &&
-      distance.absoluteX <= enemy.attackRange + 28;
+      (playerCommitted || playerSpammingJab) &&
+      ((enemy.combatStyle !== "melee" &&
+        distance.absoluteX <= enemy.attackRange + 28) ||
+        antiSpamBias >= 1.25);
     const canAttack =
       enemy.attackCooldownMs === 0 &&
-      distance.absoluteX <= enemy.attackRange &&
+      distance.absoluteX <= enemy.attackRange + (playerPredictable ? 10 : 0) &&
       inAttackLane &&
       (engagedIds.has(enemy.id) || ignoresEngagementCap);
 
@@ -267,6 +295,7 @@ export function updateEnemies(state: GameState, dtMs: number) {
       enemy.vx = 0;
       enemy.vy = 0;
       enemy.state = "attack";
+      enemy.intent = playerPredictable ? "punish" : "pressure";
       continue;
     }
 
@@ -274,13 +303,24 @@ export function updateEnemies(state: GameState, dtMs: number) {
       enemy.vx = 0;
       enemy.vy = 0;
       enemy.state = "idle";
+      enemy.intent = "hold";
       enemy.x = clampXToArena(state, enemy.x, enemy.width);
       enemy.y = clampYToArena(state, enemy.y, enemy.depth);
       continue;
     }
 
-    if (isFar || enemy.behavior.pattern === "rush" || enemy.behavior.pattern === "tank_push") {
+    if (
+      playerPredictable &&
+      !engagedIds.has(enemy.id) &&
+      antiSpamBias >= 1.15 &&
+      enemy.behavior.pattern !== "idle_block"
+    ) {
       enemy.state = "approach";
+      enemy.intent = "flank";
+      updateApproach(enemy, state, dt, distance.x, distance.y);
+    } else if (isFar || enemy.behavior.pattern === "rush" || enemy.behavior.pattern === "tank_push") {
+      enemy.state = "approach";
+      enemy.intent = playerPredictable ? "punish" : "pressure";
       updateApproach(enemy, state, dt, distance.x, distance.y);
     } else if (
       !engagedIds.has(enemy.id) ||
@@ -289,9 +329,14 @@ export function updateEnemies(state: GameState, dtMs: number) {
       (!isClose && !isFar)
     ) {
       enemy.state = "circle";
+      enemy.intent =
+        enemy.combatStyle === "ranged" || enemy.combatStyle === "hybrid"
+          ? "kite"
+          : "flank";
       updateCircle(enemy, state, dt, distance.x, distance.y);
     } else {
       enemy.state = "approach";
+      enemy.intent = "pressure";
       updateApproach(enemy, state, dt, distance.x, distance.y);
     }
 

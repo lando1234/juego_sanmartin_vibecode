@@ -56,6 +56,7 @@ export const enemyHitboxTemplate: HitboxState = {
 export const enemyAiRules = {
   engagement: {
     maxAttackers: 3,
+    maxAttackersWhenPlayerCommitted: 4,
     flankPositions: ["front", "back"] as const,
   },
   distanceLogic: {
@@ -95,6 +96,10 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
         recovery: 0.5,
       }),
     ],
+    modifiers: {
+      antiSpamBias: 1.1,
+      preferredLaneOffset: 22,
+    },
   },
   durmiente: {
     name: "Durmiente",
@@ -123,6 +128,10 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
         recovery: 0.75,
       }),
     ],
+    modifiers: {
+      antiSpamBias: 0.85,
+      preferredLaneOffset: -12,
+    },
   },
   mochilero: {
     name: "Mochilero",
@@ -150,6 +159,10 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
         recovery: 0.65,
       }),
     ],
+    modifiers: {
+      antiSpamBias: 1.15,
+      preferredLaneOffset: 8,
+    },
   },
   vendedor_competencia: {
     name: "Vendedor de la Competencia",
@@ -184,6 +197,10 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
         recovery: 0.4,
       }),
     ],
+    modifiers: {
+      antiSpamBias: 1.35,
+      preferredLaneOffset: 36,
+    },
   },
   senora_bolsos: {
     name: "Señora de los Bolsos",
@@ -221,6 +238,10 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
         recovery: 0.8,
       }),
     ],
+    modifiers: {
+      antiSpamBias: 1.2,
+      preferredLaneOffset: -28,
+    },
   },
   fisura: {
     name: "Fisura",
@@ -258,6 +279,8 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     modifiers: {
       zigzagMovement: true,
       randomSpeed: true,
+      antiSpamBias: 1.4,
+      preferredLaneOffset: 42,
     },
   },
   borracho: {
@@ -301,6 +324,9 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
         buff: {
           speedMultiplier: 1.5,
           damageMultiplier: 1.2,
+        },
+        modifiers: {
+          antiSpamBias: 1.3,
         },
       },
     ],
@@ -397,6 +423,7 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
         modifiers: {
           speedMultiplier: 1.5,
           aggression: 2,
+          antiSpamBias: 1.5,
         },
       },
     ],

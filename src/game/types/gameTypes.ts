@@ -142,7 +142,14 @@ export type EnemyModifiers = {
   aggression?: number;
   speedMultiplier?: number;
   damageMultiplier?: number;
+  antiSpamBias?: number;
+  preferredLaneOffset?: number;
+  guardChance?: number;
+  poiseHits?: number;
+  canGrabPlayer?: boolean;
 };
+
+export type EnemyIntent = "hold" | "pressure" | "punish" | "flank" | "kite";
 
 export type EnemyPhaseDefinition = {
   name: string;
@@ -306,6 +313,9 @@ export type EnemyState = {
   phases: EnemyPhaseDefinition[];
   phaseIndex: number;
   engagementSlot: "front" | "back" | null;
+  intent: EnemyIntent;
+  lastPlayerActionSeen: PlayerActionState | null;
+  lastPlayerActionSeenMs: number;
   activeAttack: ActiveEnemyAttackState | null;
   thrownTimerMs: number;
   thrownVx: number;

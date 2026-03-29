@@ -432,6 +432,20 @@ function applyDamageToPlayer(
           : damage;
   state.player.hp = Math.max(0, state.player.hp - incomingDamage);
   state.runStats.stationDamageTaken += incomingDamage;
+
+  const appliedKnockback = manualBlockActive ? Math.round(knockback * 0.35) : knockback;
+  state.player.x += sourceFacing === "right" ? appliedKnockback : -appliedKnockback;
+  state.player.x = clampXToArena(state, state.player.x, state.player.width);
+  state.player.y = clampYToArena(state, state.player.y, state.player.depth);
+
+  if (manualBlockActive && state.player.hp > 0) {
+    state.player.hurtCooldownMs = 160;
+    state.player.actionState = "block";
+    state.player.actionTimerMs = 0;
+    state.player.actionRecoveryMs = Math.max(state.player.actionRecoveryMs, 90);
+    return;
+  }
+
   state.player.hurtCooldownMs = 380;
   state.player.actionState = state.player.hp === 0 ? "defeated" : "hurt";
   state.player.queuedAction = null;
@@ -447,10 +461,6 @@ function applyDamageToPlayer(
   state.player.attack.attackWindowMs = 0;
   state.player.attack.struckEnemyIds = [];
   state.player.grabTargetId = null;
-  const appliedKnockback = manualBlockActive ? Math.round(knockback * 0.35) : knockback;
-  state.player.x += sourceFacing === "right" ? appliedKnockback : -appliedKnockback;
-  state.player.x = clampXToArena(state, state.player.x, state.player.width);
-  state.player.y = clampYToArena(state, state.player.y, state.player.depth);
 
   if (state.player.hp === 0) {
     state.phase = "game_over";

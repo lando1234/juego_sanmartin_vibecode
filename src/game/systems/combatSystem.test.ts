@@ -365,6 +365,8 @@ describe("combatSystem", () => {
     updateCombat(state, 16);
 
     expect(state.player.hp).toBeGreaterThan(90);
+    expect(state.player.actionState).toBe("block");
+    expect(state.player.hurtCooldownMs).toBeLessThan(380);
   });
 
   it("loses recoverable health if Ricky gets hit before cashing it back", () => {

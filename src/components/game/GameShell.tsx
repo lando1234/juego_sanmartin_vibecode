@@ -83,11 +83,13 @@ export function GameShell() {
       return;
     }
 
-    const orientationApi = window.screen.orientation as ScreenOrientation & {
+    const orientationApi = window.screen?.orientation as
+      | (ScreenOrientation & {
       lock?: (orientation: "landscape") => Promise<void>;
-    };
+    })
+      | undefined;
 
-    orientationApi.lock?.("landscape").catch(() => {});
+    orientationApi?.lock?.("landscape").catch(() => {});
   }, [mobileBrowser]);
 
   const sendCommand = (type: "start" | "pause-toggle" | "reset" | "next-level") => {
@@ -125,34 +127,55 @@ export function GameShell() {
           onReset={() => sendCommand("reset")}
         />
       ) : (
-        <section className="relative mx-auto flex min-h-dvh w-full max-w-[1600px] items-center justify-center px-3 py-3 sm:px-4 sm:py-4 lg:px-6 lg:py-6">
-          <div className="relative w-full">
-            <div className="relative overflow-hidden rounded-[36px] border border-white/14 bg-[linear-gradient(180deg,rgba(34,24,20,0.9),rgba(13,9,8,0.98))] p-3 shadow-[0_36px_120px_rgba(16,12,10,0.52)]">
-              <div className="mb-3 grid gap-3 xl:grid-cols-[minmax(0,1fr)_280px]">
-                <GameHud snapshot={snapshot} variant="overlay" />
+        <section
+          className={
+            mobileBrowser
+              ? "relative mx-auto flex h-dvh min-h-dvh w-full items-stretch justify-stretch overflow-hidden p-0"
+              : "relative mx-auto flex min-h-dvh w-full max-w-[1600px] items-center justify-center px-3 py-3 sm:px-4 sm:py-4 lg:px-6 lg:py-6"
+          }
+        >
+          <div className={mobileBrowser ? "relative h-full w-full" : "relative w-full"}>
+            <div
+              className={
+                mobileBrowser
+                  ? "relative h-full w-full overflow-hidden bg-[linear-gradient(180deg,rgba(34,24,20,0.96),rgba(13,9,8,1))]"
+                  : "relative overflow-hidden rounded-[36px] border border-white/14 bg-[linear-gradient(180deg,rgba(34,24,20,0.9),rgba(13,9,8,0.98))] p-3 shadow-[0_36px_120px_rgba(16,12,10,0.52)]"
+              }
+            >
+              {!mobileBrowser ? (
+                <div className="mb-3 grid gap-3 xl:grid-cols-[minmax(0,1fr)_280px]">
+                  <GameHud snapshot={snapshot} variant="overlay" />
 
-                <div className="grid gap-3">
-                  <DesktopControlsHint snapshot={snapshot} variant="overlay" />
-                  <div className="flex flex-wrap items-center gap-2 rounded-[20px] border border-white/12 bg-[linear-gradient(180deg,rgba(35,25,20,0.78),rgba(16,12,10,0.82))] p-3 shadow-[0_16px_50px_rgba(20,15,12,0.28)] backdrop-blur-xl">
-                    <button
-                      type="button"
-                      onClick={() => sendCommand("pause-toggle")}
-                      className="rounded-full bg-[linear-gradient(90deg,#1c1c1c,#3d3d3d)] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110"
-                    >
-                      {snapshot.phase === "paused" ? "Reanudar" : "Pausar"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => sendCommand("reset")}
-                      className="rounded-full border border-white/18 px-4 py-2 text-sm font-semibold text-[#f7ead4] transition hover:bg-white/8"
-                    >
-                      Reiniciar
-                    </button>
+                  <div className="grid gap-3">
+                    <DesktopControlsHint snapshot={snapshot} variant="overlay" />
+                    <div className="flex flex-wrap items-center gap-2 rounded-[20px] border border-white/12 bg-[linear-gradient(180deg,rgba(35,25,20,0.78),rgba(16,12,10,0.82))] p-3 shadow-[0_16px_50px_rgba(20,15,12,0.28)] backdrop-blur-xl">
+                      <button
+                        type="button"
+                        onClick={() => sendCommand("pause-toggle")}
+                        className="rounded-full bg-[linear-gradient(90deg,#1c1c1c,#3d3d3d)] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110"
+                      >
+                        {snapshot.phase === "paused" ? "Reanudar" : "Pausar"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => sendCommand("reset")}
+                        className="rounded-full border border-white/18 px-4 py-2 text-sm font-semibold text-[#f7ead4] transition hover:bg-white/8"
+                      >
+                        Reiniciar
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : null}
 
-              <div className="relative aspect-video overflow-hidden rounded-[28px] bg-[#2b211d]">
+              <div
+                data-testid="game-stage-frame"
+                className={
+                  mobileBrowser
+                    ? "relative h-full w-full overflow-hidden bg-[#2b211d]"
+                    : "relative aspect-video overflow-hidden rounded-[28px] bg-[#2b211d]"
+                }
+              >
                 <GameCanvas
                   snapshot={snapshot}
                   className="absolute inset-0 h-full w-full rounded-none border-0 bg-[#2b211d] shadow-none ring-0"

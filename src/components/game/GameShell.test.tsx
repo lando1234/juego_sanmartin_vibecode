@@ -46,6 +46,30 @@ describe("GameShell", () => {
     ).toBeGreaterThan(0);
   });
 
+  it("uses a full-screen stage frame on mobile browsers", async () => {
+    const user = userEvent.setup();
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: query === "(max-width: 820px)",
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })) as typeof window.matchMedia;
+
+    render(<GameShell />);
+    await user.click(screen.getByRole("button", { name: "Empezar partida" }));
+
+    const stage = screen.getAllByTestId("game-stage-frame").at(-1)!;
+    expect(stage.className).toContain("h-full");
+    expect(stage.className).not.toContain("aspect-video");
+
+    window.matchMedia = originalMatchMedia;
+  });
+
   it("cleans up engine listeners on unmount", () => {
     const removeEventListenerSpy = vi.spyOn(window, "removeEventListener");
     const { unmount } = render(<GameShell />);

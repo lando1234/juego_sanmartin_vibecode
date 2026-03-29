@@ -14,9 +14,24 @@ import { GameHud } from "./GameHud";
 import { GameOverlay } from "./GameOverlay";
 import { MobileControls } from "./MobileControls";
 
+function detectMobileBrowser(win: Window) {
+  const userAgentData = (navigator as Navigator & {
+    userAgentData?: { mobile?: boolean };
+  }).userAgentData;
+  const ua = navigator.userAgent;
+  const isMobileUa =
+    userAgentData?.mobile === true ||
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  const isIpadDesktopMode =
+    navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+
+  return isMobileUa || isIpadDesktopMode || win.matchMedia("(max-width: 820px)").matches;
+}
+
 export function GameShell() {
   const engineRef = useRef<GameEngine | null>(null);
   const [snapshot, setSnapshot] = useState<GameSnapshot>(createInitialGameState);
+  const [mobileBrowser, setMobileBrowser] = useState(false);
 
   useEffect(() => {
     const engine = createGameEngine();
@@ -38,6 +53,23 @@ export function GameShell() {
     };
   }, []);
 
+  useEffect(() => {
+    const sync = () => {
+      setMobileBrowser(detectMobileBrowser(window));
+    };
+
+    sync();
+
+    const mediaQuery = window.matchMedia("(max-width: 820px)");
+    mediaQuery.addEventListener("change", sync);
+    window.addEventListener("orientationchange", sync);
+
+    return () => {
+      mediaQuery.removeEventListener("change", sync);
+      window.removeEventListener("orientationchange", sync);
+    };
+  }, []);
+
   const sendCommand = (type: "start" | "pause-toggle" | "reset" | "next-level") => {
     engineRef.current?.sendCommand({ type });
   };
@@ -54,8 +86,18 @@ export function GameShell() {
             onReset={() => sendCommand("reset")}
           />
           <GameHud snapshot={snapshot} />
-          <GameCanvas snapshot={snapshot} />
-          <MobileControls onInput={(input) => engineRef.current?.sendInput(input)} />
+          <div className="relative">
+            <GameCanvas snapshot={snapshot} />
+            {mobileBrowser ? (
+              <MobileControls
+                variant="overlay"
+                onInput={(input) => engineRef.current?.sendInput(input)}
+              />
+            ) : null}
+          </div>
+          {!mobileBrowser ? (
+            <MobileControls onInput={(input) => engineRef.current?.sendInput(input)} />
+          ) : null}
         </div>
         <div className="grid content-start gap-4">
           <DesktopControlsHint snapshot={snapshot} />

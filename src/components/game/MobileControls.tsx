@@ -6,6 +6,7 @@ import type { InputState } from "@/game/types/gameTypes";
 
 type MobileControlsProps = {
   onInput: (input: Partial<InputState>) => void;
+  variant?: "panel" | "overlay";
 };
 
 function pressHandlers(
@@ -43,7 +44,92 @@ function pressHandlers(
   };
 }
 
-export function MobileControls({ onInput }: MobileControlsProps) {
+type ControlButtonProps = {
+  ariaLabel: string;
+  keyName: keyof InputState;
+  label: string;
+  onInput: (input: Partial<InputState>) => void;
+  className: string;
+};
+
+function ControlButton({
+  ariaLabel,
+  keyName,
+  label,
+  onInput,
+  className,
+}: ControlButtonProps) {
+  return (
+    <button
+      type="button"
+      aria-label={ariaLabel}
+      className={className}
+      {...pressHandlers(keyName, onInput)}
+    >
+      {label}
+    </button>
+  );
+}
+
+export function MobileControls({
+  onInput,
+  variant = "panel",
+}: MobileControlsProps) {
+  if (variant === "overlay") {
+    return (
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex items-end justify-between px-3 pb-3 lg:hidden [touch-action:none] [user-select:none] sm:px-4 sm:pb-4">
+        <div className="pointer-events-auto grid grid-cols-3 gap-2 rounded-[28px] border border-[#ff5a36]/35 bg-[linear-gradient(180deg,rgba(24,2,2,0.82),rgba(10,0,0,0.72))] p-2 shadow-[0_24px_48px_rgba(0,0,0,0.4)] backdrop-blur-md">
+          <div />
+          <ControlButton
+            ariaLabel="Mover arriba"
+            keyName="up"
+            label="▲"
+            onInput={onInput}
+            className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-[#ff6842]/55 bg-[radial-gradient(circle_at_35%_30%,rgba(255,105,75,0.92),rgba(173,11,11,0.94))] text-lg font-black text-white shadow-[0_0_28px_rgba(255,61,28,0.34)] transition active:scale-[0.96]"
+          />
+          <div />
+          <ControlButton
+            ariaLabel="Mover izquierda"
+            keyName="left"
+            label="◀"
+            onInput={onInput}
+            className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-[#ff6842]/55 bg-[radial-gradient(circle_at_35%_30%,rgba(255,105,75,0.92),rgba(173,11,11,0.94))] text-lg font-black text-white shadow-[0_0_28px_rgba(255,61,28,0.34)] transition active:scale-[0.96]"
+          />
+          <ControlButton
+            ariaLabel="Mover abajo"
+            keyName="down"
+            label="▼"
+            onInput={onInput}
+            className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-[#ff6842]/55 bg-[radial-gradient(circle_at_35%_30%,rgba(255,105,75,0.92),rgba(173,11,11,0.94))] text-lg font-black text-white shadow-[0_0_28px_rgba(255,61,28,0.34)] transition active:scale-[0.96]"
+          />
+          <ControlButton
+            ariaLabel="Mover derecha"
+            keyName="right"
+            label="▶"
+            onInput={onInput}
+            className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-[#ff6842]/55 bg-[radial-gradient(circle_at_35%_30%,rgba(255,105,75,0.92),rgba(173,11,11,0.94))] text-lg font-black text-white shadow-[0_0_28px_rgba(255,61,28,0.34)] transition active:scale-[0.96]"
+          />
+        </div>
+        <div className="pointer-events-auto grid grid-cols-2 gap-3 pb-1">
+          <ControlButton
+            ariaLabel="Saltar"
+            keyName="jump"
+            label="A"
+            onInput={onInput}
+            className="flex h-16 w-16 items-center justify-center self-end rounded-full border border-[#ff9a74]/45 bg-[radial-gradient(circle_at_30%_30%,rgba(255,141,98,0.98),rgba(204,39,7,0.92))] text-xl font-black text-white shadow-[0_0_34px_rgba(255,79,33,0.36)] transition active:scale-[0.96]"
+          />
+          <ControlButton
+            ariaLabel="Golpear"
+            keyName="attack"
+            label="B"
+            onInput={onInput}
+            className="mt-8 flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full border border-[#ffd0b5]/35 bg-[radial-gradient(circle_at_30%_30%,rgba(255,116,76,0.98),rgba(150,6,6,0.94))] text-2xl font-black text-white shadow-[0_0_38px_rgba(255,51,22,0.42)] transition active:scale-[0.96]"
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <section className="grid gap-4 rounded-[24px] border border-black/10 bg-[var(--panel)] p-4 shadow-[0_20px_60px_var(--shadow)] backdrop-blur-sm lg:hidden [touch-action:none] [user-select:none]">
       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--accent-strong)]">
@@ -52,57 +138,51 @@ export function MobileControls({ onInput }: MobileControlsProps) {
       <div className="grid grid-cols-2 gap-4">
         <div className="grid grid-cols-3 gap-2">
           <div />
-          <button
-            type="button"
-            aria-label="Mover arriba"
+          <ControlButton
+            ariaLabel="Mover arriba"
+            keyName="up"
+            label="↑"
+            onInput={onInput}
             className="rounded-2xl border border-black/8 bg-black/8 px-4 py-3 font-semibold transition active:scale-[0.98] active:bg-black/12"
-            {...pressHandlers("up", onInput)}
-          >
-            ↑
-          </button>
+          />
           <div />
-          <button
-            type="button"
-            aria-label="Mover izquierda"
+          <ControlButton
+            ariaLabel="Mover izquierda"
+            keyName="left"
+            label="←"
+            onInput={onInput}
             className="rounded-2xl border border-black/8 bg-black/8 px-4 py-3 font-semibold transition active:scale-[0.98] active:bg-black/12"
-            {...pressHandlers("left", onInput)}
-          >
-            ←
-          </button>
-          <button
-            type="button"
-            aria-label="Mover abajo"
+          />
+          <ControlButton
+            ariaLabel="Mover abajo"
+            keyName="down"
+            label="↓"
+            onInput={onInput}
             className="rounded-2xl border border-black/8 bg-black/8 px-4 py-3 font-semibold transition active:scale-[0.98] active:bg-black/12"
-            {...pressHandlers("down", onInput)}
-          >
-            ↓
-          </button>
-          <button
-            type="button"
-            aria-label="Mover derecha"
+          />
+          <ControlButton
+            ariaLabel="Mover derecha"
+            keyName="right"
+            label="→"
+            onInput={onInput}
             className="rounded-2xl border border-black/8 bg-black/8 px-4 py-3 font-semibold transition active:scale-[0.98] active:bg-black/12"
-            {...pressHandlers("right", onInput)}
-          >
-            →
-          </button>
+          />
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            aria-label="Saltar"
+          <ControlButton
+            ariaLabel="Saltar"
+            keyName="jump"
+            label="Saltar"
+            onInput={onInput}
             className="rounded-2xl border border-black/8 bg-[var(--accent)] px-4 py-3 font-semibold text-white shadow-[0_12px_28px_rgba(187,77,0,0.26)] transition active:scale-[0.98]"
-            {...pressHandlers("jump", onInput)}
-          >
-            Saltar
-          </button>
-          <button
-            type="button"
-            aria-label="Golpear"
+          />
+          <ControlButton
+            ariaLabel="Golpear"
+            keyName="attack"
+            label="Golpe"
+            onInput={onInput}
             className="rounded-2xl border border-black/8 bg-black px-4 py-3 font-semibold text-white shadow-[0_12px_28px_rgba(0,0,0,0.22)] transition active:scale-[0.98]"
-            {...pressHandlers("attack", onInput)}
-          >
-            Golpe
-          </button>
+          />
         </div>
       </div>
     </section>

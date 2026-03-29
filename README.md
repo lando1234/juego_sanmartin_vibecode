@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Furgon Final
 
-## Getting Started
+Estado del proyecto al `2026-03-27`.
 
-First, run the development server:
+## Resumen
+
+Juego web en `Next.js 16` + `React 19` + `TypeScript` con render en `Canvas 2D`.
+
+La run actual recorre la linea `San Martin` desde `Dr. Cabred` hasta `Retiro`, con:
+
+- `18` niveles/estaciones;
+- dificultad progresiva;
+- enemigos comunes y boss por tramo;
+- items tematicos con buffs;
+- HUD, overlays, controles desktop/mobile;
+- deploy funcionando en `Vercel`.
+
+## Estado actual
+
+Ya implementado:
+
+- campaña completa `Dr. Cabred -> Retiro`;
+- lore propio por estacion;
+- progresion de dificultad por cantidad y variedad de enemigos;
+- items:
+  - `Mate listo`: velocidad;
+  - `Tortita negra`: cura;
+  - `SUBE cargada`: mejora de dano;
+  - `Paraguas de fierro`: reduce dano;
+- pickups mejorados con radio mas generoso, magnetismo corto y feedback visual;
+- controles de teclado mas robustos:
+  - usa `event.code`;
+  - ignora `keydown` repetidos;
+  - limpia estado en `blur` y `visibilitychange`;
+- controles mobile mas tactiles:
+  - `pointer capture`;
+  - `touch-action: none`;
+  - mejor feedback visual;
+- UI mas profunda que el prototipo base;
+- build de produccion ok;
+- suite de tests ok.
+
+## Estructura importante
+
+- [`src/game/data/campaignLevels.ts`](/Users/matiaslandal/Desktop/Personal/codex/juego_sanmartin_vibecode/src/game/data/campaignLevels.ts)
+  define estaciones, lore, layout, dificultad e items.
+- [`src/game/core/createGameEngine.ts`](/Users/matiaslandal/Desktop/Personal/codex/juego_sanmartin_vibecode/src/game/core/createGameEngine.ts)
+  engine principal del juego.
+- [`src/game/systems/sceneSystem.ts`](/Users/matiaslandal/Desktop/Personal/codex/juego_sanmartin_vibecode/src/game/systems/sceneSystem.ts)
+  progresion de oleadas, boss y avance de nivel.
+- [`src/game/systems/itemSystem.ts`](/Users/matiaslandal/Desktop/Personal/codex/juego_sanmartin_vibecode/src/game/systems/itemSystem.ts)
+  logica de pickups y buffs.
+- [`src/game/input/keyboardInput.ts`](/Users/matiaslandal/Desktop/Personal/codex/juego_sanmartin_vibecode/src/game/input/keyboardInput.ts)
+  input desktop.
+- [`src/components/game/MobileControls.tsx`](/Users/matiaslandal/Desktop/Personal/codex/juego_sanmartin_vibecode/src/components/game/MobileControls.tsx)
+  input mobile.
+- [`src/game/render/renderFrame.ts`](/Users/matiaslandal/Desktop/Personal/codex/juego_sanmartin_vibecode/src/game/render/renderFrame.ts)
+  render del vagon, personajes e items.
+
+## Comandos utiles
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run test:run
+npm run build
+npx vercel --prod
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Ultima validacion
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Verificado hoy:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run test:run`
+- `npm run build`
 
-## Learn More
+## Pendientes sugeridos para manana
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- pulir mas el feel del combate;
+- agregar mas feedback audiovisual;
+- balancear dificultad por estacion;
+- sumar contenido extra:
+  - gamepad;
+  - remapeo;
+  - mas tipos de items;
+  - eventos por estacion;
+- redeploy a `Vercel` con la ultima version.

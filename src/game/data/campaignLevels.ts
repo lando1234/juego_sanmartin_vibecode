@@ -22,6 +22,8 @@ type ItemPlacement = {
   y: number;
 };
 
+type HazardPlacement = LevelLayout["hazards"][number];
+
 type StationConfig = {
   station: string;
   subtitle: string;
@@ -582,6 +584,57 @@ function createItems(levelIndex: number): ItemPlacement[] {
   ];
 }
 
+function createHazards(levelIndex: number, width: number, shiftX: number): HazardPlacement[] {
+  const pattern = levelIndex % 3;
+
+  if (pattern === 0) {
+    return [
+      {
+        id: `hazard-door-${levelIndex}`,
+        type: "door_slam",
+        x: 1160 + shiftX,
+        y: 72,
+        width: 54,
+        depth: 190,
+        damage: 8,
+        activeMs: 520,
+        cooldownMs: 880,
+        strength: -28,
+      },
+    ];
+  }
+
+  if (pattern === 1) {
+    return [
+      {
+        id: `hazard-brake-${levelIndex}`,
+        type: "sudden_brake",
+        x: 0,
+        y: 0,
+        width,
+        depth: 320,
+        activeMs: 380,
+        cooldownMs: 1400,
+        strength: -140,
+      },
+    ];
+  }
+
+  return [
+    {
+      id: `hazard-push-${levelIndex}`,
+      type: "passenger_push",
+      x: 980 + shiftX,
+      y: 54,
+      width: 360,
+      depth: 220,
+      activeMs: 900,
+      cooldownMs: 1250,
+      strength: 180,
+    },
+  ];
+}
+
 function createLevel(index: number, config: StationConfig): CampaignLevel {
   const difficulty = index + 1;
   const shiftX = index * 18;
@@ -591,6 +644,7 @@ function createLevel(index: number, config: StationConfig): CampaignLevel {
   const wave2Count = 3 + Math.floor(index / 2);
   const wave1Spawns = createWave(index, wave1Count, 970 + shiftX);
   const wave2Spawns = createWave(index + 1, wave2Count, 1670 + shiftX);
+  const hazards = createHazards(index, width, shiftX);
   const bossSpawn: Spawn = {
     kind: index === stationConfigs.length - 1 ? "boss_fisura_bici" : "borracho",
     x: 2250 + shiftX,
@@ -610,7 +664,7 @@ function createLevel(index: number, config: StationConfig): CampaignLevel {
     bossGateEndX: 2470 + shiftX,
     exitTriggerX: 2350 + shiftX,
     exitX: 2440 + shiftX,
-    hazards: [],
+    hazards,
     wave1Spawns,
     wave2Spawns,
     bossSpawn,

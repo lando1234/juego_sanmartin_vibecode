@@ -369,6 +369,42 @@ export function renderFrame(
     }
   }
 
+  for (const hazard of snapshot.scene.activeHazards) {
+    const hazardX = hazard.x - snapshot.camera.x;
+    const hazardY = toScreenDepth(hazard.y);
+    const hazardHeight = hazard.depth * LANE_DEPTH_SCALE;
+
+    if (hazard.type === "door_slam") {
+      context.fillStyle = hazard.active
+        ? "rgba(196, 74, 44, 0.24)"
+        : "rgba(255, 216, 145, 0.12)";
+      context.fillRect(hazardX, hazardY - 18, hazard.width, hazardHeight + 36);
+      context.strokeStyle = hazard.active
+        ? "rgba(255, 186, 150, 0.55)"
+        : "rgba(255, 230, 181, 0.38)";
+      context.lineWidth = 3;
+      context.strokeRect(hazardX + 2, hazardY - 10, hazard.width - 4, hazardHeight + 20);
+    }
+
+    if (hazard.type === "passenger_push") {
+      context.fillStyle = hazard.active
+        ? "rgba(91, 138, 202, 0.16)"
+        : "rgba(91, 138, 202, 0.08)";
+      context.fillRect(hazardX, hazardY, hazard.width, hazardHeight);
+      context.strokeStyle = "rgba(189, 224, 255, 0.3)";
+      context.lineWidth = 2;
+      for (let offset = 24; offset < hazard.width; offset += 64) {
+        context.beginPath();
+        context.moveTo(hazardX + offset, hazardY + hazardHeight / 2);
+        context.lineTo(hazardX + offset + 22, hazardY + hazardHeight / 2);
+        context.lineTo(hazardX + offset + 12, hazardY + hazardHeight / 2 - 10);
+        context.moveTo(hazardX + offset + 22, hazardY + hazardHeight / 2);
+        context.lineTo(hazardX + offset + 12, hazardY + hazardHeight / 2 + 10);
+        context.stroke();
+      }
+    }
+  }
+
   const gateStartSource = snapshot.scene.type === "boss_combat"
     ? snapshot.levelLayout.bossGateStartX
     : snapshot.scene.waveIndex === 2
@@ -390,6 +426,19 @@ export function renderFrame(
   context.fillRect(52, floorY - 6, canvas.width - 104, 18);
   context.fillStyle = "rgba(255, 236, 190, 0.08)";
   context.fillRect(58, floorY - 2, canvas.width - 116, 4);
+
+  if (snapshot.scene.activeHazards.some((hazard) => hazard.type === "sudden_brake" && hazard.active)) {
+    context.strokeStyle = "rgba(255, 240, 210, 0.12)";
+    context.lineWidth = 4;
+    for (let index = -1; index < 6; index += 1) {
+      const startX = index * 260 + ((timeMs / 6) % 90);
+      context.beginPath();
+      context.moveTo(startX, 104);
+      context.lineTo(startX + 120, canvas.height - 124);
+      context.stroke();
+    }
+  }
+
   for (const enemy of snapshot.enemies) {
     if (enemy.hp <= 0) {
       continue;

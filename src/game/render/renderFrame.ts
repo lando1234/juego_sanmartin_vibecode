@@ -34,7 +34,7 @@ function drawSprite(
   context.save();
   context.globalAlpha = alpha;
 
-  if (facing === "left") {
+  if (facing === "right") {
     context.translate(x + width / 2, y + height / 2);
     context.scale(-1, 1);
     context.rotate(rotation);

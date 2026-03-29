@@ -14,21 +14,21 @@ export const spriteManifest = {
     notes: "Laburante común con mochila y camisa celeste.",
     frames: {
       idle: [
-        "/sprites/characters/ricky/idle-01.svg",
-        "/sprites/characters/ricky/idle-02.svg",
+        "/sprites/characters/ricky/idle-01.png",
+        "/sprites/characters/ricky/idle-02.png",
       ],
       walk: [
-        "/sprites/characters/ricky/walk-01.svg",
-        "/sprites/characters/ricky/walk-02.svg",
+        "/sprites/characters/ricky/walk-01.png",
+        "/sprites/characters/ricky/walk-02.png",
       ],
       attack: [
-        "/sprites/characters/ricky/attack-01.svg",
+        "/sprites/characters/ricky/attack-01.png",
       ],
       hurt: [
-        "/sprites/characters/ricky/hurt-01.svg",
+        "/sprites/characters/ricky/hurt-01.png",
       ],
       defeated: [
-        "/sprites/characters/ricky/defeated-01.svg",
+        "/sprites/characters/ricky/defeated-01.png",
       ],
     },
   },
@@ -38,21 +38,21 @@ export const spriteManifest = {
     notes: "Colado rápido, hombros tensos y actitud de choque.",
     frames: {
       idle: [
-        "/sprites/characters/bloqueador-puerta/idle-01.svg",
-        "/sprites/characters/bloqueador-puerta/idle-02.svg",
+        "/sprites/characters/colado/idle-01.png",
+        "/sprites/characters/colado/idle-02.png",
       ],
       walk: [
-        "/sprites/characters/bloqueador-puerta/walk-01.svg",
-        "/sprites/characters/bloqueador-puerta/walk-02.svg",
+        "/sprites/characters/colado/walk-01.png",
+        "/sprites/characters/colado/walk-02.png",
       ],
       attack: [
-        "/sprites/characters/bloqueador-puerta/attack-01.svg",
+        "/sprites/characters/colado/attack-01.png",
       ],
       hurt: [
-        "/sprites/characters/bloqueador-puerta/hurt-01.svg",
+        "/sprites/characters/colado/hurt-01.png",
       ],
       defeated: [
-        "/sprites/characters/bloqueador-puerta/defeated-01.svg",
+        "/sprites/characters/colado/defeated-01.png",
       ],
     },
   },
@@ -62,19 +62,21 @@ export const spriteManifest = {
     notes: "Durmiente torpe y pesado, medio caído sobre el pasillo.",
     frames: {
       idle: [
-        "/sprites/characters/empujador-hora-pico.svg",
+        "/sprites/characters/durmiente/idle-01.png",
+        "/sprites/characters/durmiente/idle-02.png",
       ],
       walk: [
-        "/sprites/characters/empujador-hora-pico.svg",
+        "/sprites/characters/durmiente/walk-01.png",
+        "/sprites/characters/durmiente/walk-02.png",
       ],
       attack: [
-        "/sprites/characters/empujador-hora-pico.svg",
+        "/sprites/characters/durmiente/attack-01.png",
       ],
       hurt: [
-        "/sprites/characters/empujador-hora-pico.svg",
+        "/sprites/characters/durmiente/hurt-01.png",
       ],
       defeated: [
-        "/sprites/characters/empujador-hora-pico.svg",
+        "/sprites/characters/durmiente/defeated-01.png",
       ],
     },
   },
@@ -84,19 +86,21 @@ export const spriteManifest = {
     notes: "Mochilero ancho, toma espacio y gira con peso.",
     frames: {
       idle: [
-        "/sprites/characters/vendedor-relampago.svg",
+        "/sprites/characters/mochilero/idle-01.png",
+        "/sprites/characters/mochilero/idle-02.png",
       ],
       walk: [
-        "/sprites/characters/vendedor-relampago.svg",
+        "/sprites/characters/mochilero/walk-01.png",
+        "/sprites/characters/mochilero/walk-02.png",
       ],
       attack: [
-        "/sprites/characters/vendedor-relampago.svg",
+        "/sprites/characters/mochilero/attack-01.png",
       ],
       hurt: [
-        "/sprites/characters/vendedor-relampago.svg",
+        "/sprites/characters/mochilero/hurt-01.png",
       ],
       defeated: [
-        "/sprites/characters/vendedor-relampago.svg",
+        "/sprites/characters/mochilero/defeated-01.png",
       ],
     },
   },
@@ -106,19 +110,21 @@ export const spriteManifest = {
     notes: "Vendedor rival, rápido y con ataque híbrido.",
     frames: {
       idle: [
-        "/sprites/characters/vendedor-relampago.svg",
+        "/sprites/characters/vendedor_competencia/idle-01.png",
+        "/sprites/characters/vendedor_competencia/idle-02.png",
       ],
       walk: [
-        "/sprites/characters/vendedor-relampago.svg",
+        "/sprites/characters/vendedor_competencia/walk-01.png",
+        "/sprites/characters/vendedor_competencia/walk-02.png",
       ],
       attack: [
-        "/sprites/characters/vendedor-relampago.svg",
+        "/sprites/characters/vendedor_competencia/attack-01.png",
       ],
       hurt: [
-        "/sprites/characters/vendedor-relampago.svg",
+        "/sprites/characters/vendedor_competencia/hurt-01.png",
       ],
       defeated: [
-        "/sprites/characters/vendedor-relampago.svg",
+        "/sprites/characters/vendedor_competencia/defeated-01.png",
       ],
     },
   },
@@ -128,21 +134,21 @@ export const spriteManifest = {
     notes: "Señora de bolsos pesados, controla zona alrededor.",
     frames: {
       idle: [
-        "/sprites/characters/bloqueador-puerta/idle-01.svg",
-        "/sprites/characters/bloqueador-puerta/idle-02.svg",
+        "/sprites/characters/senora_bolsos/idle-01.png",
+        "/sprites/characters/senora_bolsos/idle-02.png",
       ],
       walk: [
-        "/sprites/characters/bloqueador-puerta/walk-01.svg",
-        "/sprites/characters/bloqueador-puerta/walk-02.svg",
+        "/sprites/characters/senora_bolsos/walk-01.png",
+        "/sprites/characters/senora_bolsos/walk-02.png",
       ],
       attack: [
-        "/sprites/characters/bloqueador-puerta/attack-01.svg",
+        "/sprites/characters/senora_bolsos/attack-01.png",
       ],
       hurt: [
-        "/sprites/characters/bloqueador-puerta/hurt-01.svg",
+        "/sprites/characters/senora_bolsos/hurt-01.png",
       ],
       defeated: [
-        "/sprites/characters/bloqueador-puerta/defeated-01.svg",
+        "/sprites/characters/senora_bolsos/defeated-01.png",
       ],
     },
   },
@@ -152,19 +158,21 @@ export const spriteManifest = {
     notes: "Fisura errático, zigzaguea y cambia el ritmo.",
     frames: {
       idle: [
-        "/sprites/characters/empujador-hora-pico.svg",
+        "/sprites/characters/fisura/idle-01.png",
+        "/sprites/characters/fisura/idle-02.png",
       ],
       walk: [
-        "/sprites/characters/empujador-hora-pico.svg",
+        "/sprites/characters/fisura/walk-01.png",
+        "/sprites/characters/fisura/walk-02.png",
       ],
       attack: [
-        "/sprites/characters/empujador-hora-pico.svg",
+        "/sprites/characters/fisura/attack-01.png",
       ],
       hurt: [
-        "/sprites/characters/empujador-hora-pico.svg",
+        "/sprites/characters/fisura/hurt-01.png",
       ],
       defeated: [
-        "/sprites/characters/empujador-hora-pico.svg",
+        "/sprites/characters/fisura/defeated-01.png",
       ],
     },
   },
@@ -174,21 +182,21 @@ export const spriteManifest = {
     notes: "Mini boss de estación, pesado y caótico.",
     frames: {
       idle: [
-        "/sprites/characters/capo-del-pasillo/idle-01.svg",
-        "/sprites/characters/capo-del-pasillo/idle-02.svg",
+        "/sprites/characters/borracho/idle-01.png",
+        "/sprites/characters/borracho/idle-02.png",
       ],
       walk: [
-        "/sprites/characters/capo-del-pasillo/walk-01.svg",
-        "/sprites/characters/capo-del-pasillo/walk-02.svg",
+        "/sprites/characters/borracho/walk-01.png",
+        "/sprites/characters/borracho/walk-02.png",
       ],
       attack: [
-        "/sprites/characters/capo-del-pasillo/attack-01.svg",
+        "/sprites/characters/borracho/attack-01.png",
       ],
       hurt: [
-        "/sprites/characters/capo-del-pasillo/hurt-01.svg",
+        "/sprites/characters/borracho/hurt-01.png",
       ],
       defeated: [
-        "/sprites/characters/capo-del-pasillo/defeated-01.svg",
+        "/sprites/characters/borracho/defeated-01.png",
       ],
     },
   },
@@ -198,21 +206,21 @@ export const spriteManifest = {
     notes: "Boss final multi fase, mezcla bici, humo y furia.",
     frames: {
       idle: [
-        "/sprites/characters/capo-del-pasillo/idle-01.svg",
-        "/sprites/characters/capo-del-pasillo/idle-02.svg",
+        "/sprites/characters/boss_fisura_bici/idle-01.png",
+        "/sprites/characters/boss_fisura_bici/idle-02.png",
       ],
       walk: [
-        "/sprites/characters/capo-del-pasillo/walk-01.svg",
-        "/sprites/characters/capo-del-pasillo/walk-02.svg",
+        "/sprites/characters/boss_fisura_bici/walk-01.png",
+        "/sprites/characters/boss_fisura_bici/walk-02.png",
       ],
       attack: [
-        "/sprites/characters/capo-del-pasillo/attack-01.svg",
+        "/sprites/characters/boss_fisura_bici/attack-01.png",
       ],
       hurt: [
-        "/sprites/characters/capo-del-pasillo/hurt-01.svg",
+        "/sprites/characters/boss_fisura_bici/hurt-01.png",
       ],
       defeated: [
-        "/sprites/characters/capo-del-pasillo/defeated-01.svg",
+        "/sprites/characters/boss_fisura_bici/defeated-01.png",
       ],
     },
   },

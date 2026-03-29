@@ -218,6 +218,9 @@ export type PlayerState = {
   actionRecoveryMs: number;
   grabTargetId: string | null;
   recoverableHp: number;
+  dashVectorX: number;
+  dashVectorY: number;
+  dashInvulnerableMs: number;
   hurtCooldownMs: number;
   speedBoostMs: number;
   attackBoostMs: number;

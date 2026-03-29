@@ -172,6 +172,47 @@ describe("combatSystem", () => {
     expect(state.enemies[0].hurtCooldownMs).toBe(0);
   });
 
+  it("lets Ricky dash through a melee hit without taking damage", () => {
+    const state = createInitialGameState();
+    state.phase = "playing";
+    state.player.actionState = "dash";
+    state.player.dashInvulnerableMs = 80;
+    const enemy = createEnemy("colado", 236, state.player.y);
+    enemy.facing = "right";
+    enemy.activeAttack = {
+      name: "push",
+      timerMs: 80,
+      startupMs: 0,
+      activeMs: 80,
+      recoveryMs: 0,
+      damage: 8,
+      knockback: 10,
+      range: 28,
+      hitbox: {
+        shape: "rectangle",
+        width: 40,
+        height: 30,
+        offsetX: 20,
+        offsetY: 10,
+        activeFrames: [2, 3],
+      },
+      projectile: false,
+      projectileSpeed: 0,
+      aoe: false,
+      radius: null,
+      effect: null,
+      durationMs: null,
+      hits: 1,
+      damageApplied: false,
+      projectileSpawned: false,
+    };
+    state.enemies = [enemy];
+
+    updateCombat(state, 16);
+
+    expect(state.player.hp).toBe(state.player.maxHp);
+  });
+
   it("keeps enemies inside the closed combat arena after knockback", () => {
     const engine = createGameEngine({ now: () => 1000 });
     spawnWave(engine);

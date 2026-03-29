@@ -189,7 +189,17 @@ function startPlayerAttack(state: GameState, action: PlayerAttackActionName) {
   state.player.attack.struckEnemyIds = [];
 }
 
-function applyDamageToPlayer(state: GameState, damage: number, knockback = 0, sourceFacing: Facing) {
+function applyDamageToPlayer(
+  state: GameState,
+  damage: number,
+  knockback = 0,
+  sourceFacing: Facing,
+  sourceType: "melee" | "projectile" | "aoe" | "hazard" = "melee",
+) {
+  if (sourceType === "melee" && state.player.actionState === "dash" && state.player.dashInvulnerableMs > 0) {
+    return;
+  }
+
   if (state.player.hurtCooldownMs > 0) {
     return;
   }
@@ -302,6 +312,7 @@ function updateEnemyAttack(state: GameState, enemy: EnemyState, dtMs: number) {
           attack.damage * attack.hits,
           attack.knockback,
           enemy.facing,
+          "aoe",
         );
         applyPlayerStatusEffect(state, attack.effect, attack.durationMs);
       }
@@ -327,6 +338,7 @@ function updateEnemyAttack(state: GameState, enemy: EnemyState, dtMs: number) {
           attack.damage * attack.hits,
           attack.knockback,
           enemy.facing,
+          "melee",
         );
         applyPlayerStatusEffect(state, attack.effect, attack.durationMs);
       }
@@ -367,7 +379,7 @@ function updateEnemyProjectiles(state: GameState, dtMs: number) {
       );
 
       if (intersects(projectileRect, playerRect)) {
-        applyDamageToPlayer(state, projectile.damage, 10, projectile.facing);
+        applyDamageToPlayer(state, projectile.damage, 10, projectile.facing, "projectile");
         applyPlayerStatusEffect(state, projectile.effect, 2000);
         return false;
       }
@@ -511,7 +523,8 @@ export function updateCombat(state: GameState, dtMs: number) {
     state.phase === "playing" &&
     state.input.attack &&
     state.player.attack.currentAction === null &&
-    state.player.hurtCooldownMs === 0
+    state.player.hurtCooldownMs === 0 &&
+    state.player.actionState !== "dash"
   ) {
     startPlayerAttack(state, "attack_1");
   }

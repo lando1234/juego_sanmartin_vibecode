@@ -74,6 +74,16 @@ describe("movementSystem", () => {
     expect(engine.getSnapshot().player.x).toBeLessThan(182);
   });
 
+  it("starts a dash and moves Ricky quickly in the facing direction", () => {
+    const engine = createGameEngine({ now: () => 1000 });
+    engine.sendCommand({ type: "start" });
+    engine.sendInput({ dash: true });
+    engine.step(16);
+
+    expect(engine.getSnapshot().player.actionState).toBe("dash");
+    expect(engine.getSnapshot().player.x).toBeGreaterThan(190);
+  });
+
   it("blocks progress past the combat gate while the wave is active", () => {
     const engine = createGameEngine({ now: () => 1000 });
     engine.sendCommand({ type: "start" });

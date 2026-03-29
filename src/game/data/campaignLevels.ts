@@ -713,6 +713,9 @@ export function applyLevelToState(
   state.player.actionRecoveryMs = 0;
   state.player.grabTargetId = null;
   state.player.recoverableHp = 0;
+  state.player.dashVectorX = 0;
+  state.player.dashVectorY = 0;
+  state.player.dashInvulnerableMs = 0;
   state.player.attack.activeMs = 0;
   state.player.attack.cooldownMs = 0;
   state.player.attack.currentAction = null;

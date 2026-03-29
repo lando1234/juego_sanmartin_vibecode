@@ -110,7 +110,14 @@ export function MobileControls({
             className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-[#ff6842]/55 bg-[radial-gradient(circle_at_35%_30%,rgba(255,105,75,0.92),rgba(173,11,11,0.94))] text-lg font-black text-white shadow-[0_0_28px_rgba(255,61,28,0.34)] transition active:scale-[0.96]"
           />
         </div>
-        <div className="pointer-events-auto grid grid-cols-2 gap-3 pb-1">
+        <div className="pointer-events-auto grid grid-cols-3 gap-3 pb-1">
+          <ControlButton
+            ariaLabel="Esquivar"
+            keyName="dash"
+            label="D"
+            onInput={onInput}
+            className="mb-10 flex h-14 w-14 items-center justify-center self-end rounded-full border border-[#ffe2c9]/30 bg-[radial-gradient(circle_at_30%_30%,rgba(255,188,131,0.96),rgba(174,78,18,0.9))] text-xl font-black text-white shadow-[0_0_28px_rgba(255,145,51,0.3)] transition active:scale-[0.96]"
+          />
           <ControlButton
             ariaLabel="Saltar"
             keyName="jump"
@@ -168,7 +175,14 @@ export function MobileControls({
             className="rounded-2xl border border-black/8 bg-black/8 px-4 py-3 font-semibold transition active:scale-[0.98] active:bg-black/12"
           />
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
+          <ControlButton
+            ariaLabel="Esquivar"
+            keyName="dash"
+            label="Esquive"
+            onInput={onInput}
+            className="rounded-2xl border border-black/8 bg-[var(--accent-strong)] px-4 py-3 font-semibold text-[#2c1509] shadow-[0_12px_28px_rgba(187,77,0,0.18)] transition active:scale-[0.98]"
+          />
           <ControlButton
             ariaLabel="Saltar"
             keyName="jump"

@@ -18,6 +18,24 @@ function runUntil(
   throw new Error("Condition not reached in test");
 }
 describe("sceneSystem", () => {
+  it("scales hazard pressure between early and late campaign levels", () => {
+    const earlyDoor = campaignLevels[0].layout.hazards.find((hazard) => hazard.type === "door_slam");
+    const lateDoor = campaignLevels[15].layout.hazards.find((hazard) => hazard.type === "door_slam");
+    const earlyBrake = campaignLevels[1].layout.hazards.find((hazard) => hazard.type === "sudden_brake");
+    const lateBrake = campaignLevels[16].layout.hazards.find((hazard) => hazard.type === "sudden_brake");
+
+    expect(earlyDoor?.damage).toBeLessThan(lateDoor?.damage ?? 0);
+    expect((earlyBrake?.strength ?? 0)).toBeGreaterThan(lateBrake?.strength ?? 0);
+  });
+
+  it("gives the final level a heavier boss hazard setup", () => {
+    const finalHazards = campaignLevels.at(-1)?.layout.hazards ?? [];
+
+    expect(finalHazards.length).toBeGreaterThan(1);
+    expect(finalHazards.some((hazard) => hazard.type === "door_slam")).toBe(true);
+    expect(finalHazards.some((hazard) => hazard.type === "seat_block")).toBe(true);
+  });
+
   it("uses the same arena width for the boss as the standard combat area", () => {
     const layout = campaignLevels[0].layout;
 

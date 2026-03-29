@@ -11,6 +11,16 @@ export function DesktopControlsHint({
   snapshot,
   variant = "panel",
 }: DesktopControlsHintProps) {
+  const controlGuide = [
+    "Moverse: WASD o flechas",
+    "Combo: J x3 para cerrar la cadena",
+    "Especial: K, gasta vida recuperable",
+    "Agarrar / lanzar: L, y L otra vez para soltar",
+    "Esquive: Shift para reposicionarte",
+    "Cubrirse: con Paraguas activo",
+    "Pausa: P",
+  ];
+
   if (variant === "overlay") {
     return (
       <aside className="grid gap-2 rounded-[20px] border border-white/12 bg-[linear-gradient(180deg,rgba(35,25,20,0.78),rgba(16,12,10,0.82))] p-3 text-[#f7ead4] shadow-[0_16px_50px_rgba(20,15,12,0.28)] backdrop-blur-xl">
@@ -18,10 +28,9 @@ export function DesktopControlsHint({
           Controles
         </p>
         <ul className="grid gap-1 text-xs text-[#f7ead4]/80">
-          {snapshot.hud.hints.slice(0, 3).map((hint) => (
+          {controlGuide.slice(0, 5).map((hint) => (
             <li key={hint}>{hint}</li>
           ))}
-          <li>Golpe: J o tap en Golpear</li>
         </ul>
       </aside>
     );
@@ -34,12 +43,9 @@ export function DesktopControlsHint({
         Controles
       </p>
       <ul className="grid gap-2 text-sm text-black/72">
-        {snapshot.hud.hints.map((hint) => (
+        {controlGuide.map((hint) => (
           <li key={hint}>{hint}</li>
         ))}
-        <li>Moverse: mantener apretado, soltar para frenar</li>
-        <li>Golpe: J o click/tap en Golpear</li>
-        <li>Pausa: P una sola vez, sin dejarla apretada</li>
         <li>Mobile: d-pad virtual con captura de toque</li>
         <li>Pickups: mate, tortita, SUBE y paraguas repartidos por el vagón</li>
       </ul>

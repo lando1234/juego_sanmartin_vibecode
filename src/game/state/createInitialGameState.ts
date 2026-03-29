@@ -11,10 +11,11 @@ import type { GameMode, GameState } from "@/game/types/gameTypes";
 
 const baseHints = [
   "Moverse: WASD o flechas",
-  "Saltar: espacio",
+  "Combo: J x3",
   "Especial: K",
-  "Agarrar: L",
+  "Agarrar / lanzar: L, L otra vez",
   "Esquive: Shift",
+  "Cubrirse: con Paraguas activo",
   "Pausa: P",
 ];
 

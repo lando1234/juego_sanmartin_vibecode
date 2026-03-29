@@ -4,6 +4,187 @@ Fecha: 2026-03-28
 
 Estos prompts mantienen la misma direccion visual del proyecto: caricatura urbana pintada, tren San Martin, lectura fuerte a tamano chico, fondo transparente, sin anime ni fantasia.
 
+## Matriz operativa por personaje
+
+Esta seccion define, personaje por personaje, que assets conviene generar ahora, como se llama cada archivo y donde va dentro del proyecto.
+
+### Ricky
+
+Estado actual:
+- Ya integrado en juego.
+- Ya existen estos archivos:
+  - `public/sprites/characters/ricky/attack-02.png`
+  - `public/sprites/characters/ricky/attack-03.png`
+  - `public/sprites/characters/ricky/special-01.png`
+  - `public/sprites/characters/ricky/dash-01.png`
+  - `public/sprites/characters/ricky/grab-01.png`
+  - `public/sprites/characters/ricky/throw-01.png`
+
+No hace falta regenerar salvo retoque visual.
+
+### colado
+
+Estado actual:
+- El set base alcanza.
+- No conviene gastar prompts extra por ahora.
+
+No generar de momento:
+- `guard-01`
+- `grabbed-01`
+- `stagger-heavy-01`
+
+Ruta futura si alguna vez se hace:
+- `public/sprites/characters/colado/guard-01.png`
+- `public/sprites/characters/colado/grabbed-01.png`
+- `public/sprites/characters/colado/stagger-heavy-01.png`
+
+### durmiente
+
+Conviene generar ahora:
+- `guard-01`
+- `grabbed-01`
+
+No es prioridad:
+- `stagger-heavy-01`
+
+Destino:
+- `public/sprites/characters/durmiente/guard-01.png`
+- `public/sprites/characters/durmiente/grabbed-01.png`
+
+Uso esperado:
+- `guard-01`: lectura de bloqueo frontal
+- `grabbed-01`: cuando Ricky lo agarra
+
+### mochilero
+
+Conviene generar ahora:
+- `grabbed-01`
+- `stagger-heavy-01`
+
+No es prioridad:
+- `guard-01`
+
+Destino:
+- `public/sprites/characters/mochilero/grabbed-01.png`
+- `public/sprites/characters/mochilero/stagger-heavy-01.png`
+
+Uso esperado:
+- `grabbed-01`: lectura de agarre corto
+- `stagger-heavy-01`: impacto pesado, mejor que el `hurt` genérico
+
+### vendedor_competencia
+
+Estado actual:
+- El set base alcanza.
+- No tiene el mayor retorno visual en esta etapa.
+
+No generar de momento:
+- `guard-01`
+- `grabbed-01`
+- `stagger-heavy-01`
+
+Ruta futura si alguna vez se hace:
+- `public/sprites/characters/vendedor_competencia/guard-01.png`
+- `public/sprites/characters/vendedor_competencia/grabbed-01.png`
+- `public/sprites/characters/vendedor_competencia/stagger-heavy-01.png`
+
+### senora_bolsos
+
+Conviene generar ahora:
+- `guard-01`
+- `grabbed-01`
+
+No es prioridad:
+- `stagger-heavy-01`
+
+Destino:
+- `public/sprites/characters/senora_bolsos/guard-01.png`
+- `public/sprites/characters/senora_bolsos/grabbed-01.png`
+
+Uso esperado:
+- `guard-01`: defensa con cuerpo y bolsos
+- `grabbed-01`: lectura clara cuando Ricky la sujeta
+
+### fisura
+
+Estado actual:
+- El set base alcanza.
+- Su valor esta mas en movimiento/IA que en estados nuevos.
+
+No generar de momento:
+- `guard-01`
+- `grabbed-01`
+- `stagger-heavy-01`
+
+Ruta futura si alguna vez se hace:
+- `public/sprites/characters/fisura/guard-01.png`
+- `public/sprites/characters/fisura/grabbed-01.png`
+- `public/sprites/characters/fisura/stagger-heavy-01.png`
+
+### borracho
+
+Conviene generar ahora:
+- `stagger-heavy-01`
+
+Opcional despues:
+- `grabbed-01` no aplica como agarre real
+- `guard-01` no hace falta
+
+Destino:
+- `public/sprites/characters/borracho/stagger-heavy-01.png`
+
+Uso esperado:
+- mejorar lectura de golpe fuerte / finisher / special
+
+### boss_fisura_bici
+
+Conviene generar ahora:
+- `stagger-heavy-01`
+- `attack-telegraph-01`
+
+Opcional despues:
+- `guard-01`
+
+Destino:
+- `public/sprites/characters/boss_fisura_bici/stagger-heavy-01.png`
+- `public/sprites/characters/boss_fisura_bici/attack-telegraph-01.png`
+
+Uso esperado:
+- `stagger-heavy-01`: vender daño pesado al boss
+- `attack-telegraph-01`: pose previa más clara antes de ataques fuertes o phase attacks
+
+## Orden recomendado de produccion
+
+1. `durmiente/guard-01`
+2. `durmiente/grabbed-01`
+3. `mochilero/stagger-heavy-01`
+4. `mochilero/grabbed-01`
+5. `senora_bolsos/guard-01`
+6. `senora_bolsos/grabbed-01`
+7. `borracho/stagger-heavy-01`
+8. `boss_fisura_bici/stagger-heavy-01`
+9. `boss_fisura_bici/attack-telegraph-01`
+
+## Regla de nombres y ubicacion
+
+Todos los PNG nuevos tienen que guardarse asi:
+
+- `public/sprites/characters/<personaje>/<asset>.png`
+
+Ejemplos:
+- `public/sprites/characters/durmiente/guard-01.png`
+- `public/sprites/characters/mochilero/stagger-heavy-01.png`
+- `public/sprites/characters/senora_bolsos/grabbed-01.png`
+- `public/sprites/characters/boss_fisura_bici/attack-telegraph-01.png`
+
+## Referencia obligatoria
+
+Siempre subir a ChatGPT la imagen madre ya aprobada del personaje correspondiente y agregar al inicio:
+
+```text
+Use the uploaded approved character image as the exact visual reference. Keep the exact same face, silhouette, proportions, clothes, palette, accessories and art style.
+```
+
 ## Ricky states
 
 ### attack-02
@@ -110,6 +291,8 @@ Avoid: anime, fantasy, sci-fi, glossy render look, background objects, style dri
 
 ## Enemy utility states
 
+Estas son las versiones genericas. Mas abajo estan los prompts concretos por personaje que conviene usar hoy.
+
 ### guard-01
 
 ```text
@@ -159,6 +342,98 @@ Color palette: worn neutrals, muted browns, dirty creams, dark grays, restrained
 Materials/textures: worn commuter clothes, believable fabric folds, practical everyday accessories
 Constraints: transparent background, no text, no watermark, preserve identity exactly, no extra limbs, no cropped parts, keep the impact readable
 Avoid: anime, fantasy, sci-fi, glossy render look, background objects, style drift
+```
+
+## Prompts concretos por personaje
+
+### durmiente · guard-01
+
+Guardar como:
+- `public/sprites/characters/durmiente/guard-01.png`
+
+```text
+Use the uploaded approved character image as the exact visual reference. Keep the exact same face, silhouette, proportions, clothes, palette, accessories and art style.
+Create a single full body sprite frame for Durmiente in guard-01 for a side-scrolling beat'em up set inside the Buenos Aires San Martin commuter train. He should look heavy, sleepy, defensive and stubborn, blocking from the front with raised shoulders, tucked chin and braced stance, like a tired passenger using his own body mass as a shield. Stylized urban caricature, flat painted game art, grounded Buenos Aires commuter realism, same visual family as the train interior and pickup items, slightly cartoonish but believable, expressive proportions, clean shape language, simple large shadows, minimal texture, simplified clothing folds. Transparent background. Full body. Feet visible. No text. No watermark.
+```
+
+### durmiente · grabbed-01
+
+Guardar como:
+- `public/sprites/characters/durmiente/grabbed-01.png`
+
+```text
+Use the uploaded approved character image as the exact visual reference. Keep the exact same face, silhouette, proportions, clothes, palette, accessories and art style.
+Create a single full body sprite frame for Durmiente in grabbed-01 for a side-scrolling beat'em up set inside the Buenos Aires San Martin commuter train. He should look off-balance, compressed and restrained, like Ricky just grabbed him by the clothes in the aisle. Keep the pose readable as a held state, not as a normal hurt animation. Stylized urban caricature, flat painted game art, grounded Buenos Aires commuter realism, same visual family as the train interior and pickup items, slightly cartoonish but believable, expressive proportions, clean shape language, simple large shadows, minimal texture, simplified clothing folds. Transparent background. Full body. Feet visible. No text. No watermark.
+```
+
+### mochilero · grabbed-01
+
+Guardar como:
+- `public/sprites/characters/mochilero/grabbed-01.png`
+
+```text
+Use the uploaded approved character image as the exact visual reference. Keep the exact same face, silhouette, proportions, clothes, palette, accessories and art style.
+Create a single full body sprite frame for Mochilero in grabbed-01 for a side-scrolling beat'em up set inside the Buenos Aires San Martin commuter train. He should still feel wide and heavy because of the backpack, but clearly restrained and slightly folded forward by the grab. The backpack mass should help the silhouette. Stylized urban caricature, flat painted game art, grounded Buenos Aires commuter realism, same visual family as the train interior and pickup items, slightly cartoonish but believable, expressive proportions, clean shape language, simple large shadows, minimal texture, simplified clothing folds. Transparent background. Full body. Feet visible. No text. No watermark.
+```
+
+### mochilero · stagger-heavy-01
+
+Guardar como:
+- `public/sprites/characters/mochilero/stagger-heavy-01.png`
+
+```text
+Use the uploaded approved character image as the exact visual reference. Keep the exact same face, silhouette, proportions, clothes, palette, accessories and art style.
+Create a single full body sprite frame for Mochilero in stagger-heavy-01 for a side-scrolling beat'em up set inside the Buenos Aires San Martin commuter train. He should look heavily rocked by impact, shoulders uneven, weight broken, backpack dragging the pose to one side, but still upright. This must read as a heavier impact than a normal hurt frame. Stylized urban caricature, flat painted game art, grounded Buenos Aires commuter realism, same visual family as the train interior and pickup items, slightly cartoonish but believable, expressive proportions, clean shape language, simple large shadows, minimal texture, simplified clothing folds. Transparent background. Full body. Feet visible. No text. No watermark.
+```
+
+### senora_bolsos · guard-01
+
+Guardar como:
+- `public/sprites/characters/senora_bolsos/guard-01.png`
+
+```text
+Use the uploaded approved character image as the exact visual reference. Keep the exact same face, silhouette, proportions, clothes, palette, accessories and art style.
+Create a single full body sprite frame for Senora Bolsos in guard-01 for a side-scrolling beat'em up set inside the Buenos Aires San Martin commuter train. She should defend herself using both posture and bags, with a strong front-facing defensive silhouette, practical commuter aggression and believable weight. Stylized urban caricature, flat painted game art, grounded Buenos Aires commuter realism, same visual family as the train interior and pickup items, slightly cartoonish but believable, expressive proportions, clean shape language, simple large shadows, minimal texture, simplified clothing folds. Transparent background. Full body. Feet visible. No text. No watermark.
+```
+
+### senora_bolsos · grabbed-01
+
+Guardar como:
+- `public/sprites/characters/senora_bolsos/grabbed-01.png`
+
+```text
+Use the uploaded approved character image as the exact visual reference. Keep the exact same face, silhouette, proportions, clothes, palette, accessories and art style.
+Create a single full body sprite frame for Senora Bolsos in grabbed-01 for a side-scrolling beat'em up set inside the Buenos Aires San Martin commuter train. She should look constrained and angry, with the bags pulled into the pose and the body clearly caught by Ricky in close quarters. Keep the silhouette readable as a grabbed state. Stylized urban caricature, flat painted game art, grounded Buenos Aires commuter realism, same visual family as the train interior and pickup items, slightly cartoonish but believable, expressive proportions, clean shape language, simple large shadows, minimal texture, simplified clothing folds. Transparent background. Full body. Feet visible. No text. No watermark.
+```
+
+### borracho · stagger-heavy-01
+
+Guardar como:
+- `public/sprites/characters/borracho/stagger-heavy-01.png`
+
+```text
+Use the uploaded approved character image as the exact visual reference. Keep the exact same face, silhouette, proportions, clothes, palette, accessories and art style.
+Create a single full body sprite frame for Borracho in stagger-heavy-01 for a side-scrolling beat'em up set inside the Buenos Aires San Martin commuter train. He should look massively staggered by a heavy blow, with unstable legs, dropped shoulder, drunken imbalance and strong body weight, but still readable and upright. Stylized urban caricature, flat painted game art, grounded Buenos Aires commuter realism, same visual family as the train interior and pickup items, slightly cartoonish but believable, expressive proportions, clean shape language, simple large shadows, minimal texture, simplified clothing folds. Transparent background. Full body. Feet visible. No text. No watermark.
+```
+
+### boss_fisura_bici · stagger-heavy-01
+
+Guardar como:
+- `public/sprites/characters/boss_fisura_bici/stagger-heavy-01.png`
+
+```text
+Use the uploaded approved character image as the exact visual reference. Keep the exact same face, silhouette, proportions, clothes, palette, accessories and art style.
+Create a single full body sprite frame for Boss Fisura Bici in stagger-heavy-01 for a side-scrolling beat'em up set inside the Buenos Aires San Martin commuter train. He should look hit hard enough to briefly lose dominance, with a dramatic but readable heavy stagger pose, urban menace still intact, suitable for boss feedback in a beat'em up. Stylized urban caricature, flat painted game art, grounded Buenos Aires commuter realism, same visual family as the train interior and pickup items, slightly cartoonish but believable, expressive proportions, clean shape language, simple large shadows, minimal texture, simplified clothing folds. Transparent background. Full body. Feet visible. No text. No watermark.
+```
+
+### boss_fisura_bici · attack-telegraph-01
+
+Guardar como:
+- `public/sprites/characters/boss_fisura_bici/attack-telegraph-01.png`
+
+```text
+Use the uploaded approved character image as the exact visual reference. Keep the exact same face, silhouette, proportions, clothes, palette, accessories and art style.
+Create a single full body sprite frame for Boss Fisura Bici in attack-telegraph-01 for a side-scrolling beat'em up set inside the Buenos Aires San Martin commuter train. He should be winding up for a dangerous attack, with a very clear anticipatory pose, readable center of gravity, obvious threat, and a silhouette that instantly tells the player a strong move is coming. Stylized urban caricature, flat painted game art, grounded Buenos Aires commuter realism, same visual family as the train interior and pickup items, slightly cartoonish but believable, expressive proportions, clean shape language, simple large shadows, minimal texture, simplified clothing folds. Transparent background. Full body. Feet visible. No text. No watermark.
 ```
 
 ## Hazards

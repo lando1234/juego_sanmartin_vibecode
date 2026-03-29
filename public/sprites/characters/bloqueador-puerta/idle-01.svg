@@ -1,10 +1,20 @@
 <svg width="256" height="384" viewBox="0 0 256 384" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="coat1" x1="78" y1="108" x2="182" y2="262" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#252C33"/>
+      <stop offset="1" stop-color="#151A1F"/>
+    </linearGradient>
+    <linearGradient id="shirt1" x1="94" y1="122" x2="166" y2="236" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4D545D"/>
+      <stop offset="1" stop-color="#3A4048"/>
+    </linearGradient>
+  </defs>
   <ellipse cx="128" cy="352" rx="64" ry="18" fill="#1A1513" fill-opacity="0.2"/>
-  <rect x="79" y="106" width="98" height="146" rx="28" fill="#20262C"/>
-  <rect x="93" y="124" width="72" height="114" rx="20" fill="#454C55"/>
-  <rect x="100" y="242" width="56" height="72" rx="20" fill="#6D7A88"/>
-  <path d="M80 141L54 182L67 193L93 166L101 178L103 144L80 141Z" fill="#20262C"/>
-  <path d="M176 141L202 182L189 193L163 166L155 178L153 144L176 141Z" fill="#20262C"/>
+  <path d="M79 108C79 91.4315 92.4315 78 109 78H147C174.062 78 196 99.938 196 127V275H79V108Z" fill="url(#coat1)"/>
+  <path d="M92 128C92 111.432 105.432 98 122 98H135C156.539 98 174 115.461 174 137V260H92V128Z" fill="url(#shirt1)"/>
+  <rect x="103" y="242" width="56" height="74" rx="20" fill="#6D7A88"/>
+  <path d="M81 140L54 182L67 194L94 167L102 179L104 146L81 140Z" fill="#252C33"/>
+  <path d="M175 141L201 182L189 194L163 167L155 179L153 146L175 141Z" fill="#252C33"/>
   <circle cx="58" cy="193" r="14" fill="#D6A67F"/>
   <circle cx="198" cy="193" r="14" fill="#D6A67F"/>
   <rect x="98" y="304" width="26" height="56" rx="13" fill="#6D7A88"/>
@@ -12,10 +22,10 @@
   <rect x="88" y="350" width="40" height="14" rx="7" fill="#201916"/>
   <rect x="128" y="350" width="40" height="14" rx="7" fill="#201916"/>
   <circle cx="128" cy="68" r="40" fill="#D6A67F"/>
-  <path d="M88 65C88 42.9086 105.909 25 128 25C150.091 25 168 42.9086 168 65V75H88V65Z" fill="#2D221F"/>
-  <path d="M94 60C104 41 121 31 141 32C152.411 32.5706 163.8 36.6 171 46L159 50L145 45L133 49L120 44L104 52L94 60Z" fill="#2D221F"/>
+  <path d="M88 65C88 42.909 105.909 25 128 25C150.091 25 168 42.909 168 65V75H88V65Z" fill="#2D221F"/>
+  <path d="M94 60C104 41 121 31 141 32C152.411 32.571 163.8 36.6 171 46L159 50L145 45L133 49L120 44L104 52L94 60Z" fill="#2D221F"/>
   <circle cx="113" cy="69" r="4.5" fill="#1E1612"/>
   <circle cx="144" cy="69" r="4.5" fill="#1E1612"/>
-  <path d="M112 90C122.667 95.3333 133.333 95.3333 144 90" stroke="#9A6645" stroke-width="4" stroke-linecap="round"/>
-  <rect x="93" y="141" width="70" height="14" rx="7" fill="#D9C27D"/>
+  <path d="M112 90C122.667 95.333 133.333 95.333 144 90" stroke="#9A6645" stroke-width="4" stroke-linecap="round"/>
+  <path d="M93 141H163" stroke="#D9C27D" stroke-width="10" stroke-linecap="round"/>
 </svg>

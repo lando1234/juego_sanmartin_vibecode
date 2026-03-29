@@ -1,25 +1,39 @@
 <svg width="256" height="384" viewBox="0 0 256 384" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="jacket3" x1="90" y1="102" x2="170" y2="258" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#255992"/>
+      <stop offset="1" stop-color="#173B66"/>
+    </linearGradient>
+    <linearGradient id="shirt3" x1="103" y1="110" x2="164" y2="242" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EEF2F7"/>
+      <stop offset="1" stop-color="#D4DEE7"/>
+    </linearGradient>
+    <linearGradient id="pants3" x1="108" y1="234" x2="169" y2="342" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#425262"/>
+      <stop offset="1" stop-color="#25313D"/>
+    </linearGradient>
+  </defs>
   <ellipse cx="128" cy="352" rx="62" ry="16" fill="#1E1816" fill-opacity="0.18"/>
-  <path d="M98 134C98 101.415 124.415 75 157 75H161C187.585 75 209 96.4152 209 123V246H98V134Z" fill="#1F4E88"/>
-  <path d="M104 142C104 115.49 125.49 94 152 94H155C177.091 94 195 111.909 195 134V239H104V142Z" fill="#D5E0EB"/>
-  <path d="M144 92L163 126L131 126L144 92Z" fill="#D96B2E"/>
-  <rect x="110" y="238" width="82" height="66" rx="18" fill="#344454"/>
-  <rect x="114" y="230" width="74" height="18" rx="9" fill="#243240"/>
-  <path d="M96 150L70 176L56 211L72 216L89 187L102 194L96 150Z" fill="#1F4E88"/>
-  <path d="M191 151L219 180L232 199L217 206L200 184L186 184L191 151Z" fill="#1F4E88"/>
-  <circle cx="60" cy="212" r="13" fill="#EFC39D"/>
-  <circle cx="219" cy="203" r="13" fill="#EFC39D"/>
-  <rect x="111" y="304" width="27" height="58" rx="13.5" transform="rotate(7 111 304)" fill="#344454"/>
-  <rect x="154" y="302" width="27" height="56" rx="13.5" transform="rotate(-10 154 302)" fill="#344454"/>
+  <path d="M97 134C97 102 123 76 155 76H161C188 76 209 97 209 124V246H97V134Z" fill="url(#jacket3)"/>
+  <path d="M104 143C104 117 125 96 151 96H155C176 96 194 113 194 135V240H104V143Z" fill="url(#shirt3)"/>
+  <path d="M145 93L164 127L132 127L145 93Z" fill="#D96B2E"/>
+  <rect x="110" y="236" width="82" height="68" rx="18" fill="url(#pants3)"/>
+  <path d="M95 150L70 176L56 211L72 216L89 187L102 194L95 150Z" fill="#24507F"/>
+  <path d="M191 151L219 180L232 199L217 206L200 184L186 184L191 151Z" fill="#24507F"/>
+  <circle cx="60" cy="212" r="13" fill="#F0C59F"/>
+  <circle cx="219" cy="203" r="13" fill="#F0C59F"/>
+  <rect x="111" y="304" width="27" height="58" rx="13.5" transform="rotate(7 111 304)" fill="url(#pants3)"/>
+  <rect x="154" y="302" width="27" height="56" rx="13.5" transform="rotate(-10 154 302)" fill="url(#pants3)"/>
   <rect x="101" y="351" width="43" height="14" rx="7" transform="rotate(4 101 351)" fill="#17110D"/>
   <rect x="145" y="345" width="43" height="14" rx="7" transform="rotate(-8 145 345)" fill="#17110D"/>
-  <circle cx="146" cy="65" r="39" fill="#EFC39D"/>
-  <path d="M108 64C108 42.4609 125.461 25 147 25H150C171.539 25 189 42.4609 189 64V73H108V64Z" fill="#251910"/>
-  <path d="M116 54C121.605 34.3602 137.486 23 154 23C168.428 23 181.858 31.129 187 49L173 45L160 50L148 43L132 50L116 54Z" fill="#251910"/>
+  <circle cx="146" cy="65" r="39" fill="#F0C59F"/>
+  <path d="M108 64C108 42.46 125.461 25 147 25H150C171.539 25 189 42.46 189 64V73H108V64Z" fill="#251910"/>
+  <path d="M116 54C121.605 34.36 137.486 23 154 23C168.428 23 181.858 31.129 187 49L173 45L160 50L148 43L132 50L116 54Z" fill="#251910"/>
   <circle cx="133" cy="64" r="4.5" fill="#231915"/>
   <circle cx="162" cy="64" r="4.5" fill="#231915"/>
-  <path d="M141 82C145.635 85.2857 151.365 85.2857 156 82" stroke="#9B5E3F" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M141 82C145.635 85.286 151.365 85.286 156 82" stroke="#9B5E3F" stroke-width="3.5" stroke-linecap="round"/>
   <path d="M100 121L92 219L115 216L122 129L100 121Z" fill="#B9793E"/>
+  <path d="M178 120L186 219L163 216L156 129L178 120Z" fill="#A96837"/>
   <rect x="85" y="113" width="24" height="26" rx="8" fill="#6A4324"/>
   <path d="M85 116C93 110.667 101 110.667 109 116" stroke="#D2A06C" stroke-width="3" stroke-linecap="round"/>
 </svg>

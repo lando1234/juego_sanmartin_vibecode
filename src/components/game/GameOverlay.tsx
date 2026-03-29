@@ -1,5 +1,6 @@
 "use client";
 
+import { getCampaignLevel } from "@/game/data/campaignLevels";
 import type { GameSnapshot } from "@/game/types/gameTypes";
 
 type GameOverlayProps = {
@@ -17,38 +18,86 @@ export function GameOverlay({
   onNextLevel,
   onReset,
 }: GameOverlayProps) {
+  const currentLevel = getCampaignLevel(snapshot.currentLevelIndex);
+
   if (snapshot.phase === "title") {
     return (
-      <div className="grid gap-4 rounded-[32px] border border-white/20 bg-[linear-gradient(180deg,rgba(61,44,32,0.96),rgba(29,22,18,0.96))] p-6 text-[#f7ead4] shadow-[0_28px_90px_rgba(20,15,12,0.35)] backdrop-blur-sm">
-        <div className="grid gap-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#f4c992]">
-            Furgon Final
-          </p>
-          <h1 className="text-4xl font-black tracking-tight text-balance">
-            Ricky tiene que llegar al laburo y el vagon ya entro en modo guerra.
-          </h1>
-          <p className="max-w-2xl text-base text-[#f7ead4]/78">
-            Peleá estación por estación en el San Martín, desde Dr. Cabred
-            hasta Retiro, bancate la hora pico y abríte paso hasta la terminal.
-          </p>
+      <div className="grid min-h-[min(100dvh,1000px)] place-items-center bg-[radial-gradient(circle_at_top,rgba(255,229,183,0.12),transparent_42%)] px-4 py-10">
+        <div className="grid w-full max-w-5xl gap-6 rounded-[36px] border border-white/18 bg-[linear-gradient(180deg,rgba(48,34,26,0.96),rgba(22,17,14,0.96))] p-6 text-[#f7ead4] shadow-[0_32px_100px_rgba(20,15,12,0.5)] backdrop-blur-sm md:p-8">
+          <div className="grid gap-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#f4c992]">
+              Furgon Final
+            </p>
+            <h1 className="max-w-3xl text-4xl font-black tracking-tight text-balance md:text-6xl">
+              Ricky tiene que llegar al laburo y el vagon ya entro en modo guerra.
+            </h1>
+            <p className="max-w-2xl text-base text-[#f7ead4]/78 md:text-lg">
+              Peleá estación por estación en el San Martín, desde Dr. Cabred hasta Retiro, bancate la hora pico y abríte paso hasta la terminal.
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-[auto_auto_1fr] md:items-center">
+            <button
+              type="button"
+              onClick={onStart}
+              className="rounded-full bg-[linear-gradient(90deg,#e06a2c,#c44310)] px-5 py-3 font-semibold text-white transition hover:brightness-110"
+            >
+              Empezar partida
+            </button>
+            <button
+              type="button"
+              onClick={onReset}
+              className="rounded-full border border-white/18 px-5 py-3 font-semibold text-[#f7ead4] transition hover:bg-white/8"
+            >
+              Reiniciar estado
+            </button>
+            <div className="text-sm text-[#f7ead4]/74">
+              Objetivo inicial: cruzar 18 estaciones, escalar la dificultad y llegar a Retiro.
+            </div>
+          </div>
         </div>
-        <div className="grid gap-3 md:grid-cols-[auto_auto_1fr] md:items-center">
-          <button
-            type="button"
-            onClick={onStart}
-            className="rounded-full bg-[linear-gradient(90deg,#e06a2c,#c44310)] px-5 py-3 font-semibold text-white transition hover:brightness-110"
-          >
-            Empezar partida
-          </button>
-          <button
-            type="button"
-            onClick={onReset}
-            className="rounded-full border border-white/18 px-5 py-3 font-semibold text-[#f7ead4] transition hover:bg-white/8"
-          >
-            Reiniciar estado
-          </button>
-          <div className="text-sm text-[#f7ead4]/74">
-            Objetivo inicial: cruzar 18 estaciones, escalar la dificultad y llegar a Retiro.
+      </div>
+    );
+  }
+
+  if (snapshot.phase === "station_intro") {
+    return (
+      <div className="grid min-h-[min(100dvh,1000px)] place-items-center bg-[radial-gradient(circle_at_top,rgba(255,211,150,0.14),transparent_42%)] px-4 py-10">
+        <div className="grid w-full max-w-5xl gap-6 rounded-[36px] border border-white/18 bg-[linear-gradient(180deg,rgba(36,27,23,0.96),rgba(15,12,10,0.98))] p-6 text-[#f7ead4] shadow-[0_32px_100px_rgba(20,15,12,0.5)] backdrop-blur-sm md:grid-cols-[1.15fr_0.85fr] md:p-8">
+          <div className="grid gap-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#f4c992]">
+              Próxima estación
+            </p>
+            <h1 className="text-4xl font-black tracking-tight text-balance md:text-6xl">
+              {snapshot.hud.levelName}
+            </h1>
+            <p className="max-w-2xl text-base text-[#f7ead4]/76 md:text-lg">
+              {currentLevel.intro}
+            </p>
+          </div>
+          <div className="grid content-between gap-4 rounded-[28px] border border-white/10 bg-black/20 p-5">
+            <div className="grid gap-2 text-sm text-[#f7ead4]/78">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#f4c992]">
+                Briefing
+              </p>
+              <p>{snapshot.hud.objective}</p>
+              <p>HP actual: {snapshot.player.hp} / {snapshot.player.maxHp}</p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={onStart}
+                className="rounded-full bg-[linear-gradient(90deg,#e06a2c,#c44310)] px-5 py-3 font-semibold text-white transition hover:brightness-110"
+              >
+                Subir al vagón
+              </button>
+              <button
+                type="button"
+                onClick={onReset}
+                className="rounded-full border border-white/18 px-5 py-3 font-semibold text-[#f7ead4] transition hover:bg-white/8"
+              >
+                Reiniciar campaña
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -61,54 +110,57 @@ export function GameOverlay({
 
     if (!isFinalLevel) {
       return (
-        <div className="grid gap-4 rounded-[32px] border border-white/20 bg-[linear-gradient(180deg,rgba(71,54,34,0.94),rgba(34,28,20,0.94))] p-6 text-[#f7ead4] shadow-[0_28px_90px_rgba(20,15,12,0.35)] backdrop-blur-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#f4c992]">
-            Estación {currentLevelNumber} despejada
-          </p>
-          <h1 className="text-3xl font-black tracking-tight">
-            {snapshot.hud.completionTitle ?? "Ricky limpió el vagón."}
-          </h1>
-          <p className="text-[#f7ead4]/78">
-            {snapshot.hud.completionSummary ??
-              "El tren sigue cargado y todavía queda camino por delante."}
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={onNextLevel}
-              className="rounded-full bg-[linear-gradient(90deg,#e06a2c,#c44310)] px-5 py-3 font-semibold text-white transition hover:brightness-110"
-            >
-              Seguir a la próxima estación
-            </button>
-            <button
-              type="button"
-              onClick={onReset}
-              className="rounded-full border border-white/18 px-5 py-3 font-semibold text-[#f7ead4] transition hover:bg-white/8"
-            >
-              Reiniciar campaña
-            </button>
+        <div className="grid min-h-[min(100dvh,1000px)] place-items-center bg-[radial-gradient(circle_at_top,rgba(255,223,159,0.12),transparent_40%)] px-4 py-10">
+          <div className="grid w-full max-w-4xl gap-5 rounded-[34px] border border-white/18 bg-[linear-gradient(180deg,rgba(55,40,28,0.96),rgba(24,18,15,0.96))] p-6 text-[#f7ead4] shadow-[0_30px_90px_rgba(20,15,12,0.46)] backdrop-blur-sm md:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#f4c992]">
+              Estación {currentLevelNumber} despejada
+            </p>
+            <h1 className="text-3xl font-black tracking-tight md:text-5xl">
+              {snapshot.hud.completionTitle ?? "Ricky limpió el vagón."}
+            </h1>
+            <p className="max-w-2xl text-[#f7ead4]/78 md:text-lg">
+              {snapshot.hud.completionSummary ??
+                "El tren sigue cargado y todavía queda camino por delante."}
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={onNextLevel}
+                className="rounded-full bg-[linear-gradient(90deg,#e06a2c,#c44310)] px-5 py-3 font-semibold text-white transition hover:brightness-110"
+              >
+                Seguir a la próxima estación
+              </button>
+              <button
+                type="button"
+                onClick={onReset}
+                className="rounded-full border border-white/18 px-5 py-3 font-semibold text-[#f7ead4] transition hover:bg-white/8"
+              >
+                Reiniciar campaña
+              </button>
+            </div>
           </div>
         </div>
       );
     }
 
     return (
-      <div className="grid gap-4 rounded-[32px] border border-white/20 bg-[linear-gradient(180deg,rgba(71,54,34,0.94),rgba(34,28,20,0.94))] p-6 text-[#f7ead4] shadow-[0_28px_90px_rgba(20,15,12,0.35)] backdrop-blur-sm">
-        <h1 className="text-3xl font-black tracking-tight">
-          Ricky cruzó todo el San Martín y dominó Retiro.
-        </h1>
-        <p className="text-[#f7ead4]/78">
-          Desde Dr. Cabred hasta la terminal, el recorrido quedó despejado de
-          punta a punta.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={onReset}
-            className="rounded-full bg-[linear-gradient(90deg,#e06a2c,#c44310)] px-5 py-3 font-semibold text-white transition hover:brightness-110"
-          >
-            Jugar de nuevo
-          </button>
+      <div className="grid min-h-[min(100dvh,1000px)] place-items-center bg-[radial-gradient(circle_at_top,rgba(255,223,159,0.15),transparent_40%)] px-4 py-10">
+        <div className="grid w-full max-w-4xl gap-5 rounded-[34px] border border-white/18 bg-[linear-gradient(180deg,rgba(55,40,28,0.96),rgba(24,18,15,0.96))] p-6 text-[#f7ead4] shadow-[0_30px_90px_rgba(20,15,12,0.46)] backdrop-blur-sm md:p-8">
+          <h1 className="text-3xl font-black tracking-tight md:text-5xl">
+            Ricky cruzó todo el San Martín y dominó Retiro.
+          </h1>
+          <p className="max-w-2xl text-[#f7ead4]/78 md:text-lg">
+            Desde Dr. Cabred hasta la terminal, el recorrido quedó despejado de punta a punta.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={onReset}
+              className="rounded-full bg-[linear-gradient(90deg,#e06a2c,#c44310)] px-5 py-3 font-semibold text-white transition hover:brightness-110"
+            >
+              Jugar de nuevo
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -116,28 +168,30 @@ export function GameOverlay({
 
   if (snapshot.phase === "game_over") {
     return (
-      <div className="grid gap-4 rounded-[32px] border border-white/20 bg-[linear-gradient(180deg,rgba(78,33,23,0.94),rgba(31,19,17,0.94))] p-6 text-[#f7ead4] shadow-[0_28px_90px_rgba(20,15,12,0.35)] backdrop-blur-sm">
-        <h1 className="text-3xl font-black tracking-tight">
-          Ricky perdio la pulseada del horario pico.
-        </h1>
-        <p className="text-[#f7ead4]/78">
-          Lo voltearon antes de llegar al furgón. Hora pico 1, Ricky 0.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={onReset}
-            className="rounded-full bg-[linear-gradient(90deg,#e06a2c,#c44310)] px-5 py-3 font-semibold text-white transition hover:brightness-110"
-          >
-            Reintentar
-          </button>
+      <div className="grid min-h-[min(100dvh,1000px)] place-items-center bg-[radial-gradient(circle_at_top,rgba(125,38,25,0.18),transparent_42%)] px-4 py-10">
+        <div className="grid w-full max-w-4xl gap-5 rounded-[34px] border border-white/18 bg-[linear-gradient(180deg,rgba(64,26,19,0.96),rgba(22,14,12,0.98))] p-6 text-[#f7ead4] shadow-[0_30px_90px_rgba(20,15,12,0.5)] backdrop-blur-sm md:p-8">
+          <h1 className="text-3xl font-black tracking-tight md:text-5xl">
+            Ricky perdio la pulseada del horario pico.
+          </h1>
+          <p className="max-w-2xl text-[#f7ead4]/78 md:text-lg">
+            Lo voltearon antes de llegar al furgón. Hora pico 1, Ricky 0.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={onReset}
+              className="rounded-full bg-[linear-gradient(90deg,#e06a2c,#c44310)] px-5 py-3 font-semibold text-white transition hover:brightness-110"
+            >
+              Reintentar
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-[24px] border border-white/18 bg-[linear-gradient(180deg,rgba(57,43,34,0.9),rgba(28,22,18,0.9))] p-4 text-[#f7ead4] shadow-[0_20px_60px_rgba(20,15,12,0.3)] backdrop-blur-sm">
+    <div className="flex flex-wrap items-center gap-3 rounded-[24px] border border-white/18 bg-[linear-gradient(180deg,rgba(57,43,34,0.82),rgba(28,22,18,0.86))] p-4 text-[#f7ead4] shadow-[0_20px_60px_rgba(20,15,12,0.28)] backdrop-blur-sm">
       <button
         type="button"
         onClick={onPauseToggle}

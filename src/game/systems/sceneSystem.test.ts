@@ -58,8 +58,8 @@ describe("sceneSystem", () => {
     runUntil(engine, () => engine.getSnapshot().scene.bossTriggered);
 
     expect(engine.getSnapshot().scene.type).toBe("boss_combat");
-    expect(engine.getSnapshot().enemies[0].kind).toBe("capo_pasillo");
-    expect(engine.getSnapshot().enemies[0].isBoss).toBe(true);
+    expect(engine.getSnapshot().enemies[0].kind).toBe("borracho");
+    expect(engine.getSnapshot().enemies[0].role).toBe("mini_boss");
   });
 
   it("completes a level and advances to the next one", () => {
@@ -99,7 +99,7 @@ describe("sceneSystem", () => {
 
     engine.sendCommand({ type: "next-level" });
 
-    expect(engine.getSnapshot().phase).toBe("playing");
+    expect(engine.getSnapshot().phase).toBe("station_intro");
     expect(engine.getSnapshot().currentLevelIndex).toBe(1);
     expect(engine.getSnapshot().hud.levelName).toBe(campaignLevels[1].name);
   });

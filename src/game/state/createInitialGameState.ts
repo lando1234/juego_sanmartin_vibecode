@@ -5,6 +5,7 @@ import {
   VIEWPORT_HEIGHT,
   VIEWPORT_WIDTH,
 } from "@/game/data/campaignLevels";
+import { enemyHitboxTemplate } from "@/game/data/enemyCatalog";
 import { resetEnemySeed } from "@/game/entities/createEnemy";
 import type { GameState } from "@/game/types/gameTypes";
 
@@ -57,13 +58,24 @@ export function createInitialGameState(): GameState {
         damage: 22,
         range: 108,
         width: 88,
+        hitbox: {
+          ...enemyHitboxTemplate,
+          width: 88,
+          height: 36,
+          offsetX: 18,
+          offsetY: 6,
+        },
+        struckEnemyIds: [],
       },
       hurtCooldownMs: 0,
       speedBoostMs: 0,
       attackBoostMs: 0,
       shieldMs: 0,
+      blindMs: 0,
+      invertControlsMs: 0,
     },
     enemies: [],
+    projectiles: [],
     items: [],
     camera: {
       x: 0,

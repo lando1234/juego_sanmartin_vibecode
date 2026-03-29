@@ -534,18 +534,23 @@ function getEnemyKind(levelIndex: number, offset: number): EnemyKind {
   const difficulty = levelIndex + 1;
 
   if (difficulty <= 4) {
-    return offset % 3 === 0 ? "bloqueador_puerta" : "empujador_hora_pico";
+    return offset % 3 === 0 ? "durmiente" : "colado";
   }
 
   if (difficulty <= 10) {
-    return ["bloqueador_puerta", "empujador_hora_pico", "vendedor_relampago"][
+    return ["colado", "durmiente", "mochilero"][
       (levelIndex + offset) % 3
     ] as EnemyKind;
   }
 
-  return ["empujador_hora_pico", "vendedor_relampago", "bloqueador_puerta"][
-    (levelIndex + offset) % 3
-  ] as EnemyKind;
+  return [
+    "colado",
+    "durmiente",
+    "mochilero",
+    "vendedor_competencia",
+    "senora_bolsos",
+    "fisura",
+  ][(levelIndex + offset) % 6] as EnemyKind;
 }
 
 function createWave(levelIndex: number, count: number, startX: number): Spawn[] {
@@ -585,7 +590,7 @@ function createLevel(index: number, config: StationConfig): CampaignLevel {
   const wave1Spawns = createWave(index, wave1Count, 970 + shiftX);
   const wave2Spawns = createWave(index + 1, wave2Count, 1670 + shiftX);
   const bossSpawn: Spawn = {
-    kind: "capo_pasillo",
+    kind: index === stationConfigs.length - 1 ? "boss_fisura_bici" : "borracho",
     x: 2250 + shiftX,
     y: laneY[(index + 2) % laneY.length],
   };

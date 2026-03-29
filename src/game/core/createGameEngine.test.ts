@@ -59,4 +59,45 @@ describe("createGameEngine", () => {
     expect(engine.getSnapshot().currentLevelIndex).toBe(0);
     expect(engine.getSnapshot().hud.levelName).toBe(campaignLevels[0].name);
   });
+
+  it("moves to a station intro screen after finishing a level", () => {
+    const engine = createGameEngine({ now: () => 1000 });
+
+    engine.sendCommand({ type: "start" });
+    engine.sendCommand({
+      type: "debug-set-player-position",
+      payload: { x: engine.getSnapshot().levelLayout.wave1TriggerX + 8 },
+    });
+    engine.step(16);
+    engine.sendCommand({ type: "debug-defeat-enemies" });
+    engine.step(16);
+    engine.sendCommand({
+      type: "debug-set-player-position",
+      payload: { x: engine.getSnapshot().levelLayout.wave2TriggerX + 8 },
+    });
+    engine.step(16);
+    engine.sendCommand({ type: "debug-defeat-enemies" });
+    engine.step(16);
+    engine.sendCommand({
+      type: "debug-set-player-position",
+      payload: { x: engine.getSnapshot().levelLayout.bossTriggerX + 8 },
+    });
+    engine.step(16);
+    engine.sendCommand({ type: "debug-defeat-enemies" });
+    engine.step(16);
+    engine.sendCommand({
+      type: "debug-set-player-position",
+      payload: { x: engine.getSnapshot().levelLayout.exitX + 8 },
+    });
+    engine.step(16);
+
+    expect(engine.getSnapshot().phase).toBe("victory");
+
+    engine.sendCommand({ type: "next-level" });
+
+    expect(engine.getSnapshot().phase).toBe("station_intro");
+    expect(engine.getSnapshot().scene.type).toBe("carriage_intro");
+    expect(engine.getSnapshot().currentLevelIndex).toBe(1);
+    expect(engine.getSnapshot().hud.levelName).toBe(campaignLevels[1].name);
+  });
 });

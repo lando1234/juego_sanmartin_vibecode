@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ecd6a7;
-  --foreground: #1c1a17;
-  --panel: rgba(255, 247, 229, 0.86);
-  --panel-border: rgba(55, 41, 26, 0.22);
-  --accent: #bb4d00;
-  --accent-strong: #7a2208;
-  --track: #6d6f73;
-  --steel: #88939f;
-  --shadow: rgba(34, 24, 13, 0.18);
+  --background: #120d0b;
+  --foreground: #efe3d2;
+  --panel: rgba(22, 17, 14, 0.78);
+  --panel-border: rgba(255, 214, 170, 0.14);
+  --accent: #d65d20;
+  --accent-strong: #ffb06c;
+  --track: #4e5661;
+  --steel: #8d99a8;
+  --shadow: rgba(0, 0, 0, 0.42);
 }
 
 @theme inline {
@@ -25,8 +25,9 @@
 
 html {
   background:
-    radial-gradient(circle at top, rgba(255, 240, 196, 0.96), rgba(236, 214, 167, 0.92) 36%, rgba(188, 143, 84, 0.92)),
-    linear-gradient(180deg, #f1dfba, #d5ad74 58%, #9a6637);
+    radial-gradient(circle at top, rgba(243, 122, 58, 0.18), transparent 24%),
+    radial-gradient(circle at 20% 30%, rgba(255, 210, 120, 0.08), transparent 18%),
+    linear-gradient(180deg, #261811, #140f0e 42%, #090808);
 }
 
 body {
@@ -35,15 +36,17 @@ body {
   color: var(--foreground);
   font-family: "Trebuchet MS", "Segoe UI", sans-serif;
   background:
-    radial-gradient(circle at top, rgba(255, 224, 152, 0.32), transparent 24%),
-    linear-gradient(180deg, rgba(251, 236, 198, 0.96), rgba(214, 173, 118, 0.94)),
+    radial-gradient(circle at top, rgba(255, 152, 82, 0.12), transparent 22%),
+    radial-gradient(circle at bottom, rgba(57, 92, 126, 0.1), transparent 28%),
+    linear-gradient(180deg, rgba(31, 20, 16, 0.98), rgba(12, 10, 10, 0.98)),
     repeating-linear-gradient(
       135deg,
-      rgba(114, 76, 42, 0.045) 0,
-      rgba(114, 76, 42, 0.045) 10px,
+      rgba(255, 208, 161, 0.018) 0,
+      rgba(255, 208, 161, 0.018) 10px,
       transparent 10px,
-      transparent 24px
+      transparent 28px
     );
+  overflow-x: hidden;
 }
 
 button,

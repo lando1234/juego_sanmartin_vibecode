@@ -31,27 +31,37 @@ type DrawCharacterOptions = {
 
 function getEnemyPalette(kind: EnemyKind): CharacterPalette {
   switch (kind) {
-    case "bloqueador_puerta":
+    case "colado":
       return {
         skin: "#d6a67f",
         hair: "#2d221f",
-        shirt: "#454c55",
-        jacket: "#20262c",
+        shirt: "#5a646d",
+        jacket: "#24313c",
         pants: "#6d7a88",
         shoes: "#201916",
         accent: "#d9c27d",
       };
-    case "empujador_hora_pico":
+    case "durmiente":
       return {
-        skin: "#e2b48a",
-        hair: "#5f2e1f",
-        shirt: "#64798b",
-        jacket: "#2f3a44",
-        pants: "#3f4d59",
-        shoes: "#231714",
-        accent: "#ec8f4f",
+        skin: "#ddb08f",
+        hair: "#6c5541",
+        shirt: "#7d7b73",
+        jacket: "#59564f",
+        pants: "#4f535d",
+        shoes: "#2f2b2a",
+        accent: "#b89d6d",
       };
-    case "vendedor_relampago":
+    case "mochilero":
+      return {
+        skin: "#d0a078",
+        hair: "#3b2419",
+        shirt: "#5d7082",
+        jacket: "#2f4254",
+        pants: "#4f4b52",
+        shoes: "#221917",
+        accent: "#e9a859",
+      };
+    case "vendedor_competencia":
       return {
         skin: "#efc198",
         hair: "#332117",
@@ -61,15 +71,55 @@ function getEnemyPalette(kind: EnemyKind): CharacterPalette {
         shoes: "#241a17",
         accent: "#ffe38d",
       };
-    case "capo_pasillo":
+    case "senora_bolsos":
+      return {
+        skin: "#e8ba97",
+        hair: "#4b372f",
+        shirt: "#7d5258",
+        jacket: "#4c2f39",
+        pants: "#3c3d4d",
+        shoes: "#21181d",
+        accent: "#d4bf87",
+      };
+    case "fisura":
+      return {
+        skin: "#c9966d",
+        hair: "#201511",
+        shirt: "#7f8f63",
+        jacket: "#414c2c",
+        pants: "#41362c",
+        shoes: "#16110f",
+        accent: "#d4cf83",
+      };
+    case "borracho":
+      return {
+        skin: "#d4a37b",
+        hair: "#2c2018",
+        shirt: "#906948",
+        jacket: "#5a3421",
+        pants: "#332925",
+        shoes: "#140f0d",
+        accent: "#d3a44f",
+      };
+    case "boss_fisura_bici":
       return {
         skin: "#d4a37b",
         hair: "#151515",
         shirt: "#7d1f1f",
-        jacket: "#3d0f0f",
+        jacket: "#2a2a38",
         pants: "#221a1a",
         shoes: "#0f0b0b",
-        accent: "#d3a44f",
+        accent: "#54b1d3",
+      };
+    default:
+      return {
+        skin: "#d6a67f",
+        hair: "#2d221f",
+        shirt: "#5a646d",
+        jacket: "#24313c",
+        pants: "#6d7a88",
+        shoes: "#201916",
+        accent: "#d9c27d",
       };
   }
 }
@@ -152,11 +202,23 @@ function drawHead(
   context.arc(centerX, centerY - radius * 0.25, radius * 0.95, Math.PI, Math.PI * 2);
   context.fill();
 
+  context.fillStyle = "rgba(0, 0, 0, 0.08)";
+  context.beginPath();
+  context.ellipse(centerX - radius * 0.4, centerY + radius * 0.06, radius * 0.12, radius * 0.2, 0.2, 0, Math.PI * 2);
+  context.ellipse(centerX + radius * 0.4, centerY + radius * 0.06, radius * 0.12, radius * 0.2, -0.2, 0, Math.PI * 2);
+  context.fill();
+
   context.fillStyle = "#1c1512";
   context.beginPath();
   context.arc(centerX - radius * 0.28, centerY - radius * 0.05, radius * 0.08, 0, Math.PI * 2);
   context.arc(centerX + radius * 0.28, centerY - radius * 0.05, radius * 0.08, 0, Math.PI * 2);
   context.fill();
+
+  context.strokeStyle = "rgba(42, 24, 18, 0.2)";
+  context.lineWidth = Math.max(1, radius * 0.08);
+  context.beginPath();
+  context.arc(centerX, centerY + radius * 0.1, radius * 0.32, 0.15 * Math.PI, 0.85 * Math.PI);
+  context.stroke();
 }
 
 function drawTorso(
@@ -172,6 +234,11 @@ function drawTorso(
   context.roundRect(x, y, width, height, Math.max(8, width * 0.12));
   context.fill();
 
+  context.fillStyle = "rgba(255, 255, 255, 0.08)";
+  context.beginPath();
+  context.roundRect(x + width * 0.06, y + height * 0.08, width * 0.18, height * 0.84, Math.max(6, width * 0.08));
+  context.fill();
+
   context.fillStyle = palette.shirt;
   context.beginPath();
   context.roundRect(x + width * 0.22, y + height * 0.08, width * 0.56, height * 0.76, width * 0.1);
@@ -181,6 +248,13 @@ function drawTorso(
   context.beginPath();
   context.roundRect(x + width * 0.44, y + height * 0.08, width * 0.12, height * 0.54, width * 0.08);
   context.fill();
+
+  context.strokeStyle = "rgba(0, 0, 0, 0.16)";
+  context.lineWidth = Math.max(1, width * 0.04);
+  context.beginPath();
+  context.moveTo(x + width * 0.5, y + height * 0.12);
+  context.lineTo(x + width * 0.5, y + height * 0.84);
+  context.stroke();
 }
 
 function drawCharacter(
@@ -323,7 +397,7 @@ export function drawEnemyCharacter(
   timeMs: number,
 ) {
   const pose: CharacterPose =
-    enemy.state === "advance"
+    enemy.state === "approach" || enemy.state === "circle"
       ? "move"
       : enemy.state === "attack"
         ? "attack"

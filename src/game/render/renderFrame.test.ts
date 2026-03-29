@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
+import { createEnemy } from "@/game/entities/createEnemy";
 import { createInitialGameState } from "@/game/state/createInitialGameState";
 import { renderFrame } from "@/game/render/renderFrame";
 
@@ -47,31 +48,9 @@ describe("renderFrame", () => {
     snapshot.scene.gateClosed = true;
     snapshot.scene.gateRightX = snapshot.levelLayout.gate1EndX;
     snapshot.scene.waveIndex = 1;
-    snapshot.enemies = [
-      {
-        id: "enemy-1",
-        kind: "bloqueador_puerta",
-        name: "Bloqueador de Puerta",
-        x: 940,
-        y: 120,
-        z: 0,
-        vx: 0,
-        vy: 0,
-        width: 72,
-        depth: 34,
-        speed: 150,
-        hp: 45,
-        maxHp: 45,
-        damage: 12,
-        attackRange: 92,
-        attackIntervalMs: 850,
-        attackCooldownMs: 0,
-        hurtCooldownMs: 0,
-        facing: "left",
-        state: "advance",
-        isBoss: false,
-      },
-    ];
+    const enemy = createEnemy("mochilero", 940, 120);
+    enemy.state = "approach";
+    snapshot.enemies = [enemy];
 
     expect(() => renderFrame(context, snapshot)).not.toThrow();
     expect(context.arc).toHaveBeenCalled();
@@ -83,37 +62,15 @@ describe("renderFrame", () => {
     const context = createMockContext();
     const snapshot = createInitialGameState();
     snapshot.phase = "playing";
-    snapshot.enemies = [
-      {
-        id: "enemy-1",
-        kind: "capo_pasillo",
-        name: "El Capo del Pasillo",
-        x: 2160,
-        y: 120,
-        z: 0,
-        vx: 0,
-        vy: 0,
-        width: 96,
-        depth: 42,
-        speed: 170,
-        hp: 180,
-        maxHp: 180,
-        damage: 18,
-        attackRange: 108,
-        attackIntervalMs: 780,
-        attackCooldownMs: 0,
-        hurtCooldownMs: 0,
-        facing: "left",
-        state: "attack",
-        isBoss: true,
-      },
-    ];
+    const boss = createEnemy("boss_fisura_bici", 2160, 120);
+    boss.state = "attack";
+    snapshot.enemies = [boss];
 
     renderFrame(context, snapshot, {
       ricky: {
         idle: [{} as CanvasImageSource],
       },
-      capo_pasillo: {
+      boss_fisura_bici: {
         attack: [{} as CanvasImageSource],
       },
     });

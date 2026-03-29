@@ -32,10 +32,10 @@ export const spriteManifest = {
       ],
     },
   },
-  bloqueadorPuerta: {
-    id: "bloqueador_puerta",
+  colado: {
+    id: "colado",
     role: "enemy",
-    notes: "Tanque del pasillo, hombros anchos y gesto de pared humana.",
+    notes: "Colado rápido, hombros tensos y actitud de choque.",
     frames: {
       idle: [
         "/sprites/characters/bloqueador-puerta/idle-01.svg",
@@ -56,10 +56,10 @@ export const spriteManifest = {
       ],
     },
   },
-  empujadorHoraPico: {
-    id: "empujador_hora_pico",
+  durmiente: {
+    id: "durmiente",
     role: "enemy",
-    notes: "Perfil inclinado y agresivo, listo para chocar en hora pico.",
+    notes: "Durmiente torpe y pesado, medio caído sobre el pasillo.",
     frames: {
       idle: [
         "/sprites/characters/empujador-hora-pico.svg",
@@ -78,10 +78,10 @@ export const spriteManifest = {
       ],
     },
   },
-  vendedorRelampago: {
-    id: "vendedor_relampago",
+  mochilero: {
+    id: "mochilero",
     role: "enemy",
-    notes: "Mochila o caja de venta, silueta nerviosa y móvil.",
+    notes: "Mochilero ancho, toma espacio y gira con peso.",
     frames: {
       idle: [
         "/sprites/characters/vendedor-relampago.svg",
@@ -100,10 +100,102 @@ export const spriteManifest = {
       ],
     },
   },
-  capoDelPasillo: {
-    id: "capo_pasillo",
+  vendedorCompetencia: {
+    id: "vendedor_competencia",
+    role: "enemy",
+    notes: "Vendedor rival, rápido y con ataque híbrido.",
+    frames: {
+      idle: [
+        "/sprites/characters/vendedor-relampago.svg",
+      ],
+      walk: [
+        "/sprites/characters/vendedor-relampago.svg",
+      ],
+      attack: [
+        "/sprites/characters/vendedor-relampago.svg",
+      ],
+      hurt: [
+        "/sprites/characters/vendedor-relampago.svg",
+      ],
+      defeated: [
+        "/sprites/characters/vendedor-relampago.svg",
+      ],
+    },
+  },
+  senoraBolsos: {
+    id: "senora_bolsos",
+    role: "enemy",
+    notes: "Señora de bolsos pesados, controla zona alrededor.",
+    frames: {
+      idle: [
+        "/sprites/characters/bloqueador-puerta/idle-01.svg",
+        "/sprites/characters/bloqueador-puerta/idle-02.svg",
+      ],
+      walk: [
+        "/sprites/characters/bloqueador-puerta/walk-01.svg",
+        "/sprites/characters/bloqueador-puerta/walk-02.svg",
+      ],
+      attack: [
+        "/sprites/characters/bloqueador-puerta/attack-01.svg",
+      ],
+      hurt: [
+        "/sprites/characters/bloqueador-puerta/hurt-01.svg",
+      ],
+      defeated: [
+        "/sprites/characters/bloqueador-puerta/defeated-01.svg",
+      ],
+    },
+  },
+  fisura: {
+    id: "fisura",
+    role: "enemy",
+    notes: "Fisura errático, zigzaguea y cambia el ritmo.",
+    frames: {
+      idle: [
+        "/sprites/characters/empujador-hora-pico.svg",
+      ],
+      walk: [
+        "/sprites/characters/empujador-hora-pico.svg",
+      ],
+      attack: [
+        "/sprites/characters/empujador-hora-pico.svg",
+      ],
+      hurt: [
+        "/sprites/characters/empujador-hora-pico.svg",
+      ],
+      defeated: [
+        "/sprites/characters/empujador-hora-pico.svg",
+      ],
+    },
+  },
+  borracho: {
+    id: "borracho",
     role: "boss",
-    notes: "Silueta pesada, saco oscuro y presencia dominante.",
+    notes: "Mini boss de estación, pesado y caótico.",
+    frames: {
+      idle: [
+        "/sprites/characters/capo-del-pasillo/idle-01.svg",
+        "/sprites/characters/capo-del-pasillo/idle-02.svg",
+      ],
+      walk: [
+        "/sprites/characters/capo-del-pasillo/walk-01.svg",
+        "/sprites/characters/capo-del-pasillo/walk-02.svg",
+      ],
+      attack: [
+        "/sprites/characters/capo-del-pasillo/attack-01.svg",
+      ],
+      hurt: [
+        "/sprites/characters/capo-del-pasillo/hurt-01.svg",
+      ],
+      defeated: [
+        "/sprites/characters/capo-del-pasillo/defeated-01.svg",
+      ],
+    },
+  },
+  bossFisuraBici: {
+    id: "boss_fisura_bici",
+    role: "boss",
+    notes: "Boss final multi fase, mezcla bici, humo y furia.",
     frames: {
       idle: [
         "/sprites/characters/capo-del-pasillo/idle-01.svg",

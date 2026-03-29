@@ -50,8 +50,33 @@ export function createGameEngine(options: EngineOptions = {}): GameEngine {
   const createSnapshot = (): GameSnapshot => ({
     ...state,
     scene: { ...state.scene },
-    player: { ...state.player },
-    enemies: state.enemies.map((enemy) => ({ ...enemy })),
+    player: {
+      ...state.player,
+      attack: {
+        ...state.player.attack,
+        hitbox: { ...state.player.attack.hitbox },
+        struckEnemyIds: [...state.player.attack.struckEnemyIds],
+      },
+    },
+    enemies: state.enemies.map((enemy) => ({
+      ...enemy,
+      behavior: { ...enemy.behavior },
+      attacks: enemy.attacks.map((attack) => ({ ...attack })),
+      modifiers: { ...enemy.modifiers },
+      phases: enemy.phases.map((phase) => ({
+        ...phase,
+        buff: phase.buff ? { ...phase.buff } : undefined,
+        attacks: phase.attacks?.map((attack) => ({ ...attack })),
+        modifiers: phase.modifiers ? { ...phase.modifiers } : undefined,
+      })),
+      activeAttack: enemy.activeAttack
+        ? {
+            ...enemy.activeAttack,
+            hitbox: { ...enemy.activeAttack.hitbox },
+          }
+        : null,
+    })),
+    projectiles: state.projectiles.map((projectile) => ({ ...projectile })),
     items: state.items.map((item) => ({ ...item })),
     camera: { ...state.camera },
     input: { ...state.input },
@@ -119,8 +144,8 @@ export function createGameEngine(options: EngineOptions = {}): GameEngine {
     }
 
     applyLevelToState(state, nextLevelIndex);
-    state.phase = "playing";
-    state.scene.type = "carriage_combat";
+    state.phase = "station_intro";
+    state.scene.type = "carriage_intro";
     state.hud.completionTitle = null;
     state.hud.completionSummary = null;
   };
@@ -132,7 +157,7 @@ export function createGameEngine(options: EngineOptions = {}): GameEngine {
         emit();
         return;
       case "pause-toggle":
-        if (state.phase === "title") {
+        if (state.phase === "title" || state.phase === "station_intro") {
           startRun();
         } else {
           state.phase = state.phase === "paused" ? "playing" : "paused";

@@ -56,7 +56,7 @@ export function resolveEnemySpriteState(enemy: EnemyState): SpriteAnimationState
     return "hurt";
   }
 
-  if (enemy.state === "advance") {
+  if (enemy.state === "approach" || enemy.state === "circle") {
     return "walk";
   }
 

@@ -1,4 +1,10 @@
-export type GamePhase = "title" | "playing" | "paused" | "victory" | "game_over";
+export type GamePhase =
+  | "title"
+  | "station_intro"
+  | "playing"
+  | "paused"
+  | "victory"
+  | "game_over";
 
 export type SceneType =
   | "carriage_intro"
@@ -8,10 +14,33 @@ export type SceneType =
 
 export type Facing = "left" | "right";
 export type EnemyKind =
-  | "bloqueador_puerta"
-  | "empujador_hora_pico"
-  | "vendedor_relampago"
-  | "capo_pasillo";
+  | "colado"
+  | "durmiente"
+  | "mochilero"
+  | "vendedor_competencia"
+  | "senora_bolsos"
+  | "fisura"
+  | "borracho"
+  | "boss_fisura_bici";
+export type EnemyRole = "common" | "special" | "mini_boss" | "boss";
+export type CombatStyle = "melee" | "ranged" | "hybrid";
+export type EnemyPattern =
+  | "rush"
+  | "idle_block"
+  | "tank_push"
+  | "hybrid"
+  | "zone_control"
+  | "erratic"
+  | "chaotic"
+  | "multi_phase";
+export type EnemyAiState =
+  | "idle"
+  | "approach"
+  | "circle"
+  | "attack"
+  | "recover"
+  | "hurt"
+  | "defeated";
 export type ItemKind =
   | "mate_listo"
   | "tortita_negra"
@@ -39,6 +68,99 @@ export type AttackState = {
   damage: number;
   range: number;
   width: number;
+  hitbox: HitboxState;
+  struckEnemyIds: string[];
+};
+
+export type HitboxState = {
+  shape: "rectangle";
+  width: number;
+  height: number;
+  offsetX: number;
+  offsetY: number;
+  activeFrames: number[];
+};
+
+export type EnemyAttackDefinition = {
+  name: string;
+  damage: number;
+  knockback?: number;
+  startupMs: number;
+  activeMs: number;
+  recoveryMs: number;
+  aoe?: boolean;
+  radius?: number;
+  projectile?: boolean;
+  speed?: number;
+  arc?: number;
+  durationMs?: number;
+  hits?: number;
+  effect?: "blind" | "invert_controls";
+};
+
+export type EnemyBehaviorDefinition = {
+  aggroRange: number;
+  attackRange: number;
+  pattern: EnemyPattern;
+  cooldownMs: number;
+};
+
+export type EnemyModifiers = {
+  zigzagMovement?: boolean;
+  randomSpeed?: boolean;
+  aggression?: number;
+  speedMultiplier?: number;
+  damageMultiplier?: number;
+};
+
+export type EnemyPhaseDefinition = {
+  name: string;
+  triggerHpRatio?: number;
+  buff?: {
+    speedMultiplier?: number;
+    damageMultiplier?: number;
+  };
+  attacks?: EnemyAttackDefinition[];
+  modifiers?: EnemyModifiers;
+};
+
+export type ActiveEnemyAttackState = {
+  name: string;
+  timerMs: number;
+  startupMs: number;
+  activeMs: number;
+  recoveryMs: number;
+  damage: number;
+  knockback: number;
+  range: number;
+  hitbox: HitboxState;
+  projectile: boolean;
+  projectileSpeed: number;
+  aoe: boolean;
+  radius: number | null;
+  effect: EnemyAttackDefinition["effect"] | null;
+  durationMs: number | null;
+  hits: number;
+  damageApplied: boolean;
+  projectileSpawned: boolean;
+};
+
+export type ProjectileState = {
+  id: string;
+  ownerId: string;
+  source: "player" | "enemy";
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  width: number;
+  height: number;
+  damage: number;
+  lifetimeMs: number;
+  facing: Facing;
+  effect: EnemyAttackDefinition["effect"] | null;
+  radius: number;
+  color: string;
 };
 
 export type PlayerState = {
@@ -65,6 +187,8 @@ export type PlayerState = {
   speedBoostMs: number;
   attackBoostMs: number;
   shieldMs: number;
+  blindMs: number;
+  invertControlsMs: number;
 };
 
 export type CameraState = {
@@ -110,6 +234,8 @@ export type ItemState = {
 export type EnemyState = {
   id: string;
   kind: EnemyKind;
+  role: EnemyRole;
+  combatStyle: CombatStyle;
   name: string;
   x: number;
   y: number;
@@ -122,12 +248,20 @@ export type EnemyState = {
   hp: number;
   maxHp: number;
   damage: number;
+  aggroRange: number;
   attackRange: number;
   attackIntervalMs: number;
   attackCooldownMs: number;
   hurtCooldownMs: number;
   facing: Facing;
-  state: "idle" | "advance" | "attack" | "hurt" | "defeated";
+  state: EnemyAiState;
+  behavior: EnemyBehaviorDefinition;
+  attacks: EnemyAttackDefinition[];
+  modifiers: EnemyModifiers;
+  phases: EnemyPhaseDefinition[];
+  phaseIndex: number;
+  engagementSlot: "front" | "back" | null;
+  activeAttack: ActiveEnemyAttackState | null;
   isBoss: boolean;
 };
 
@@ -168,6 +302,7 @@ export type GameState = {
   scene: SceneState;
   player: PlayerState;
   enemies: EnemyState[];
+  projectiles: ProjectileState[];
   items: ItemState[];
   camera: CameraState;
   input: InputState;

@@ -9,6 +9,13 @@ import {
   resolvePlayerSpriteState,
 } from "./spriteAnimation";
 
+const LANE_TOP_Y = 168;
+const LANE_DEPTH_SCALE = 0.8;
+
+function toScreenDepth(worldY: number) {
+  return LANE_TOP_Y + worldY * LANE_DEPTH_SCALE;
+}
+
 function drawSprite(
   context: CanvasRenderingContext2D,
   sprite: CanvasImageSource | undefined,
@@ -42,6 +49,33 @@ function drawSprite(
   return true;
 }
 
+function createGradientOrFallback(
+  context: CanvasRenderingContext2D,
+  kind: "linear" | "radial",
+  args: number[],
+  fallback: string,
+) {
+  if (kind === "radial" && typeof context.createRadialGradient === "function") {
+    return context.createRadialGradient(
+      args[0],
+      args[1],
+      args[2],
+      args[3],
+      args[4],
+      args[5],
+    );
+  }
+
+  if (typeof context.createLinearGradient === "function") {
+    return context.createLinearGradient(args[0], args[1], args[2], args[3]);
+  }
+
+  return {
+    addColorStop: () => undefined,
+    fallback,
+  } as unknown as CanvasGradient;
+}
+
 export function renderFrame(
   context: CanvasRenderingContext2D,
   snapshot: GameSnapshot,
@@ -53,27 +87,67 @@ export function renderFrame(
   context.clearRect(0, 0, canvas.width, canvas.height);
 
   const background = context.createLinearGradient(0, 0, 0, canvas.height);
-  background.addColorStop(0, "#b47a3a");
-  background.addColorStop(0.45, "#8a6242");
-  background.addColorStop(1, "#4d3b35");
+  background.addColorStop(0, "#c9934f");
+  background.addColorStop(0.34, "#9a6a45");
+  background.addColorStop(0.68, "#61453c");
+  background.addColorStop(1, "#312722");
   context.fillStyle = background;
   context.fillRect(0, 0, canvas.width, canvas.height);
 
+  const topGlow = createGradientOrFallback(
+    context,
+    "radial",
+    [
+      canvas.width * 0.55,
+      canvas.height * 0.08,
+      60,
+      canvas.width * 0.55,
+      canvas.height * 0.08,
+      canvas.width * 0.82,
+    ],
+    "rgba(255, 207, 140, 0)",
+  );
+  topGlow.addColorStop(0, "rgba(255, 242, 212, 0.34)");
+  topGlow.addColorStop(0.45, "rgba(255, 207, 140, 0.14)");
+  topGlow.addColorStop(1, "rgba(255, 207, 140, 0)");
+  context.fillStyle = topGlow;
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
   const vignette = context.createLinearGradient(0, 0, canvas.width, canvas.height);
-  vignette.addColorStop(0, "rgba(0, 0, 0, 0.14)");
-  vignette.addColorStop(0.5, "rgba(0, 0, 0, 0)");
-  vignette.addColorStop(1, "rgba(0, 0, 0, 0.22)");
+  vignette.addColorStop(0, "rgba(0, 0, 0, 0.18)");
+  vignette.addColorStop(0.46, "rgba(0, 0, 0, 0)");
+  vignette.addColorStop(1, "rgba(0, 0, 0, 0.3)");
   context.fillStyle = vignette;
   context.fillRect(0, 0, canvas.width, canvas.height);
 
-  context.fillStyle = "#2b3138";
-  context.fillRect(0, canvas.height - 84, canvas.width, 84);
+  context.fillStyle = "#262a31";
+  context.fillRect(0, canvas.height - 88, canvas.width, 88);
 
-  context.fillStyle = "#bea282";
-  context.fillRect(48, 88, canvas.width - 96, canvas.height - 184);
+  const carriage = createGradientOrFallback(
+    context,
+    "linear",
+    [0, 96, 0, canvas.height - 110],
+    "#b58f69",
+  );
+  carriage.addColorStop(0, "#d7b38a");
+  carriage.addColorStop(0.56, "#b58f69");
+  carriage.addColorStop(1, "#8a6d55");
+  context.fillStyle = carriage;
+  context.fillRect(44, 90, canvas.width - 88, canvas.height - 192);
 
-  context.fillStyle = "#59646e";
-  context.fillRect(86, 120, canvas.width - 172, 44);
+  context.fillStyle = "#515b66";
+  context.fillRect(82, 118, canvas.width - 164, 46);
+
+  context.strokeStyle = "rgba(255, 244, 214, 0.18)";
+  context.lineWidth = 2;
+  context.beginPath();
+  context.moveTo(92, 118);
+  context.lineTo(canvas.width - 92, 118);
+  context.stroke();
+  context.beginPath();
+  context.moveTo(92, 164);
+  context.lineTo(canvas.width - 92, 164);
+  context.stroke();
 
   context.fillStyle = "rgba(255, 236, 190, 0.32)";
   for (let index = 0; index < 5; index += 1) {
@@ -89,12 +163,12 @@ export function renderFrame(
     context.fillStyle = "rgba(255, 236, 190, 0.32)";
   }
 
-  context.fillStyle = "rgba(49, 41, 34, 0.18)";
+  context.fillStyle = "rgba(49, 41, 34, 0.22)";
   for (let index = 0; index < 6; index += 1) {
     context.fillRect(104 + index * 186, 120, 10, canvas.height - 206);
   }
 
-  context.fillStyle = "#8d5a31";
+  context.fillStyle = "#7c4f2a";
   for (let index = 0; index < 4; index += 1) {
     const benchX = 138 + index * 255;
     context.beginPath();
@@ -102,7 +176,7 @@ export function renderFrame(
     context.fill();
   }
 
-  context.strokeStyle = "rgba(53, 58, 64, 0.45)";
+  context.strokeStyle = "rgba(53, 58, 64, 0.55)";
   context.lineWidth = 4;
   for (let index = 0; index < 6; index += 1) {
     const handleX = 152 + index * 180;
@@ -115,15 +189,27 @@ export function renderFrame(
     context.stroke();
   }
 
+  context.strokeStyle = "rgba(255, 255, 255, 0.12)";
+  context.lineWidth = 1;
+  context.beginPath();
+  context.moveTo(86, canvas.height - 114);
+  context.lineTo(canvas.width - 86, canvas.height - 114);
+  context.stroke();
+  context.beginPath();
+  context.moveTo(canvas.width * 0.5, 116);
+  context.lineTo(canvas.width * 0.5, canvas.height - 118);
+  context.stroke();
+
   for (const item of snapshot.items) {
     if (item.collected) {
       continue;
     }
 
     const itemX = item.x - snapshot.camera.x;
-    const itemY = 152 + item.y;
+    const itemY = toScreenDepth(item.y) + 12;
     const playerCenterX = snapshot.player.x + snapshot.player.width / 2 - snapshot.camera.x;
-    const playerCenterY = 152 + snapshot.player.y + snapshot.player.depth / 2;
+    const playerCenterY =
+      toScreenDepth(snapshot.player.y) + snapshot.player.depth / 2;
     const itemCenterX = itemX + item.width / 2;
     const itemCenterY = itemY + item.depth / 2;
     const dx = playerCenterX - itemCenterX;
@@ -214,13 +300,17 @@ export function renderFrame(
   }
 
   const floorY = canvas.height - 112;
+  context.fillStyle = "rgba(19, 20, 23, 0.22)";
+  context.fillRect(52, floorY - 6, canvas.width - 104, 18);
+  context.fillStyle = "rgba(255, 236, 190, 0.08)";
+  context.fillRect(58, floorY - 2, canvas.width - 116, 4);
   for (const enemy of snapshot.enemies) {
     if (enemy.hp <= 0) {
       continue;
     }
 
     const enemyVisibleX = enemy.x - snapshot.camera.x;
-    const enemyVisibleY = 140 + enemy.y;
+    const enemyVisibleY = toScreenDepth(enemy.y);
 
     context.fillStyle = "rgba(20, 17, 10, 0.25)";
     context.beginPath();
@@ -277,8 +367,17 @@ export function renderFrame(
     }
   }
 
+  for (const projectile of snapshot.projectiles) {
+    const projectileX = projectile.x - snapshot.camera.x;
+    const projectileY = toScreenDepth(projectile.y) + 4;
+    context.fillStyle = projectile.color;
+    context.beginPath();
+    context.roundRect(projectileX, projectileY, projectile.width, projectile.height, 8);
+    context.fill();
+  }
+
   const visibleX = snapshot.player.x - snapshot.camera.x;
-  const visibleY = 140 + snapshot.player.y;
+  const visibleY = toScreenDepth(snapshot.player.y);
   const playerSpriteState = resolvePlayerSpriteState(snapshot.player);
   const playerTransform = getSpriteTransform(
     playerSpriteState,
@@ -346,25 +445,47 @@ export function renderFrame(
 
   if (snapshot.player.attack.activeMs > 0) {
     context.fillStyle = "rgba(255, 203, 94, 0.55)";
-    const attackOffset = snapshot.player.facing === "right" ? snapshot.player.width : -snapshot.player.attack.width;
+    const attackRectWidth = snapshot.player.attack.hitbox.width;
+    const attackRectHeight = snapshot.player.attack.hitbox.height;
+    const attackOffset =
+      snapshot.player.facing === "right"
+        ? snapshot.player.width / 2 + snapshot.player.attack.hitbox.offsetX
+        : snapshot.player.width / 2 - snapshot.player.attack.hitbox.offsetX - attackRectWidth;
     context.fillRect(
       visibleX + attackOffset,
-      visibleY - snapshot.player.z + 14,
-      snapshot.player.attack.width,
-      36,
+      visibleY - snapshot.player.z + snapshot.player.attack.hitbox.offsetY + 6,
+      attackRectWidth,
+      attackRectHeight,
     );
     context.fillStyle = "rgba(255, 243, 181, 0.72)";
     context.beginPath();
     context.ellipse(
-      visibleX + attackOffset + snapshot.player.attack.width / 2,
+      visibleX + attackOffset + attackRectWidth / 2,
       visibleY + 30,
-      snapshot.player.attack.width * 0.36,
+      attackRectWidth * 0.36,
       24,
       0,
       0,
       Math.PI * 2,
     );
     context.fill();
+  }
+
+  const lightBand = createGradientOrFallback(
+    context,
+    "linear",
+    [0, 0, canvas.width, 0],
+    "rgba(255, 248, 228, 0.11)",
+  );
+  lightBand.addColorStop(0, "rgba(255, 255, 255, 0.03)");
+  lightBand.addColorStop(0.5, "rgba(255, 248, 228, 0.11)");
+  lightBand.addColorStop(1, "rgba(255, 255, 255, 0.03)");
+  context.fillStyle = lightBand;
+  context.fillRect(62, 126, canvas.width - 124, 28);
+
+  if (snapshot.player.blindMs > 0) {
+    context.fillStyle = "rgba(214, 221, 224, 0.22)";
+    context.fillRect(0, 0, canvas.width, canvas.height);
   }
 
   context.fillStyle = "#ffffff";

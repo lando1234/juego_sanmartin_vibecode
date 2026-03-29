@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { createEnemy } from "@/game/entities/createEnemy";
 import {
   getAnimatedSpriteFrame,
   getSpriteTransform,
@@ -27,29 +28,8 @@ describe("spriteAnimation", () => {
 
   it("resolves enemy states from ai state", () => {
     const snapshot = createInitialGameState();
-    const enemy = {
-      id: "enemy-1",
-      kind: "bloqueador_puerta",
-      name: "Bloqueador",
-      x: 0,
-      y: 0,
-      z: 0,
-      vx: 0,
-      vy: 0,
-      width: 72,
-      depth: 32,
-      speed: 120,
-      hp: 40,
-      maxHp: 40,
-      damage: 10,
-      attackRange: 90,
-      attackIntervalMs: 900,
-      attackCooldownMs: 0,
-      hurtCooldownMs: 0,
-      facing: "left" as const,
-      state: "advance" as const,
-      isBoss: false,
-    };
+    const enemy = createEnemy("colado", 0, 0);
+    enemy.state = "approach";
 
     expect(resolveEnemySpriteState(enemy)).toBe("walk");
 

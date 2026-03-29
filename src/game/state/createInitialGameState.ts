@@ -35,6 +35,7 @@ export function createInitialGameState(): GameState {
       secondWaveTriggered: false,
       bossTriggered: false,
       victoryWalkTriggered: false,
+      activeHazards: [],
     },
     player: {
       id: "ricky",

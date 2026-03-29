@@ -528,6 +528,7 @@ const baseScene = (): SceneState => ({
   secondWaveTriggered: false,
   bossTriggered: false,
   victoryWalkTriggered: false,
+  activeHazards: [],
 });
 
 function getEnemyKind(levelIndex: number, offset: number): EnemyKind {
@@ -609,6 +610,7 @@ function createLevel(index: number, config: StationConfig): CampaignLevel {
     bossGateEndX: 2470 + shiftX,
     exitTriggerX: 2350 + shiftX,
     exitX: 2440 + shiftX,
+    hazards: [],
     wave1Spawns,
     wave2Spawns,
     bossSpawn,
@@ -693,6 +695,7 @@ export function applyLevelToState(
   state.levelBounds = { ...level.bounds };
   state.levelLayout = {
     ...level.layout,
+    hazards: level.layout.hazards.map((hazard) => ({ ...hazard })),
     wave1Spawns: [...level.layout.wave1Spawns],
     wave2Spawns: [...level.layout.wave2Spawns],
     bossSpawn: { ...level.layout.bossSpawn },

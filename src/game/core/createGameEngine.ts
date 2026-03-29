@@ -4,6 +4,7 @@ import { updateCombat } from "@/game/systems/combatSystem";
 import { updateCamera } from "@/game/systems/cameraSystem";
 import { updateEnemies } from "@/game/systems/enemySystem";
 import { updateHud } from "@/game/systems/hudSystem";
+import { updateHazards } from "@/game/systems/hazardSystem";
 import { updateItems } from "@/game/systems/itemSystem";
 import { updateMovement } from "@/game/systems/movementSystem";
 import { updateScene } from "@/game/systems/sceneSystem";
@@ -49,7 +50,10 @@ export function createGameEngine(options: EngineOptions = {}): GameEngine {
 
   const createSnapshot = (): GameSnapshot => ({
     ...state,
-    scene: { ...state.scene },
+    scene: {
+      ...state.scene,
+      activeHazards: state.scene.activeHazards.map((hazard) => ({ ...hazard })),
+    },
     player: {
       ...state.player,
       attack: {
@@ -83,6 +87,7 @@ export function createGameEngine(options: EngineOptions = {}): GameEngine {
     levelBounds: { ...state.levelBounds },
     levelLayout: {
       ...state.levelLayout,
+      hazards: state.levelLayout.hazards.map((hazard) => ({ ...hazard })),
       wave1Spawns: [...state.levelLayout.wave1Spawns],
       wave2Spawns: [...state.levelLayout.wave2Spawns],
       bossSpawn: { ...state.levelLayout.bossSpawn },
@@ -117,6 +122,7 @@ export function createGameEngine(options: EngineOptions = {}): GameEngine {
   const tick = (dtMs: number) => {
     updateMovement(state, dtMs);
     updateScene(state);
+    updateHazards(state, dtMs);
     updateCombat(state, dtMs);
     updateEnemies(state, dtMs);
     updateItems(state, dtMs);

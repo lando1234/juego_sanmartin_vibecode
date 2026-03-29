@@ -12,6 +12,13 @@ export type SceneType =
   | "boss_intro"
   | "boss_combat";
 
+export type HazardType =
+  | "seat_block"
+  | "door_slam"
+  | "sudden_brake"
+  | "passenger_push"
+  | "floor_clutter";
+
 export type Facing = "left" | "right";
 export type EnemyKind =
   | "colado"
@@ -253,6 +260,26 @@ export type SceneState = {
   secondWaveTriggered: boolean;
   bossTriggered: boolean;
   victoryWalkTriggered: boolean;
+  activeHazards: HazardState[];
+};
+
+export type HazardSpawn = {
+  id: string;
+  type: HazardType;
+  x: number;
+  y: number;
+  width: number;
+  depth: number;
+  damage?: number;
+  activeMs?: number;
+  cooldownMs?: number;
+  strength?: number;
+};
+
+export type HazardState = HazardSpawn & {
+  timerMs: number;
+  cooldownRemainingMs: number;
+  active: boolean;
 };
 
 export type HudState = {
@@ -337,6 +364,7 @@ export type LevelLayout = {
   bossGateEndX: number;
   exitTriggerX: number;
   exitX: number;
+  hazards: HazardSpawn[];
   wave1Spawns: Array<{
     kind: EnemyKind;
     x: number;

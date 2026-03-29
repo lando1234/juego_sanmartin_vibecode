@@ -3,8 +3,10 @@ node_modules/
 out/
 dist/
 coverage/
+output/imagegen/
 
 .env
+.env.*
 .env.local
 .env.development.local
 .env.test.local

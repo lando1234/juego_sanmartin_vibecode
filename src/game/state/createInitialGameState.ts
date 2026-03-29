@@ -154,5 +154,9 @@ export function createInitialGameState(mode: GameMode = "campaign"): GameState {
   };
 
   applyLevelToState(state, 0, false);
+  if (mode === "survival") {
+    state.hud.levelName = "Supervivencia";
+    state.hud.objective = "Oleadas infinitas. Elegí cómo querés arrancar.";
+  }
   return state;
 }

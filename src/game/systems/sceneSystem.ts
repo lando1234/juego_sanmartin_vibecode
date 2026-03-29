@@ -1,6 +1,16 @@
 import { getCampaignLevel } from "@/game/data/campaignLevels";
 import { createEnemy } from "@/game/entities/createEnemy";
-import type { GameState } from "@/game/types/gameTypes";
+import type { EnemyKind, GameState } from "@/game/types/gameTypes";
+
+const SURVIVAL_MINIBOSS_CADENCE = 5;
+const SURVIVAL_COMMON_POOL: EnemyKind[] = [
+  "colado",
+  "durmiente",
+  "mochilero",
+  "vendedor_competencia",
+  "senora_bolsos",
+  "fisura",
+];
 
 function computeStationResult(state: GameState) {
   const scoreDelta = Math.max(0, state.runStats.score - state.runStats.stationScoreStart);
@@ -65,12 +75,103 @@ function formatStationSummary(state: GameState) {
     .join(" ");
 }
 
-export function updateScene(state: GameState) {
-  const currentLevel = getCampaignLevel(state.currentLevelIndex);
+function isSurvivalMinibossWave(waveNumber: number) {
+  return waveNumber > 0 && waveNumber % SURVIVAL_MINIBOSS_CADENCE === 0;
+}
 
+function getSurvivalSpawnSeeds(state: GameState) {
+  const seeds = [...state.levelLayout.wave1Spawns, ...state.levelLayout.wave2Spawns];
+
+  if (seeds.length > 0) {
+    return seeds;
+  }
+
+  return [
+    { kind: "colado" as const, x: state.levelLayout.wave1TriggerX + 120, y: 104 },
+    { kind: "durmiente" as const, x: state.levelLayout.wave1TriggerX + 240, y: 144 },
+    { kind: "mochilero" as const, x: state.levelLayout.wave1TriggerX + 360, y: 188 },
+  ];
+}
+
+function spawnSurvivalWave(state: GameState, waveNumber: number) {
+  const seeds = getSurvivalSpawnSeeds(state);
+  const minibossWave = isSurvivalMinibossWave(waveNumber);
+  const commonCount = minibossWave
+    ? 2 + Math.min(2, Math.floor(waveNumber / SURVIVAL_MINIBOSS_CADENCE))
+    : 3 + Math.min(3, Math.floor((waveNumber - 1) / 3));
+  const baseIndex = waveNumber - 1;
+  const spawnKind = (index: number): EnemyKind =>
+    SURVIVAL_COMMON_POOL[(baseIndex + index) % SURVIVAL_COMMON_POOL.length];
+
+  const spawns = Array.from({ length: commonCount }, (_, index) => {
+    const seed = seeds[(baseIndex + index) % seeds.length];
+
+    return {
+      kind: spawnKind(index),
+      x: seed.x + (index % 3 - 1) * 22,
+      y: seed.y,
+    };
+  });
+
+  if (minibossWave) {
+    const centerSeed = seeds[Math.floor(seeds.length / 2)] ?? seeds[0];
+
+    spawns.unshift({
+      kind: "borracho",
+      x: centerSeed.x,
+      y: centerSeed.y,
+    });
+  }
+
+  state.survivalWave = waveNumber;
+  state.currentLevelIndex = waveNumber - 1;
+  state.totalLevels = waveNumber;
+  state.scene.waveIndex = waveNumber;
+  state.scene.waveTriggered = true;
+  state.scene.secondWaveTriggered = true;
+  state.scene.bossTriggered = minibossWave;
+  state.scene.victoryWalkTriggered = false;
+  state.scene.gateClosed = false;
+  state.scene.gateRightX = null;
+  state.scene.type = minibossWave ? "boss_combat" : "carriage_combat";
+  state.enemies = spawns.map((spawn) => createEnemy(spawn.kind, spawn.x, spawn.y));
+  state.hud.levelName = `Supervivencia · Oleada ${waveNumber}`;
+  state.hud.objective = minibossWave
+    ? `Supervivencia · miniboss de la oleada ${waveNumber}`
+    : `Supervivencia · oleada ${waveNumber}`;
+}
+
+function updateSurvivalScene(state: GameState) {
+  if (state.survivalWave === 0 && state.enemies.length === 0) {
+    spawnSurvivalWave(state, 1);
+    return;
+  }
+
+  const waveCleared = state.survivalWave > 0 && state.enemies.every((enemy) => enemy.hp <= 0);
+
+  if (!waveCleared) {
+    return;
+  }
+
+  if (isSurvivalMinibossWave(state.survivalWave)) {
+    state.survivalMinibossesCleared += 1;
+  }
+
+  state.survivalWavesCleared += 1;
+  spawnSurvivalWave(state, state.survivalWave + 1);
+}
+
+export function updateScene(state: GameState) {
   if (state.phase !== "playing") {
     return;
   }
+
+  if (state.mode === "survival") {
+    updateSurvivalScene(state);
+    return;
+  }
+
+  const currentLevel = getCampaignLevel(state.currentLevelIndex);
 
   if (
     !state.scene.waveTriggered &&

@@ -1,11 +1,12 @@
 "use client";
 
 import { getCampaignLevel } from "@/game/data/campaignLevels";
-import type { GameSnapshot } from "@/game/types/gameTypes";
+import type { GameMode, GameSnapshot } from "@/game/types/gameTypes";
 
 type GameOverlayProps = {
   snapshot: GameSnapshot;
   onStart: () => void;
+  onSelectMode: (mode: GameMode) => void;
   onPauseToggle: () => void;
   onNextLevel: () => void;
   onReset: () => void;
@@ -14,11 +15,13 @@ type GameOverlayProps = {
 export function GameOverlay({
   snapshot,
   onStart,
+  onSelectMode,
   onPauseToggle,
   onNextLevel,
   onReset,
 }: GameOverlayProps) {
   const currentLevel = getCampaignLevel(snapshot.currentLevelIndex);
+  const isSurvivalMode = snapshot.mode === "survival";
 
   if (snapshot.phase === "title") {
     return (
@@ -29,19 +32,49 @@ export function GameOverlay({
               Furgon Final
             </p>
             <h1 className="max-w-3xl text-4xl font-black tracking-tight text-balance md:text-6xl">
-              Ricky tiene que llegar al laburo y el vagon ya entro en modo guerra.
+              {isSurvivalMode
+                ? "Supervivencia: bancá las oleadas y no aflojes el pasillo."
+                : "Ricky tiene que llegar al laburo y el vagon ya entro en modo guerra."}
             </h1>
             <p className="max-w-2xl text-base text-[#f7ead4]/78 md:text-lg">
-              Peleá estación por estación en el San Martín, desde Dr. Cabred hasta Retiro, bancate la hora pico y abríte paso hasta la terminal.
+              {isSurvivalMode
+                ? "Oleadas infinitas, minibosses cada cinco rondas y una sola corrida para medir cuánto aguantás."
+                : "Peleá estación por estación en el San Martín, desde Dr. Cabred hasta Retiro, bancate la hora pico y abríte paso hasta la terminal."}
             </p>
           </div>
-          <div className="grid gap-3 md:grid-cols-[auto_auto_1fr] md:items-center">
+          <div className="grid gap-4 md:grid-cols-[auto_auto_auto_1fr] md:items-center">
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => onSelectMode("campaign")}
+                aria-pressed={!isSurvivalMode}
+                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                  !isSurvivalMode
+                    ? "bg-[linear-gradient(90deg,#e06a2c,#c44310)] text-white"
+                    : "border border-white/18 text-[#f7ead4] hover:bg-white/8"
+                }`}
+              >
+                Campaña
+              </button>
+              <button
+                type="button"
+                onClick={() => onSelectMode("survival")}
+                aria-pressed={isSurvivalMode}
+                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                  isSurvivalMode
+                    ? "bg-[linear-gradient(90deg,#5c8fd6,#335a98)] text-white"
+                    : "border border-white/18 text-[#f7ead4] hover:bg-white/8"
+                }`}
+              >
+                Supervivencia
+              </button>
+            </div>
             <button
               type="button"
               onClick={onStart}
               className="rounded-full bg-[linear-gradient(90deg,#e06a2c,#c44310)] px-5 py-3 font-semibold text-white transition hover:brightness-110"
             >
-              Empezar partida
+              {isSurvivalMode ? "Empezar supervivencia" : "Empezar partida"}
             </button>
             <button
               type="button"
@@ -51,7 +84,9 @@ export function GameOverlay({
               Reiniciar estado
             </button>
             <div className="text-sm text-[#f7ead4]/74">
-              Objetivo inicial: cruzar 18 estaciones, escalar la dificultad y llegar a Retiro.
+              {isSurvivalMode
+                ? "Objetivo inicial: aguantá la primera oleada y abrí racha."
+                : "Objetivo inicial: cruzar 18 estaciones, escalar la dificultad y llegar a Retiro."}
             </div>
           </div>
         </div>
@@ -195,15 +230,47 @@ export function GameOverlay({
   }
 
   if (snapshot.phase === "game_over") {
+    const summaryTitle =
+      snapshot.mode === "survival"
+        ? snapshot.hud.completionTitle ?? "Supervivencia terminada"
+        : "Ricky perdio la pulseada del horario pico.";
+    const summaryBody =
+      snapshot.mode === "survival"
+        ? snapshot.hud.completionSummary ??
+          `Llegaste a la oleada ${Math.max(1, snapshot.survivalWave)}.`
+        : "Lo voltearon antes de llegar al furgón. Hora pico 1, Ricky 0.";
+
     return (
       <div className="grid min-h-[min(100dvh,1000px)] place-items-center bg-[radial-gradient(circle_at_top,rgba(125,38,25,0.18),transparent_42%)] px-4 py-10">
         <div className="grid w-full max-w-4xl gap-5 rounded-[34px] border border-white/18 bg-[linear-gradient(180deg,rgba(64,26,19,0.96),rgba(22,14,12,0.98))] p-6 text-[#f7ead4] shadow-[0_30px_90px_rgba(20,15,12,0.5)] backdrop-blur-sm md:p-8">
           <h1 className="text-3xl font-black tracking-tight md:text-5xl">
-            Ricky perdio la pulseada del horario pico.
+            {summaryTitle}
           </h1>
           <p className="max-w-2xl text-[#f7ead4]/78 md:text-lg">
-            Lo voltearon antes de llegar al furgón. Hora pico 1, Ricky 0.
+            {summaryBody}
           </p>
+          {snapshot.mode === "survival" ? (
+            <div className="grid gap-2 rounded-[24px] border border-white/12 bg-black/20 p-4 text-sm text-[#f7ead4]/80 md:grid-cols-3">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f4c992]">
+                  Oleadas superadas
+                </p>
+                <p className="text-xl font-black text-white">{snapshot.survivalWavesCleared}</p>
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f4c992]">
+                  Minibosses
+                </p>
+                <p className="text-xl font-black text-white">{snapshot.survivalMinibossesCleared}</p>
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f4c992]">
+                  Oleada alcanzada
+                </p>
+                <p className="text-xl font-black text-white">{Math.max(1, snapshot.survivalWave)}</p>
+              </div>
+            </div>
+          ) : null}
           <div className="flex flex-wrap gap-3">
             <button
               type="button"

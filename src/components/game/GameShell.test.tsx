@@ -23,6 +23,18 @@ describe("GameShell", () => {
     expect(screen.getByText(/En vagón: 0 rivales/i)).toBeInTheDocument();
   });
 
+  it("lets you switch to survival mode from the title overlay", async () => {
+    const user = userEvent.setup();
+    render(<GameShell />);
+
+    await user.click(screen.getByRole("button", { name: "Supervivencia" }));
+    await user.click(
+      screen.getByRole("button", { name: "Empezar supervivencia" }),
+    );
+
+    expect(screen.getAllByText(/Fase: playing/i)).toHaveLength(2);
+  });
+
   it("cleans up engine listeners on unmount", () => {
     const removeEventListenerSpy = vi.spyOn(window, "removeEventListener");
     const { unmount } = render(<GameShell />);

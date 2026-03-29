@@ -48,6 +48,18 @@ export function createGameEngine(options: EngineOptions = {}): GameEngine {
   let lastFrameTime = 0;
   let running = false;
 
+  const formatElapsedRun = (elapsedMs: number) => {
+    const totalSeconds = Math.max(0, Math.floor(elapsedMs / 1000));
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    if (minutes === 0) {
+      return `${seconds}s`;
+    }
+
+    return `${minutes}m ${String(seconds).padStart(2, "0")}s`;
+  };
+
   const createSnapshot = (): GameSnapshot => ({
     ...state,
     scene: {
@@ -134,6 +146,12 @@ export function createGameEngine(options: EngineOptions = {}): GameEngine {
     updateItems(state, dtMs);
     updateCamera(state);
     updateHud(state, now());
+    if (state.phase === "game_over" && state.mode === "survival") {
+      state.hud.completionTitle = state.hud.completionTitle ?? "Supervivencia terminada";
+      state.hud.completionSummary =
+        state.hud.completionSummary ??
+        `Llegaste a la oleada ${Math.max(1, state.survivalWave)}. Superaste ${state.survivalWavesCleared} oleadas, ${state.survivalMinibossesCleared} miniboss${state.survivalMinibossesCleared === 1 ? "" : "es"} y aguantaste ${formatElapsedRun(state.hud.elapsedMs)}.`;
+    }
     emit();
   };
 
@@ -143,6 +161,28 @@ export function createGameEngine(options: EngineOptions = {}): GameEngine {
     }
 
     state.phase = "playing";
+    state.hud.completionTitle = null;
+    state.hud.completionSummary = null;
+
+    if (state.mode === "survival") {
+      state.currentLevelIndex = 0;
+      state.totalLevels = 1;
+      state.scene.type = "carriage_combat";
+      state.scene.gateClosed = false;
+      state.scene.gateRightX = null;
+      state.scene.waveIndex = 0;
+      state.scene.waveTriggered = false;
+      state.scene.secondWaveTriggered = false;
+      state.scene.bossTriggered = false;
+      state.scene.victoryWalkTriggered = false;
+      state.hud.levelName = "Supervivencia";
+      state.hud.objective = "Oleadas infinitas. Resistí para marcar tu racha.";
+      state.survivalWave = 0;
+      state.survivalWavesCleared = 0;
+      state.survivalMinibossesCleared = 0;
+      return;
+    }
+
     state.scene.type = "carriage_combat";
     state.hud.completionTitle = null;
     state.hud.completionSummary = null;
@@ -168,6 +208,21 @@ export function createGameEngine(options: EngineOptions = {}): GameEngine {
         startRun();
         emit();
         return;
+      case "set-mode":
+        state.mode = command.payload.mode;
+        if (state.phase === "title") {
+          const campaignState = createInitialGameState("campaign");
+          state.hud.levelName =
+            command.payload.mode === "survival"
+              ? "Supervivencia"
+              : campaignState.hud.levelName;
+          state.hud.objective =
+            command.payload.mode === "survival"
+              ? "Oleadas infinitas. Elegí cómo querés arrancar."
+              : campaignState.hud.objective;
+        }
+        emit();
+        return;
       case "pause-toggle":
         if (state.phase === "title" || state.phase === "station_intro") {
           startRun();
@@ -183,7 +238,7 @@ export function createGameEngine(options: EngineOptions = {}): GameEngine {
         emit();
         return;
       case "reset":
-        state = createInitialGameState();
+        state = createInitialGameState(state.mode);
         lastFrameTime = 0;
         emit();
         return;

@@ -113,4 +113,25 @@ describe("sceneSystem", () => {
     expect(engine.getSnapshot().currentLevelIndex).toBe(1);
     expect(engine.getSnapshot().hud.levelName).toBe(campaignLevels[1].name);
   });
+
+  it("advances endless survival waves and inserts a miniboss cadence", () => {
+    const engine = createGameEngine({ now: () => 1000 });
+
+    engine.sendCommand({ type: "set-mode", payload: { mode: "survival" } });
+    engine.sendCommand({ type: "start" });
+
+    runUntil(engine, () => engine.getSnapshot().survivalWave === 1);
+    expect(engine.getSnapshot().hud.levelName).toContain("Supervivencia");
+
+    for (let wave = 1; wave < 5; wave += 1) {
+      engine.sendCommand({ type: "debug-defeat-enemies" });
+      engine.step(16);
+      runUntil(engine, () => engine.getSnapshot().survivalWave === wave + 1);
+    }
+
+    expect(engine.getSnapshot().scene.type).toBe("boss_combat");
+    expect(engine.getSnapshot().enemies.some((enemy) => enemy.kind === "borracho")).toBe(true);
+    expect(engine.getSnapshot().survivalWavesCleared).toBe(4);
+    expect(engine.getSnapshot().survivalMinibossesCleared).toBe(0);
+  });
 });

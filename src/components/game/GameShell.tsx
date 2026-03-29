@@ -94,6 +94,10 @@ export function GameShell() {
     engineRef.current?.sendCommand({ type });
   };
 
+  const selectMode = (mode: GameSnapshot["mode"]) => {
+    engineRef.current?.sendCommand({ type: "set-mode", payload: { mode } });
+  };
+
   const isIntermission =
     snapshot.phase === "title" ||
     snapshot.phase === "station_intro" ||
@@ -115,6 +119,7 @@ export function GameShell() {
         <GameOverlay
           snapshot={snapshot}
           onStart={() => sendCommand("start")}
+          onSelectMode={selectMode}
           onPauseToggle={() => sendCommand("pause-toggle")}
           onNextLevel={() => sendCommand("next-level")}
           onReset={() => sendCommand("reset")}
@@ -179,6 +184,7 @@ export function GameShell() {
                     <GameOverlay
                       snapshot={snapshot}
                       onStart={() => sendCommand("start")}
+                      onSelectMode={selectMode}
                       onPauseToggle={() => sendCommand("pause-toggle")}
                       onNextLevel={() => sendCommand("next-level")}
                       onReset={() => sendCommand("reset")}

@@ -421,6 +421,9 @@ export type GameState = {
   phase: GamePhase;
   currentLevelIndex: number;
   totalLevels: number;
+  survivalWave: number;
+  survivalWavesCleared: number;
+  survivalMinibossesCleared: number;
   scene: SceneState;
   player: PlayerState;
   enemies: EnemyState[];
@@ -433,9 +436,6 @@ export type GameState = {
   lastDtMs: number;
   startedAtMs: number | null;
   updatedAtMs: number | null;
-  survivalWave: number;
-  survivalWavesCleared: number;
-  survivalMinibossesCleared: number;
   hud: HudState;
   runStats: RunStatsState;
 };
@@ -444,9 +444,9 @@ export type GameSnapshot = Readonly<GameState>;
 
 export type GameCommand =
   | { type: "start" }
+  | { type: "set-mode"; payload: { mode: GameMode } }
   | { type: "pause-toggle" }
   | { type: "next-level" }
-  | { type: "set-mode"; payload: { mode: GameMode } }
   | { type: "reset" }
   | { type: "input"; payload: Partial<InputState> }
   | { type: "debug-set-player-position"; payload: { x: number; y?: number } }

@@ -9,6 +9,7 @@ describe("createGameEngine", () => {
     const snapshot = engine.getSnapshot();
 
     expect(snapshot.phase).toBe("title");
+    expect(snapshot.mode).toBe("campaign");
     expect(snapshot.scene.type).toBe("carriage_intro");
     expect(snapshot.player.name).toBe("Ricky Ferreyra");
     expect(snapshot.camera.x).toBe(0);
@@ -48,6 +49,31 @@ describe("createGameEngine", () => {
     expect(engine.getSnapshot().phase).toBe("title");
     expect(engine.getSnapshot().player.x).toBe(180);
     expect(engine.getSnapshot().startedAtMs).toBeNull();
+  });
+
+  it("keeps the selected mode when resetting from the title screen", () => {
+    const engine = createGameEngine({ now: () => 1000 });
+
+    engine.sendCommand({ type: "set-mode", payload: { mode: "survival" } });
+    engine.reset();
+
+    expect(engine.getSnapshot().phase).toBe("title");
+    expect(engine.getSnapshot().mode).toBe("survival");
+    expect(engine.getSnapshot().survivalWave).toBe(0);
+  });
+
+  it("starts survival mode with the first wave and survival labels", () => {
+    const engine = createGameEngine({ now: () => 1000 });
+
+    engine.sendCommand({ type: "set-mode", payload: { mode: "survival" } });
+    engine.sendCommand({ type: "start" });
+    engine.step(16);
+
+    expect(engine.getSnapshot().mode).toBe("survival");
+    expect(engine.getSnapshot().phase).toBe("playing");
+    expect(engine.getSnapshot().survivalWave).toBe(1);
+    expect(engine.getSnapshot().hud.levelName).toMatch(/Supervivencia · Oleada 1/i);
+    expect(engine.getSnapshot().enemies.length).toBeGreaterThan(0);
   });
 
   it("ignores next-level outside victory", () => {

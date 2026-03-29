@@ -213,9 +213,11 @@ export function getSpriteTransform(
       transform.rotation = walkCycle * 0.03;
       break;
     case "block":
-      transform.y -= 1;
-      transform.width *= 1.02;
-      transform.rotation = -0.04;
+      transform.x += 6;
+      transform.y += 6;
+      transform.width *= 0.96;
+      transform.height *= 0.97;
+      transform.rotation = -0.02;
       break;
     case "attack":
       transform.x += 14;

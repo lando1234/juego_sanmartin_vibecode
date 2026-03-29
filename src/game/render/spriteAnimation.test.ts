@@ -152,7 +152,9 @@ describe("spriteAnimation", () => {
     const defeated = getSpriteTransform("defeated", 0, 10, 20, 100, 180);
 
     expect(attack.x).toBeGreaterThan(10);
-    expect(block.width).toBeGreaterThan(100);
+    expect(block.x).toBeGreaterThan(10);
+    expect(block.y).toBeGreaterThan(20);
+    expect(block.width).toBeLessThan(100);
     expect(telegraph.width).toBeGreaterThan(100);
     expect(attack.width).toBeGreaterThan(100);
     expect(attack3.width).toBeGreaterThan(attack.width);

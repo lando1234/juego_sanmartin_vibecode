@@ -78,13 +78,13 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     width: 68,
     depth: 30,
     speed: 240,
-    hp: 60,
-    damage: 8,
+    hp: 64,
+    damage: 9,
     behavior: {
-      aggroRange: 150,
-      attackRange: 28,
+      aggroRange: 164,
+      attackRange: 30,
       pattern: "rush",
-      cooldownMs: 880,
+      cooldownMs: 760,
     },
     attacks: [
       createAttack({
@@ -97,8 +97,8 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
       }),
     ],
     modifiers: {
-      antiSpamBias: 1.1,
-      preferredLaneOffset: 22,
+      antiSpamBias: 1.2,
+      preferredLaneOffset: 26,
     },
   },
   durmiente: {
@@ -107,14 +107,14 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     combatStyle: "melee",
     width: 78,
     depth: 34,
-    speed: 80,
-    hp: 90,
-    damage: 10,
+    speed: 88,
+    hp: 108,
+    damage: 12,
     behavior: {
-      aggroRange: 92,
-      attackRange: 24,
+      aggroRange: 104,
+      attackRange: 28,
       pattern: "idle_block",
-      cooldownMs: 1400,
+      cooldownMs: 1220,
     },
     attacks: [
       createAttack({ name: "headbutt", damage: 10, knockback: 15 }),
@@ -129,9 +129,9 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
       }),
     ],
     modifiers: {
-      antiSpamBias: 0.85,
-      preferredLaneOffset: -12,
-      guardChance: 0.35,
+      antiSpamBias: 0.95,
+      preferredLaneOffset: -16,
+      guardChance: 0.42,
     },
   },
   mochilero: {
@@ -140,14 +140,14 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     combatStyle: "melee",
     width: 84,
     depth: 36,
-    speed: 120,
-    hp: 120,
-    damage: 12,
+    speed: 132,
+    hp: 134,
+    damage: 14,
     behavior: {
-      aggroRange: 126,
-      attackRange: 34,
+      aggroRange: 136,
+      attackRange: 38,
       pattern: "tank_push",
-      cooldownMs: 1100,
+      cooldownMs: 980,
     },
     attacks: [
       createAttack({
@@ -161,9 +161,9 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
       }),
     ],
     modifiers: {
-      antiSpamBias: 1.15,
-      preferredLaneOffset: 8,
-      poiseHits: 2,
+      antiSpamBias: 1.22,
+      preferredLaneOffset: 10,
+      poiseHits: 3,
     },
   },
   vendedor_competencia: {
@@ -172,14 +172,14 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     combatStyle: "hybrid",
     width: 66,
     depth: 30,
-    speed: 200,
-    hp: 80,
-    damage: 10,
+    speed: 216,
+    hp: 88,
+    damage: 11,
     behavior: {
-      aggroRange: 182,
-      attackRange: 94,
+      aggroRange: 196,
+      attackRange: 108,
       pattern: "hybrid",
-      cooldownMs: 760,
+      cooldownMs: 660,
     },
     attacks: [
       createAttack({
@@ -200,8 +200,8 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
       }),
     ],
     modifiers: {
-      antiSpamBias: 1.35,
-      preferredLaneOffset: 36,
+      antiSpamBias: 1.5,
+      preferredLaneOffset: 42,
     },
   },
   senora_bolsos: {
@@ -210,14 +210,14 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     combatStyle: "hybrid",
     width: 82,
     depth: 38,
-    speed: 96,
-    hp: 100,
-    damage: 14,
+    speed: 104,
+    hp: 112,
+    damage: 15,
     behavior: {
-      aggroRange: 128,
-      attackRange: 52,
+      aggroRange: 142,
+      attackRange: 58,
       pattern: "zone_control",
-      cooldownMs: 1250,
+      cooldownMs: 1060,
     },
     attacks: [
       createAttack({
@@ -241,9 +241,9 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
       }),
     ],
     modifiers: {
-      antiSpamBias: 1.2,
-      preferredLaneOffset: -28,
-      guardChance: 0.24,
+      antiSpamBias: 1.32,
+      preferredLaneOffset: -34,
+      guardChance: 0.3,
     },
   },
   fisura: {
@@ -252,14 +252,14 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     combatStyle: "melee",
     width: 62,
     depth: 28,
-    speed: 320,
-    hp: 70,
-    damage: 9,
+    speed: 340,
+    hp: 76,
+    damage: 10,
     behavior: {
-      aggroRange: 168,
-      attackRange: 26,
+      aggroRange: 182,
+      attackRange: 30,
       pattern: "erratic",
-      cooldownMs: 560,
+      cooldownMs: 470,
     },
     attacks: [
       createAttack({
@@ -282,8 +282,8 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     modifiers: {
       zigzagMovement: true,
       randomSpeed: true,
-      antiSpamBias: 1.4,
-      preferredLaneOffset: 42,
+      antiSpamBias: 1.6,
+      preferredLaneOffset: 48,
     },
   },
   borracho: {
@@ -292,14 +292,14 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     combatStyle: "melee",
     width: 96,
     depth: 44,
-    speed: 160,
-    hp: 200,
-    damage: 18,
+    speed: 176,
+    hp: 230,
+    damage: 20,
     behavior: {
-      aggroRange: 184,
-      attackRange: 42,
+      aggroRange: 200,
+      attackRange: 46,
       pattern: "chaotic",
-      cooldownMs: 720,
+      cooldownMs: 620,
     },
     attacks: [
       createAttack({
@@ -329,13 +329,13 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
           damageMultiplier: 1.2,
         },
         modifiers: {
-          antiSpamBias: 1.3,
-          poiseHits: 2,
+          antiSpamBias: 1.45,
+          poiseHits: 3,
         },
       },
     ],
     modifiers: {
-      poiseHits: 2,
+      poiseHits: 3,
     },
   },
   boss_fisura_bici: {
@@ -344,14 +344,14 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     combatStyle: "hybrid",
     width: 112,
     depth: 50,
-    speed: 240,
-    hp: 500,
-    damage: 20,
+    speed: 252,
+    hp: 560,
+    damage: 22,
     behavior: {
-      aggroRange: 240,
-      attackRange: 76,
+      aggroRange: 264,
+      attackRange: 84,
       pattern: "multi_phase",
-      cooldownMs: 520,
+      cooldownMs: 430,
     },
     attacks: [
       createAttack({
@@ -429,8 +429,8 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
         ],
         modifiers: {
           speedMultiplier: 1.5,
-          aggression: 2,
-          antiSpamBias: 1.5,
+          aggression: 2.2,
+          antiSpamBias: 1.7,
           poiseHits: 999,
         },
       },

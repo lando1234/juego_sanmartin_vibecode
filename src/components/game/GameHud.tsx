@@ -19,6 +19,37 @@ export function GameHud({ snapshot, variant = "panel" }: GameHudProps) {
   const boss = snapshot.enemies.find((enemy) => enemy.isBoss && enemy.hp > 0);
   const availableItems = snapshot.items.filter((item) => !item.collected).length;
   const bossHpPercent = boss ? (boss.hp / boss.maxHp) * 100 : 0;
+  const comboCount =
+    snapshot.player.attack.currentAction !== null ||
+    snapshot.player.attack.actionTimerMs > 0 ||
+    snapshot.player.attack.actionRecoveryMs > 0 ||
+    snapshot.player.attack.attackWindowMs > 0
+      ? snapshot.player.attack.attackChainIndex + 1
+      : 0;
+  const activeTelegraphs =
+    snapshot.scene.activeHazards.filter((hazard) => hazard.active).length +
+    snapshot.enemies.filter(
+      (enemy) =>
+        enemy.hp > 0 &&
+        enemy.activeAttack !== null &&
+        enemy.activeAttack.timerMs <= enemy.activeAttack.startupMs,
+    ).length;
+  const combatStateLabel =
+    snapshot.player.attack.currentAction === "special"
+      ? "Especial"
+      : snapshot.player.attack.currentAction === "grab"
+        ? "Agarre"
+        : snapshot.player.attack.currentAction === "throw"
+          ? "Lanzamiento"
+          : snapshot.player.shieldMs > 0
+            ? "Guardia"
+            : snapshot.player.grabTargetId
+              ? "Agarrando"
+              : snapshot.player.hurtCooldownMs > 0
+                ? "Stagger"
+                : snapshot.player.attack.activeMs > 0
+                  ? "Ataque"
+                  : "Listo";
   const activeEffects = [
     snapshot.player.speedBoostMs > 0
       ? `Mate ${Math.ceil(snapshot.player.speedBoostMs / 1000)}s`
@@ -63,6 +94,26 @@ export function GameHud({ snapshot, variant = "panel" }: GameHudProps) {
                 style={{ width: `${hpPercent}%` }}
               />
             </div>
+            <div className="flex flex-wrap gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#f7ead4]/76">
+              <span className="rounded-full border border-white/12 bg-white/6 px-2 py-1 text-[#ffe2be]">
+                {combatStateLabel}
+              </span>
+              {comboCount > 0 ? (
+                <span className="rounded-full border border-[#f4c992]/25 bg-[#f4c992]/10 px-2 py-1 text-[#ffe6c0]">
+                  Combo x{comboCount}
+                </span>
+              ) : null}
+              {activeTelegraphs > 0 ? (
+                <span className="rounded-full border border-[#ff8d72]/24 bg-[#ff8d72]/10 px-2 py-1 text-[#ffb7a7]">
+                  {activeTelegraphs} peligros
+                </span>
+              ) : null}
+              {recoverableHp > 0 ? (
+                <span className="rounded-full border border-[#95c17b]/25 bg-[#95c17b]/10 px-2 py-1 text-[#d8f0c7]">
+                  Recuperable {recoverableHp}
+                </span>
+              ) : null}
+            </div>
           </div>
           <div className="grid gap-1 rounded-[18px] border border-white/8 bg-black/12 p-3 text-xs text-[#f7ead4]/78">
             <span className="font-semibold uppercase tracking-[0.16em] text-[#f4c992]">
@@ -71,6 +122,7 @@ export function GameHud({ snapshot, variant = "panel" }: GameHudProps) {
             <span>Fase: {snapshot.phase}</span>
             <span>En vagón: {snapshot.hud.enemyCount} rivales</span>
             <span>Tiempo: {seconds}s</span>
+            <span>Amenazas: {activeTelegraphs}</span>
           </div>
           {boss ? (
             <div className="grid gap-1 rounded-[18px] border border-[#b85d56]/24 bg-[linear-gradient(180deg,rgba(104,28,28,0.34),rgba(53,11,11,0.42))] p-3">
@@ -180,6 +232,16 @@ export function GameHud({ snapshot, variant = "panel" }: GameHudProps) {
             Buffs activos
           </span>
           <span>{activeEffects.length > 0 ? activeEffects.join(" · ") : "Sin boosts activos"}</span>
+        </div>
+        <div className="grid gap-1">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#f4c992]">
+            Combate
+          </span>
+          <span>
+            {combatStateLabel}
+            {comboCount > 0 ? ` · Combo x${comboCount}` : ""}
+            {activeTelegraphs > 0 ? ` · ${activeTelegraphs} peligros` : ""}
+          </span>
         </div>
         {snapshot.hud.pickupMessage ? (
           <div className="rounded-[18px] border border-[#f4c992]/18 bg-[#f4c992]/8 p-3 text-sm text-[#ffe7c5]">

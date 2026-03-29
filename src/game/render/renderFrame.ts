@@ -144,6 +144,177 @@ function drawCombatBarrier(
   context.stroke();
 }
 
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function drawImpactFlash(
+  context: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  radius: number,
+  fill: string,
+  stroke: string,
+) {
+  context.save();
+  context.fillStyle = fill;
+  context.beginPath();
+  context.ellipse(centerX, centerY, radius * 1.18, radius * 0.8, 0, 0, Math.PI * 2);
+  context.fill();
+  context.strokeStyle = stroke;
+  context.lineWidth = Math.max(2, radius * 0.12);
+  context.beginPath();
+  context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  context.stroke();
+  context.restore();
+}
+
+function drawAttackTelegraph(
+  context: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  facing: "left" | "right",
+  width: number,
+  height: number,
+  progress: number,
+  color: string,
+) {
+  const dir = facing === "right" ? 1 : -1;
+  const reach = width * (0.5 + progress * 0.65);
+  const arcHeight = height * (0.16 + progress * 0.12);
+  const leadX = centerX + dir * (width * 0.24 + progress * width * 0.22);
+
+  context.save();
+  context.fillStyle = color;
+  context.globalAlpha = 0.16 + progress * 0.18;
+  context.beginPath();
+  context.ellipse(leadX, centerY - 8, reach * 0.58, arcHeight * 1.25, 0, 0, Math.PI * 2);
+  context.fill();
+
+  context.globalAlpha = 0.42 + progress * 0.22;
+  context.strokeStyle = color;
+  context.lineWidth = 3;
+  context.beginPath();
+  context.arc(leadX, centerY - 8, reach * 0.44, 0.92 * Math.PI, 1.95 * Math.PI);
+  context.stroke();
+
+  context.beginPath();
+  context.moveTo(centerX + dir * 12, centerY + 2);
+  context.lineTo(centerX + dir * (34 + progress * 24), centerY + 2);
+  context.lineTo(centerX + dir * (20 + progress * 20), centerY - 12);
+  context.moveTo(centerX + dir * (34 + progress * 24), centerY + 2);
+  context.lineTo(centerX + dir * (20 + progress * 20), centerY + 16);
+  context.stroke();
+  context.restore();
+}
+
+function drawHazardTelegraph(
+  context: CanvasRenderingContext2D,
+  type: GameSnapshot["scene"]["activeHazards"][number]["type"],
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  active: boolean,
+  timeMs: number,
+) {
+  context.save();
+
+  if (type === "door_slam") {
+    const pulse = 0.5 + Math.sin(timeMs / 120) * 0.5;
+    context.fillStyle = active ? "rgba(222, 78, 56, 0.2)" : "rgba(255, 206, 123, 0.12)";
+    context.fillRect(x, y - 18, width, height + 36);
+    context.fillStyle = active ? "rgba(255, 156, 117, 0.2)" : "rgba(255, 236, 190, 0.1)";
+    for (let index = 0; index < 6; index += 1) {
+      context.fillRect(x + index * (width / 6), y - 12, width / 12, height + 24);
+    }
+    context.strokeStyle = active ? "rgba(255, 213, 180, 0.58)" : "rgba(255, 232, 189, 0.42)";
+    context.lineWidth = 3;
+    context.strokeRect(x + 2, y - 10, width - 4, height + 20);
+    context.beginPath();
+    context.arc(x + width / 2, y + height / 2, 18 + pulse * 4, 0, Math.PI * 2);
+    context.stroke();
+    context.restore();
+    return;
+  }
+
+  if (type === "sudden_brake") {
+    context.strokeStyle = active ? "rgba(255, 241, 206, 0.24)" : "rgba(255, 235, 198, 0.14)";
+    context.lineWidth = active ? 4 : 2;
+    for (let index = -1; index < 6; index += 1) {
+      const startX = x + index * 120 + ((timeMs / 5) % 80);
+      context.beginPath();
+      context.moveTo(startX, y - 10);
+      context.lineTo(startX + 84, y + height + 10);
+      context.stroke();
+    }
+    context.fillStyle = active ? "rgba(255, 173, 107, 0.08)" : "rgba(255, 223, 165, 0.06)";
+    context.fillRect(x, y, width, height);
+    context.restore();
+    return;
+  }
+
+  if (type === "passenger_push") {
+    context.fillStyle = active ? "rgba(91, 138, 202, 0.18)" : "rgba(91, 138, 202, 0.1)";
+    context.fillRect(x, y, width, height);
+    context.strokeStyle = "rgba(189, 224, 255, 0.32)";
+    context.lineWidth = 2;
+    for (let offset = 20; offset < width; offset += 72) {
+      context.beginPath();
+      context.moveTo(x + offset, y + height / 2);
+      context.lineTo(x + offset + 22, y + height / 2);
+      context.lineTo(x + offset + 12, y + height / 2 - 11);
+      context.moveTo(x + offset + 22, y + height / 2);
+      context.lineTo(x + offset + 12, y + height / 2 + 11);
+      context.stroke();
+    }
+    context.beginPath();
+    context.moveTo(x + 12, y + 10);
+    context.lineTo(x + 34, y + 22);
+    context.lineTo(x + 12, y + 34);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(x + width - 12, y + 10);
+    context.lineTo(x + width - 34, y + 22);
+    context.lineTo(x + width - 12, y + 34);
+    context.stroke();
+    context.restore();
+    return;
+  }
+
+  if (type === "floor_clutter") {
+    context.fillStyle = active ? "rgba(140, 117, 80, 0.12)" : "rgba(140, 117, 80, 0.08)";
+    context.fillRect(x, y, width, height);
+    context.strokeStyle = "rgba(255, 232, 189, 0.24)";
+    context.lineWidth = 2;
+    context.strokeRect(x + 4, y + 4, width - 8, height - 8);
+    context.fillStyle = "rgba(255, 220, 146, 0.22)";
+    for (let index = 0; index < 5; index += 1) {
+      const dotX = x + 18 + index * (width / 6);
+      const dotY = y + 16 + ((index % 2) * 10);
+      context.beginPath();
+      context.arc(dotX, dotY, 4 + (index % 3), 0, Math.PI * 2);
+      context.fill();
+    }
+    context.restore();
+    return;
+  }
+
+  context.fillStyle = active ? "rgba(109, 91, 130, 0.12)" : "rgba(109, 91, 130, 0.08)";
+  context.fillRect(x, y, width, height);
+  context.strokeStyle = "rgba(228, 214, 244, 0.24)";
+  context.lineWidth = 2;
+  context.beginPath();
+  context.roundRect(x + 6, y + height * 0.22, width - 12, height * 0.58, 10);
+  context.stroke();
+  context.beginPath();
+  context.moveTo(x + width * 0.2, y + height * 0.2);
+  context.lineTo(x + width * 0.8, y + height * 0.2);
+  context.stroke();
+
+  context.restore();
+}
+
 export function renderFrame(
   context: CanvasRenderingContext2D,
   snapshot: GameSnapshot,
@@ -373,36 +544,16 @@ export function renderFrame(
     const hazardX = hazard.x - snapshot.camera.x;
     const hazardY = toScreenDepth(hazard.y);
     const hazardHeight = hazard.depth * LANE_DEPTH_SCALE;
-
-    if (hazard.type === "door_slam") {
-      context.fillStyle = hazard.active
-        ? "rgba(196, 74, 44, 0.24)"
-        : "rgba(255, 216, 145, 0.12)";
-      context.fillRect(hazardX, hazardY - 18, hazard.width, hazardHeight + 36);
-      context.strokeStyle = hazard.active
-        ? "rgba(255, 186, 150, 0.55)"
-        : "rgba(255, 230, 181, 0.38)";
-      context.lineWidth = 3;
-      context.strokeRect(hazardX + 2, hazardY - 10, hazard.width - 4, hazardHeight + 20);
-    }
-
-    if (hazard.type === "passenger_push") {
-      context.fillStyle = hazard.active
-        ? "rgba(91, 138, 202, 0.16)"
-        : "rgba(91, 138, 202, 0.08)";
-      context.fillRect(hazardX, hazardY, hazard.width, hazardHeight);
-      context.strokeStyle = "rgba(189, 224, 255, 0.3)";
-      context.lineWidth = 2;
-      for (let offset = 24; offset < hazard.width; offset += 64) {
-        context.beginPath();
-        context.moveTo(hazardX + offset, hazardY + hazardHeight / 2);
-        context.lineTo(hazardX + offset + 22, hazardY + hazardHeight / 2);
-        context.lineTo(hazardX + offset + 12, hazardY + hazardHeight / 2 - 10);
-        context.moveTo(hazardX + offset + 22, hazardY + hazardHeight / 2);
-        context.lineTo(hazardX + offset + 12, hazardY + hazardHeight / 2 + 10);
-        context.stroke();
-      }
-    }
+    drawHazardTelegraph(
+      context,
+      hazard.type,
+      hazardX,
+      hazardY - 10,
+      hazard.width,
+      hazardHeight + 20,
+      hazard.active,
+      timeMs,
+    );
   }
 
   const gateStartSource = snapshot.scene.type === "boss_combat"
@@ -446,11 +597,14 @@ export function renderFrame(
 
     const enemyVisibleX = enemy.x - snapshot.camera.x;
     const enemyVisibleY = toScreenDepth(enemy.y);
+    const enemyMetrics = getEnemySpriteMetrics(enemy);
+    const enemyCenterX = enemyVisibleX + enemy.width / 2;
+    const enemyCenterY = enemyVisibleY - 12 + enemy.depth / 2;
 
     context.fillStyle = "rgba(20, 17, 10, 0.25)";
     context.beginPath();
     context.ellipse(
-      enemyVisibleX + enemy.width / 2,
+      enemyCenterX,
       floorY + enemy.depth / 2,
       enemy.width / 2,
       enemy.depth / 2.3,
@@ -460,8 +614,62 @@ export function renderFrame(
     );
     context.fill();
 
+    if (enemy.activeAttack) {
+      const attackProgress =
+        enemy.activeAttack.timerMs <= enemy.activeAttack.startupMs
+          ? clamp(1 - enemy.activeAttack.timerMs / Math.max(1, enemy.activeAttack.startupMs), 0, 1)
+          : 1;
+      const telegraphColor =
+        enemy.activeAttack.effect === "blind"
+          ? "rgba(100, 198, 224, 0.85)"
+          : enemy.activeAttack.effect === "invert_controls"
+            ? "rgba(170, 132, 244, 0.85)"
+            : enemy.isBoss
+              ? "rgba(255, 180, 118, 0.9)"
+              : "rgba(255, 203, 112, 0.86)";
+      drawAttackTelegraph(
+        context,
+        enemyCenterX,
+        enemyCenterY,
+        enemy.facing,
+        enemyMetrics.width,
+        enemyMetrics.height,
+        attackProgress,
+        telegraphColor,
+      );
+      if (enemy.activeAttack.timerMs > enemy.activeAttack.startupMs) {
+        drawImpactFlash(
+          context,
+          enemyCenterX,
+          enemyCenterY,
+          enemy.isBoss ? 32 : 22,
+          "rgba(255, 183, 104, 0.14)",
+          "rgba(255, 227, 170, 0.35)",
+        );
+      }
+    } else if (enemy.modifiers.guardChance && enemy.state !== "hurt" && enemy.state !== "defeated") {
+      drawImpactFlash(
+        context,
+        enemyCenterX,
+        enemyCenterY,
+        enemy.isBoss ? 28 : 20,
+        "rgba(120, 176, 230, 0.08)",
+        "rgba(182, 219, 255, 0.2)",
+      );
+    }
+
+    if (enemy.hurtCooldownMs > 0) {
+      drawImpactFlash(
+        context,
+        enemyCenterX,
+        enemyCenterY,
+        enemy.isBoss ? 24 : 16,
+        "rgba(255, 173, 103, 0.16)",
+        "rgba(255, 221, 185, 0.28)",
+      );
+    }
+
     const enemySpriteState = resolveEnemySpriteState(enemy);
-    const enemyMetrics = getEnemySpriteMetrics(enemy);
     const enemyTransform = getSpriteTransform(
       enemySpriteState,
       timeMs + enemy.x,
@@ -486,7 +694,6 @@ export function renderFrame(
     if (!drewEnemySprite) {
       drawEnemyCharacter(context, enemy, enemyVisibleX, enemyVisibleY - 12, timeMs);
     }
-
   }
 
   for (const projectile of snapshot.projectiles) {
@@ -500,6 +707,8 @@ export function renderFrame(
 
   const visibleX = snapshot.player.x - snapshot.camera.x;
   const visibleY = toScreenDepth(snapshot.player.y);
+  const playerCenterX = visibleX + snapshot.player.width / 2;
+  const playerCenterY = visibleY - snapshot.player.z + snapshot.player.depth / 2;
   const playerSpriteState = resolvePlayerSpriteState(snapshot.player);
   const playerTransform = getSpriteTransform(
     playerSpriteState,
@@ -513,7 +722,7 @@ export function renderFrame(
   context.fillStyle = "rgba(20, 17, 10, 0.25)";
   context.beginPath();
   context.ellipse(
-    visibleX + snapshot.player.width / 2,
+    playerCenterX,
     floorY + snapshot.player.depth / 2,
     snapshot.player.width / 2,
     snapshot.player.depth / 2.2,
@@ -550,6 +759,56 @@ export function renderFrame(
     );
   }
 
+  if (snapshot.player.attack.currentAction === "special" || snapshot.player.shieldMs > 0) {
+    drawImpactFlash(
+      context,
+      playerCenterX,
+      playerCenterY,
+      snapshot.player.width * 0.5,
+      snapshot.player.attack.currentAction === "special"
+        ? "rgba(255, 187, 104, 0.18)"
+        : "rgba(131, 190, 255, 0.14)",
+      snapshot.player.attack.currentAction === "special"
+        ? "rgba(255, 233, 183, 0.32)"
+        : "rgba(191, 226, 255, 0.28)",
+    );
+  }
+
+  if (snapshot.player.grabTargetId) {
+    const grabbedEnemy = snapshot.enemies.find(
+      (enemy) => enemy.id === snapshot.player.grabTargetId && enemy.hp > 0,
+    );
+    if (grabbedEnemy) {
+      const grabbedCenterX = grabbedEnemy.x - snapshot.camera.x + grabbedEnemy.width / 2;
+      const grabbedCenterY = toScreenDepth(grabbedEnemy.y) - 12 + grabbedEnemy.depth / 2;
+      context.strokeStyle = "rgba(255, 211, 139, 0.46)";
+      context.lineWidth = 3;
+      context.beginPath();
+      context.moveTo(playerCenterX, playerCenterY - 8);
+      context.lineTo(grabbedCenterX, grabbedCenterY - 4);
+      context.stroke();
+      drawImpactFlash(
+        context,
+        grabbedCenterX,
+        grabbedCenterY,
+        grabbedEnemy.isBoss ? 24 : 18,
+        "rgba(255, 198, 127, 0.14)",
+        "rgba(255, 239, 198, 0.32)",
+      );
+    }
+  }
+
+  if (snapshot.player.hurtCooldownMs > 0) {
+    drawImpactFlash(
+      context,
+      playerCenterX,
+      playerCenterY,
+      snapshot.player.width * 0.44,
+      "rgba(255, 106, 72, 0.12)",
+      "rgba(255, 211, 195, 0.24)",
+    );
+  }
+
   const lightBand = createGradientOrFallback(
     context,
     "linear",
@@ -561,6 +820,19 @@ export function renderFrame(
   lightBand.addColorStop(1, "rgba(255, 255, 255, 0.03)");
   context.fillStyle = lightBand;
   context.fillRect(62, 126, canvas.width - 124, 28);
+
+  const hitstopSource =
+    Math.max(snapshot.player.attack.activeMs > 0 ? snapshot.player.attack.activeMs : 0, 0) ||
+    Math.max(snapshot.player.hurtCooldownMs, 0) ||
+    Math.max(
+      ...snapshot.enemies.map((enemy) => (enemy.hurtCooldownMs > 0 ? enemy.hurtCooldownMs : 0)),
+      0,
+    );
+  if (hitstopSource > 0) {
+    const flashAlpha = clamp(hitstopSource / 380, 0.04, 0.16);
+    context.fillStyle = `rgba(255, 228, 180, ${flashAlpha})`;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+  }
 
   if (snapshot.player.blindMs > 0) {
     context.fillStyle = "rgba(214, 221, 224, 0.22)";

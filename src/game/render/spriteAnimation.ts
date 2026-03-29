@@ -117,22 +117,24 @@ export function getSpriteTransform(
       transform.rotation = walkCycle * 0.03;
       break;
     case "attack":
-      transform.x += 12;
-      transform.y -= 2;
-      transform.width *= 1.05;
-      transform.height *= 1.02;
-      transform.rotation = 0.05;
+      transform.x += 14;
+      transform.y -= 4;
+      transform.width *= 1.08;
+      transform.height *= 1.04;
+      transform.rotation = 0.08 + Math.sin(timeMs / 70) * 0.02;
       break;
     case "hurt":
-      transform.x -= 10;
-      transform.rotation = -0.08;
-      transform.alpha = 0.92;
+      transform.x -= 12;
+      transform.y += 1;
+      transform.width *= 0.98;
+      transform.rotation = -0.12;
+      transform.alpha = 0.9;
       break;
     case "defeated":
-      transform.y += 18;
-      transform.height *= 0.9;
-      transform.rotation = 1.2;
-      transform.alpha = 0.84;
+      transform.y += 22;
+      transform.height *= 0.88;
+      transform.rotation = 1.28;
+      transform.alpha = 0.8;
       break;
     default:
       transform.y += Math.abs(idleCycle) * 3;

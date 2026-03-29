@@ -5,7 +5,16 @@ import type {
   PlayerState,
 } from "@/game/types/gameTypes";
 
-type CharacterPose = "idle" | "move" | "attack" | "hurt" | "defeated";
+type CharacterPose =
+  | "idle"
+  | "move"
+  | "attack"
+  | "special"
+  | "grab"
+  | "guard"
+  | "hurt"
+  | "stagger"
+  | "defeated";
 
 type CharacterPalette = {
   skin: string;
@@ -27,6 +36,7 @@ type DrawCharacterOptions = {
   palette: CharacterPalette;
   isBoss?: boolean;
   highlight?: boolean;
+  accent?: "neutral" | "special" | "grab" | "guard" | "stagger";
 };
 
 function getEnemyPalette(kind: EnemyKind): CharacterPalette {
@@ -143,12 +153,40 @@ function getPoseOffsets(pose: CharacterPose, timeMs: number) {
         legSwing: 0.45,
         bounce: 2,
       };
+    case "special":
+      return {
+        bodyTilt: 0.2,
+        armSwing: 1.35,
+        legSwing: 0.35,
+        bounce: 3,
+      };
+    case "grab":
+      return {
+        bodyTilt: 0.06,
+        armSwing: 1.0,
+        legSwing: 0.2,
+        bounce: 1,
+      };
+    case "guard":
+      return {
+        bodyTilt: -0.08,
+        armSwing: 0.2,
+        legSwing: 0.15,
+        bounce: 0.5,
+      };
     case "hurt":
       return {
         bodyTilt: -0.16,
         armSwing: 0.22,
         legSwing: 0.22,
         bounce: 1,
+      };
+    case "stagger":
+      return {
+        bodyTilt: -0.28,
+        armSwing: 0.08,
+        legSwing: 0.06,
+        bounce: 0,
       };
     case "defeated":
       return {
@@ -272,6 +310,7 @@ function drawCharacter(
     palette,
     isBoss = false,
     highlight = false,
+    accent = "neutral",
   } = options;
   const offsets = getPoseOffsets(pose, timeMs);
   const scaleX = facing === "right" ? 1 : -1;
@@ -298,6 +337,55 @@ function drawCharacter(
     context.beginPath();
     context.ellipse(0, torsoY + torsoHeight * 0.1, width * 0.52, height * 0.54, 0, 0, Math.PI * 2);
     context.fill();
+  }
+
+  if (accent === "special") {
+    context.fillStyle = "rgba(255, 190, 102, 0.18)";
+    context.beginPath();
+    context.ellipse(0, torsoY + torsoHeight * 0.18, width * 0.64, height * 0.48, 0, 0, Math.PI * 2);
+    context.fill();
+    context.fillStyle = "rgba(255, 236, 181, 0.12)";
+    context.beginPath();
+    context.ellipse(0, torsoY + torsoHeight * 0.12, width * 0.42, height * 0.28, 0, 0, Math.PI * 2);
+    context.fill();
+  }
+
+  if (accent === "grab") {
+    context.strokeStyle = "rgba(255, 209, 138, 0.42)";
+    context.lineWidth = Math.max(2, width * 0.03);
+    context.beginPath();
+    context.moveTo(-width * 0.14, shoulderY - 6);
+    context.lineTo(width * 0.18, shoulderY - 10);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(-width * 0.1, shoulderY + 10);
+    context.lineTo(width * 0.22, shoulderY + 4);
+    context.stroke();
+  }
+
+  if (accent === "guard") {
+    context.fillStyle = "rgba(113, 171, 222, 0.16)";
+    context.beginPath();
+    context.ellipse(0, torsoY + torsoHeight * 0.08, width * 0.5, height * 0.38, 0, 0, Math.PI * 2);
+    context.fill();
+    context.strokeStyle = "rgba(166, 213, 255, 0.36)";
+    context.lineWidth = Math.max(2, width * 0.025);
+    context.beginPath();
+    context.arc(0, torsoY + torsoHeight * 0.14, width * 0.34, 0.95 * Math.PI, 2.02 * Math.PI);
+    context.stroke();
+  }
+
+  if (accent === "stagger") {
+    context.strokeStyle = "rgba(255, 180, 112, 0.34)";
+    context.lineWidth = Math.max(2, width * 0.028);
+    context.beginPath();
+    context.moveTo(-width * 0.34, torsoY + torsoHeight * 0.18);
+    context.lineTo(-width * 0.1, torsoY + torsoHeight * 0.1);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(width * 0.14, torsoY + torsoHeight * 0.22);
+    context.lineTo(width * 0.36, torsoY + torsoHeight * 0.1);
+    context.stroke();
   }
 
   drawLimb(
@@ -357,10 +445,19 @@ export function drawPlayerCharacter(
   timeMs: number,
 ) {
   let pose: CharacterPose = "idle";
+  let accent: DrawCharacterOptions["accent"] = "neutral";
   if (player.attack.activeMs > 0) {
-    pose = "attack";
+    pose = player.attack.currentAction === "special" ? "special" : player.attack.currentAction === "grab" || player.attack.currentAction === "throw" ? "grab" : "attack";
+    accent = player.attack.currentAction === "special" ? "special" : player.attack.currentAction === "grab" || player.attack.currentAction === "throw" ? "grab" : "neutral";
+  } else if (player.shieldMs > 0) {
+    pose = "guard";
+    accent = "guard";
+  } else if (player.grabTargetId !== null) {
+    pose = "grab";
+    accent = "grab";
   } else if (player.hurtCooldownMs > 0) {
-    pose = "hurt";
+    pose = "stagger";
+    accent = "stagger";
   } else if (player.isMoving) {
     pose = "move";
   }
@@ -383,7 +480,8 @@ export function drawPlayerCharacter(
         shoes: "#17110d",
         accent: "#d96b2e",
       },
-      highlight: player.attack.activeMs > 0,
+      highlight: player.attack.activeMs > 0 || player.shieldMs > 0 || player.grabTargetId !== null,
+      accent,
     },
     timeMs,
   );
@@ -401,8 +499,10 @@ export function drawEnemyCharacter(
       ? "move"
       : enemy.state === "attack"
         ? "attack"
-        : enemy.state === "hurt"
-          ? "hurt"
+      : enemy.state === "hurt"
+          ? "stagger"
+          : enemy.modifiers.guardChance && enemy.state !== "defeated"
+            ? "guard"
           : enemy.state === "defeated"
             ? "defeated"
             : "idle";
@@ -418,7 +518,15 @@ export function drawEnemyCharacter(
       pose,
       palette: getEnemyPalette(enemy.kind),
       isBoss: enemy.isBoss,
-      highlight: enemy.state === "attack",
+      highlight: enemy.state === "attack" || enemy.state === "hurt" || Boolean(enemy.modifiers.guardChance),
+      accent:
+        enemy.state === "attack"
+          ? "neutral"
+          : enemy.state === "hurt"
+            ? "stagger"
+            : enemy.modifiers.guardChance
+              ? "guard"
+              : "neutral",
     },
     timeMs + enemy.x,
   );

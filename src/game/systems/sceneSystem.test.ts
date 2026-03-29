@@ -18,6 +18,17 @@ function runUntil(
   throw new Error("Condition not reached in test");
 }
 describe("sceneSystem", () => {
+  it("uses curated enemy packs that scale in role complexity across the campaign", () => {
+    const earlyKinds = campaignLevels[0].layout.wave1Spawns.map((spawn) => spawn.kind);
+    const midKinds = campaignLevels[7].layout.wave2Spawns.map((spawn) => spawn.kind);
+    const lateKinds = campaignLevels[14].layout.wave2Spawns.map((spawn) => spawn.kind);
+
+    expect(earlyKinds.every((kind) => kind === "colado" || kind === "durmiente")).toBe(true);
+    expect(midKinds.some((kind) => kind === "vendedor_competencia" || kind === "senora_bolsos")).toBe(true);
+    expect(lateKinds.some((kind) => kind === "fisura")).toBe(true);
+    expect(lateKinds.length).toBeGreaterThanOrEqual(midKinds.length);
+  });
+
   it("scales hazard pressure between early and late campaign levels", () => {
     const earlyDoor = campaignLevels[0].layout.hazards.find((hazard) => hazard.type === "door_slam");
     const lateDoor = campaignLevels[15].layout.hazards.find((hazard) => hazard.type === "door_slam");

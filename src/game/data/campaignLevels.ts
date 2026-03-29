@@ -556,11 +556,68 @@ function getEnemyKind(levelIndex: number, offset: number): EnemyKind {
   ][(levelIndex + offset) % 6] as EnemyKind;
 }
 
+function getWaveComposition(levelIndex: number, waveIndex: 1 | 2): EnemyKind[] {
+  const earlyCompositions: EnemyKind[][] =
+    waveIndex === 1
+      ? [
+          ["colado", "durmiente", "colado"],
+          ["colado", "colado", "durmiente"],
+          ["durmiente", "colado", "colado"],
+          ["colado", "durmiente", "durmiente"],
+        ]
+      : [
+          ["colado", "durmiente", "colado", "mochilero"],
+          ["durmiente", "colado", "mochilero", "colado"],
+          ["colado", "mochilero", "durmiente", "colado"],
+        ];
+
+  const midCompositions: EnemyKind[][] =
+    waveIndex === 1
+      ? [
+          ["colado", "durmiente", "mochilero", "colado"],
+          ["durmiente", "mochilero", "colado", "colado"],
+          ["colado", "vendedor_competencia", "durmiente", "colado"],
+          ["mochilero", "colado", "durmiente", "vendedor_competencia"],
+        ]
+      : [
+          ["mochilero", "durmiente", "vendedor_competencia", "colado", "colado"],
+          ["colado", "senora_bolsos", "durmiente", "mochilero", "colado"],
+          ["vendedor_competencia", "colado", "mochilero", "durmiente", "fisura"],
+          ["senora_bolsos", "colado", "durmiente", "vendedor_competencia", "colado"],
+        ];
+
+  const lateCompositions: EnemyKind[][] =
+    waveIndex === 1
+      ? [
+          ["fisura", "vendedor_competencia", "durmiente", "mochilero", "colado"],
+          ["senora_bolsos", "fisura", "colado", "durmiente", "vendedor_competencia"],
+          ["mochilero", "fisura", "vendedor_competencia", "colado", "durmiente"],
+          ["senora_bolsos", "mochilero", "fisura", "colado", "vendedor_competencia"],
+        ]
+      : [
+          ["senora_bolsos", "fisura", "vendedor_competencia", "mochilero", "durmiente", "colado"],
+          ["fisura", "fisura", "mochilero", "vendedor_competencia", "senora_bolsos", "colado"],
+          ["vendedor_competencia", "senora_bolsos", "durmiente", "fisura", "mochilero", "colado"],
+          ["mochilero", "senora_bolsos", "fisura", "vendedor_competencia", "durmiente", "colado"],
+        ];
+
+  const pool =
+    levelIndex < 6
+      ? earlyCompositions
+      : levelIndex < 12
+        ? midCompositions
+        : lateCompositions;
+
+  return pool[levelIndex % pool.length] ?? pool[0] ?? [getEnemyKind(levelIndex, 0)];
+}
+
 function createWave(levelIndex: number, count: number, startX: number): Spawn[] {
-  return Array.from({ length: count }, (_, offset) => ({
-    kind: getEnemyKind(levelIndex, offset),
+  const composition = getWaveComposition(levelIndex, count > 4 ? 2 : 1);
+
+  return composition.map((kind, offset) => ({
+    kind,
     x: startX + offset * 118 + (levelIndex % 3) * 14,
-    y: laneY[(levelIndex + offset) % laneY.length],
+    y: laneY[(levelIndex + offset * 2) % laneY.length],
   }));
 }
 

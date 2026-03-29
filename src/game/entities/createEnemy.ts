@@ -42,6 +42,9 @@ export function createEnemy(kind: EnemyKind, x: number, y: number): EnemyState {
     phaseIndex: 0,
     engagementSlot: null,
     activeAttack: null,
+    thrownTimerMs: 0,
+    thrownVx: 0,
+    thrownVy: 0,
     isBoss: template.role === "boss",
   };
 }

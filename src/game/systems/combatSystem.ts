@@ -189,6 +189,73 @@ function startPlayerAttack(state: GameState, action: PlayerAttackActionName) {
   state.player.attack.struckEnemyIds = [];
 }
 
+function tryStartGrab(state: GameState) {
+  const grabRangeX = 48;
+  const grabRangeY = 28;
+  const playerCenterX = state.player.x + state.player.width / 2;
+  const playerCenterY = state.player.y + state.player.depth / 2;
+  const candidate = state.enemies
+    .filter((enemy) => enemy.hp > 0 && enemy.state !== "defeated")
+    .find((enemy) => {
+      const enemyCenterX = enemy.x + enemy.width / 2;
+      const enemyCenterY = enemy.y + enemy.depth / 2;
+      return (
+        Math.abs(enemyCenterX - playerCenterX) <= grabRangeX &&
+        Math.abs(enemyCenterY - playerCenterY) <= grabRangeY
+      );
+    });
+
+  if (!candidate) {
+    state.player.actionRecoveryMs = Math.max(state.player.actionRecoveryMs, 110);
+    return;
+  }
+
+  if (candidate.role === "boss") {
+    state.player.actionRecoveryMs = Math.max(state.player.actionRecoveryMs, 90);
+    return;
+  }
+
+  if (candidate.role === "mini_boss") {
+    applyDamageToEnemy(state, state.player.x, candidate, 10, 18);
+    state.player.actionRecoveryMs = Math.max(state.player.actionRecoveryMs, 120);
+    return;
+  }
+
+  candidate.state = "grabbed";
+  candidate.vx = 0;
+  candidate.vy = 0;
+  candidate.activeAttack = null;
+  state.player.grabTargetId = candidate.id;
+  state.player.actionState = "grab";
+  state.player.actionTimerMs = 0;
+  state.player.actionRecoveryMs = 0;
+}
+
+function throwHeldEnemy(state: GameState) {
+  const target = state.enemies.find((enemy) => enemy.id === state.player.grabTargetId);
+
+  if (!target || target.hp <= 0) {
+    state.player.grabTargetId = null;
+    state.player.actionState = "idle";
+    return;
+  }
+
+  const throwDirection =
+    state.input.left ? -1 : state.input.right ? 1 : state.player.facing === "right" ? 1 : -1;
+
+  state.player.facing = throwDirection > 0 ? "right" : "left";
+  state.player.grabTargetId = null;
+  state.player.actionState = "throw";
+  state.player.actionTimerMs = 180;
+  state.player.actionRecoveryMs = 140;
+  target.state = "thrown";
+  target.hurtCooldownMs = 220;
+  target.thrownTimerMs = 220;
+  target.thrownVx = throwDirection * 620;
+  target.thrownVy = 0;
+  target.activeAttack = null;
+}
+
 function applyDamageToPlayer(
   state: GameState,
   damage: number,
@@ -220,6 +287,7 @@ function applyDamageToPlayer(
   state.player.attack.attackChainIndex = 0;
   state.player.attack.attackWindowMs = 0;
   state.player.attack.struckEnemyIds = [];
+  state.player.grabTargetId = null;
   state.player.x += sourceFacing === "right" ? knockback : -knockback;
   state.player.x = clampXToArena(state, state.player.x, state.player.width);
   state.player.y = clampYToArena(state, state.player.y, state.player.depth);
@@ -393,6 +461,47 @@ function updateEnemyProjectiles(state: GameState, dtMs: number) {
   });
 }
 
+function updateThrownEnemyCollisions(state: GameState) {
+  for (const thrownEnemy of state.enemies) {
+    if (thrownEnemy.state !== "thrown" || thrownEnemy.thrownTimerMs <= 0) {
+      continue;
+    }
+
+    const thrownRect = getBodyRect(
+      thrownEnemy.x,
+      thrownEnemy.y,
+      thrownEnemy.width,
+      thrownEnemy.depth,
+    );
+
+    const collidedTarget = state.enemies.find((enemy) => {
+      if (
+        enemy.id === thrownEnemy.id ||
+        enemy.hp <= 0 ||
+        enemy.state === "grabbed" ||
+        enemy.state === "defeated"
+      ) {
+        return false;
+      }
+
+      return intersects(
+        thrownRect,
+        getBodyRect(enemy.x, enemy.y, enemy.width, enemy.depth),
+      );
+    });
+
+    if (!collidedTarget) {
+      continue;
+    }
+
+    applyDamageToEnemy(state, thrownEnemy.x, collidedTarget, 18, 26);
+    thrownEnemy.thrownTimerMs = 0;
+    thrownEnemy.thrownVx = 0;
+    thrownEnemy.thrownVy = 0;
+    thrownEnemy.state = thrownEnemy.hp <= 0 ? "defeated" : "hurt";
+  }
+}
+
 export function updateCombat(state: GameState, dtMs: number) {
   state.player.attack.cooldownMs = Math.max(
     0,
@@ -405,6 +514,21 @@ export function updateCombat(state: GameState, dtMs: number) {
   for (const enemy of state.enemies) {
     enemy.attackCooldownMs = Math.max(0, enemy.attackCooldownMs - dtMs);
     enemy.hurtCooldownMs = Math.max(0, enemy.hurtCooldownMs - dtMs);
+  }
+
+  if (
+    state.phase === "playing" &&
+    state.input.grab &&
+    state.player.hurtCooldownMs === 0 &&
+    state.player.actionState !== "dash"
+  ) {
+    if (state.player.grabTargetId) {
+      throwHeldEnemy(state);
+    } else if (state.player.attack.currentAction === null) {
+      tryStartGrab(state);
+    }
+
+    state.input.grab = false;
   }
 
   const currentPlayerAttack = state.player.attack.currentAction
@@ -524,7 +648,8 @@ export function updateCombat(state: GameState, dtMs: number) {
     state.input.attack &&
     state.player.attack.currentAction === null &&
     state.player.hurtCooldownMs === 0 &&
-    state.player.actionState !== "dash"
+    state.player.actionState !== "dash" &&
+    state.player.grabTargetId === null
   ) {
     startPlayerAttack(state, "attack_1");
   }
@@ -534,4 +659,5 @@ export function updateCombat(state: GameState, dtMs: number) {
   }
 
   updateEnemyProjectiles(state, dtMs);
+  updateThrownEnemyCollisions(state);
 }

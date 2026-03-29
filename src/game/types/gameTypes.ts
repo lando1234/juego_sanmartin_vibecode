@@ -39,6 +39,8 @@ export type EnemyAiState =
   | "circle"
   | "attack"
   | "recover"
+  | "grabbed"
+  | "thrown"
   | "hurt"
   | "defeated";
 export type ItemKind =
@@ -305,6 +307,9 @@ export type EnemyState = {
   phaseIndex: number;
   engagementSlot: "front" | "back" | null;
   activeAttack: ActiveEnemyAttackState | null;
+  thrownTimerMs: number;
+  thrownVx: number;
+  thrownVy: number;
   isBoss: boolean;
 };
 

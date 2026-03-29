@@ -190,6 +190,33 @@ export function updateEnemies(state: GameState, dtMs: number) {
       continue;
     }
 
+    if (enemy.state === "grabbed" && state.player.grabTargetId === enemy.id) {
+      const holdOffset = state.player.facing === "right" ? 34 : -34;
+      enemy.vx = 0;
+      enemy.vy = 0;
+      enemy.activeAttack = null;
+      enemy.x = clampXToArena(state, state.player.x + holdOffset, enemy.width);
+      enemy.y = clampYToArena(state, state.player.y, enemy.depth);
+      enemy.facing = state.player.facing === "right" ? "left" : "right";
+      continue;
+    }
+
+    if (enemy.state === "thrown" && enemy.thrownTimerMs > 0) {
+      enemy.thrownTimerMs = Math.max(0, enemy.thrownTimerMs - dtMs);
+      enemy.x += enemy.thrownVx * dt;
+      enemy.y += enemy.thrownVy * dt;
+      enemy.x = clampXToArena(state, enemy.x, enemy.width);
+      enemy.y = clampYToArena(state, enemy.y, enemy.depth);
+
+      if (enemy.thrownTimerMs === 0) {
+        enemy.state = enemy.hp <= 0 ? "defeated" : "hurt";
+        enemy.thrownVx = 0;
+        enemy.thrownVy = 0;
+      }
+
+      continue;
+    }
+
     applyEnemyPhases(enemy);
 
     const distance = distanceToPlayer(enemy, state);

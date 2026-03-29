@@ -43,4 +43,16 @@ describe("MobileControls", () => {
     expect(onInput).toHaveBeenNthCalledWith(1, { dash: true });
     expect(onInput).toHaveBeenNthCalledWith(2, { dash: false });
   });
+
+  it("renders a grab control and maps its pointer events", () => {
+    const onInput = vi.fn();
+    render(<MobileControls variant="overlay" onInput={onInput} />);
+
+    const grabButton = screen.getByRole("button", { name: "Agarrar" });
+    fireEvent.pointerDown(grabButton);
+    fireEvent.pointerUp(grabButton);
+
+    expect(onInput).toHaveBeenNthCalledWith(1, { grab: true });
+    expect(onInput).toHaveBeenNthCalledWith(2, { grab: false });
+  });
 });

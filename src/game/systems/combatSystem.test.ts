@@ -213,6 +213,52 @@ describe("combatSystem", () => {
     expect(state.player.hp).toBe(state.player.maxHp);
   });
 
+  it("grabs a common enemy and throws it on the next grab input", () => {
+    const state = createInitialGameState();
+    state.phase = "playing";
+    state.enemies = [createEnemy("colado", 228, state.player.y)];
+    state.input.grab = true;
+
+    updateCombat(state, 16);
+    expect(state.player.grabTargetId).toBe(state.enemies[0].id);
+    expect(state.enemies[0].state).toBe("grabbed");
+
+    state.input.grab = true;
+    updateCombat(state, 16);
+
+    expect(state.player.grabTargetId).toBeNull();
+    expect(state.player.actionState).toBe("throw");
+    expect(state.enemies[0].state).toBe("thrown");
+  });
+
+  it("turns a grab on a mini boss into a shove instead of a hold", () => {
+    const state = createInitialGameState();
+    state.phase = "playing";
+    state.enemies = [createEnemy("borracho", 192, state.player.y)];
+    state.input.grab = true;
+
+    updateCombat(state, 16);
+
+    expect(state.player.grabTargetId).toBeNull();
+    expect(state.enemies[0].state).not.toBe("grabbed");
+    expect(state.enemies[0].hp).toBeLessThan(state.enemies[0].maxHp);
+  });
+
+  it("lets a thrown enemy damage another enemy on collision", () => {
+    const state = createInitialGameState();
+    state.phase = "playing";
+    const grabbed = createEnemy("colado", 228, state.player.y);
+    const target = createEnemy("durmiente", 238, state.player.y);
+    state.enemies = [grabbed, target];
+    state.input.grab = true;
+
+    updateCombat(state, 16);
+    state.input.grab = true;
+    updateCombat(state, 16);
+
+    expect(target.hp).toBeLessThan(target.maxHp);
+  });
+
   it("keeps enemies inside the closed combat arena after knockback", () => {
     const engine = createGameEngine({ now: () => 1000 });
     spawnWave(engine);

@@ -115,6 +115,15 @@ export function updateMovement(state: GameState, dtMs: number) {
       state.player.dashVectorX = 0;
       state.player.dashVectorY = 0;
     }
+  } else if (state.player.actionState === "throw" && state.player.actionTimerMs > 0) {
+    state.player.actionTimerMs = Math.max(0, state.player.actionTimerMs - clampedDtMs);
+    state.player.vx = 0;
+    state.player.vy = 0;
+
+    if (state.player.actionTimerMs === 0) {
+      state.player.actionState = "idle";
+      state.player.actionRecoveryMs = Math.max(state.player.actionRecoveryMs, 140);
+    }
   } else if (state.player.actionRecoveryMs > 0 && state.player.attack.currentAction === null) {
     state.player.actionRecoveryMs = Math.max(0, state.player.actionRecoveryMs - clampedDtMs);
   }

@@ -110,7 +110,7 @@ export function MobileControls({
             className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-[#ff6842]/55 bg-[radial-gradient(circle_at_35%_30%,rgba(255,105,75,0.92),rgba(173,11,11,0.94))] text-lg font-black text-white shadow-[0_0_28px_rgba(255,61,28,0.34)] transition active:scale-[0.96]"
           />
         </div>
-        <div className="pointer-events-auto grid grid-cols-3 gap-3 pb-1">
+        <div className="pointer-events-auto grid grid-cols-4 gap-3 pb-1">
           <ControlButton
             ariaLabel="Esquivar"
             keyName="dash"
@@ -124,6 +124,13 @@ export function MobileControls({
             label="A"
             onInput={onInput}
             className="flex h-16 w-16 items-center justify-center self-end rounded-full border border-[#ff9a74]/45 bg-[radial-gradient(circle_at_30%_30%,rgba(255,141,98,0.98),rgba(204,39,7,0.92))] text-xl font-black text-white shadow-[0_0_34px_rgba(255,79,33,0.36)] transition active:scale-[0.96]"
+          />
+          <ControlButton
+            ariaLabel="Agarrar"
+            keyName="grab"
+            label="C"
+            onInput={onInput}
+            className="mb-4 flex h-[4.25rem] w-[4.25rem] items-center justify-center rounded-full border border-[#fff0cf]/28 bg-[radial-gradient(circle_at_30%_30%,rgba(255,210,145,0.95),rgba(171,95,20,0.9))] text-xl font-black text-white shadow-[0_0_30px_rgba(255,180,72,0.28)] transition active:scale-[0.96]"
           />
           <ControlButton
             ariaLabel="Golpear"
@@ -175,7 +182,7 @@ export function MobileControls({
             className="rounded-2xl border border-black/8 bg-black/8 px-4 py-3 font-semibold transition active:scale-[0.98] active:bg-black/12"
           />
         </div>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-4 gap-2">
           <ControlButton
             ariaLabel="Esquivar"
             keyName="dash"
@@ -189,6 +196,13 @@ export function MobileControls({
             label="Saltar"
             onInput={onInput}
             className="rounded-2xl border border-black/8 bg-[var(--accent)] px-4 py-3 font-semibold text-white shadow-[0_12px_28px_rgba(187,77,0,0.26)] transition active:scale-[0.98]"
+          />
+          <ControlButton
+            ariaLabel="Agarrar"
+            keyName="grab"
+            label="Agarrar"
+            onInput={onInput}
+            className="rounded-2xl border border-black/8 bg-[color:rgba(166,101,24,0.95)] px-4 py-3 font-semibold text-white shadow-[0_12px_28px_rgba(99,58,4,0.24)] transition active:scale-[0.98]"
           />
           <ControlButton
             ariaLabel="Golpear"

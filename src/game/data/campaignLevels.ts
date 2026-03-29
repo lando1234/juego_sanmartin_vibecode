@@ -707,8 +707,21 @@ export function applyLevelToState(
   state.player.onGround = true;
   state.player.facing = "right";
   state.player.isMoving = false;
+  state.player.actionState = "idle";
+  state.player.queuedAction = null;
+  state.player.actionTimerMs = 0;
+  state.player.actionRecoveryMs = 0;
+  state.player.grabTargetId = null;
+  state.player.recoverableHp = 0;
   state.player.attack.activeMs = 0;
   state.player.attack.cooldownMs = 0;
+  state.player.attack.currentAction = null;
+  state.player.attack.queuedAction = null;
+  state.player.attack.actionTimerMs = 0;
+  state.player.attack.actionRecoveryMs = 0;
+  state.player.attack.attackChainIndex = 0;
+  state.player.attack.attackWindowMs = 0;
+  state.player.attack.struckEnemyIds = [];
   state.player.hurtCooldownMs = 0;
   state.player.speedBoostMs = 0;
   state.player.attackBoostMs = 0;
@@ -721,12 +734,18 @@ export function applyLevelToState(
     down: false,
     jump: false,
     attack: false,
+    special: false,
+    grab: false,
+    dash: false,
     pause: false,
   };
   state.hud.levelName = level.name;
   state.hud.hints = [
     "Moverse: WASD o flechas",
     "Saltar: espacio",
+    "Especial: K",
+    "Agarrar: L",
+    "Esquive: Shift",
     "Pausa: P",
   ];
   state.hud.enemyCount = 0;

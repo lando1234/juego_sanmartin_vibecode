@@ -54,6 +54,9 @@ export type InputState = {
   down: boolean;
   jump: boolean;
   attack: boolean;
+  special: boolean;
+  grab: boolean;
+  dash: boolean;
   pause: boolean;
 };
 
@@ -68,9 +71,35 @@ export type AttackState = {
   damage: number;
   range: number;
   width: number;
+  currentAction:
+    | "attack_1"
+    | "attack_2"
+    | "attack_3"
+    | "special"
+    | "grab"
+    | "throw"
+    | null;
+  queuedAction: "attack" | "special" | "grab" | null;
+  actionTimerMs: number;
+  actionRecoveryMs: number;
+  attackChainIndex: 0 | 1 | 2 | 3;
+  attackWindowMs: number;
   hitbox: HitboxState;
   struckEnemyIds: string[];
 };
+
+export type PlayerActionState =
+  | "idle"
+  | "walk"
+  | "attack_1"
+  | "attack_2"
+  | "attack_3"
+  | "special"
+  | "grab"
+  | "throw"
+  | "dash"
+  | "hurt"
+  | "defeated";
 
 export type HitboxState = {
   shape: "rectangle";
@@ -182,7 +211,13 @@ export type PlayerState = {
   onGround: boolean;
   facing: Facing;
   isMoving: boolean;
+  actionState: PlayerActionState;
   attack: AttackState;
+  queuedAction: "attack" | "special" | "grab" | null;
+  actionTimerMs: number;
+  actionRecoveryMs: number;
+  grabTargetId: string | null;
+  recoverableHp: number;
   hurtCooldownMs: number;
   speedBoostMs: number;
   attackBoostMs: number;

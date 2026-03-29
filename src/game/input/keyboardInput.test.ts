@@ -47,6 +47,9 @@ describe("attachKeyboardInput", () => {
       down: false,
       jump: false,
       attack: false,
+      special: false,
+      grab: false,
+      dash: false,
       pause: false,
     });
     expect(onInput).toHaveBeenNthCalledWith(2, {
@@ -56,6 +59,9 @@ describe("attachKeyboardInput", () => {
       down: false,
       jump: false,
       attack: false,
+      special: false,
+      grab: false,
+      dash: false,
       pause: false,
     });
   });
@@ -74,6 +80,9 @@ describe("attachKeyboardInput", () => {
       down: false,
       jump: false,
       attack: false,
+      special: false,
+      grab: false,
+      dash: false,
       pause: false,
     });
 

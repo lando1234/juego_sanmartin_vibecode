@@ -126,4 +126,15 @@ describe("createGameEngine", () => {
     expect(engine.getSnapshot().currentLevelIndex).toBe(1);
     expect(engine.getSnapshot().hud.levelName).toBe(campaignLevels[1].name);
   });
+
+  it("keeps dash latched across a quick tap until movement consumes it", () => {
+    const engine = createGameEngine({ now: () => 1000 });
+
+    engine.sendCommand({ type: "start" });
+    engine.sendInput({ dash: true });
+    engine.sendInput({ dash: false });
+    engine.step(16);
+
+    expect(engine.getSnapshot().player.actionState).toBe("dash");
+  });
 });

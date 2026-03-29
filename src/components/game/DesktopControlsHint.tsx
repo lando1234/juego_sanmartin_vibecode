@@ -17,7 +17,6 @@ export function DesktopControlsHint({
     "Especial: K, gasta vida recuperable",
     "Agarrar / lanzar: L, y L otra vez para soltar",
     "Esquive: Shift para reposicionarte",
-    "Cubrirse: con Paraguas activo",
     "Pausa: P",
   ];
 

@@ -246,6 +246,12 @@ export function createGameEngine(options: EngineOptions = {}): GameEngine {
         state.input = {
           ...state.input,
           ...command.payload,
+          dash:
+            command.payload.dash === true
+              ? true
+              : command.payload.dash === false
+                ? state.input.dash
+                : state.input.dash,
         };
 
         if (command.payload.pause) {

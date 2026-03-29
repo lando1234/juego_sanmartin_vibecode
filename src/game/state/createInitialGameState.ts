@@ -15,7 +15,6 @@ const baseHints = [
   "Especial: K",
   "Agarrar / lanzar: L, L otra vez",
   "Esquive: Shift",
-  "Cubrirse: con Paraguas activo",
   "Pausa: P",
 ];
 

@@ -234,7 +234,7 @@ export function MobileControls({
         <p>Combo: Golpe x3</p>
         <p>Especial: Especial, gasta vida recuperable</p>
         <p>Agarre: Agarrar y repetir para lanzar</p>
-        <p>Defensa: cubrirse solo con Paraguas activo</p>
+        <p>Esquive: toque corto para salir de presion</p>
       </div>
     </section>
   );

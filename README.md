@@ -57,6 +57,19 @@ Ya implementado:
 - [`src/game/render/renderFrame.ts`](/Users/matiaslandal/Desktop/Personal/codex/juego_sanmartin_vibecode/src/game/render/renderFrame.ts)
   render del vagon, personajes e items.
 
+## Documentacion
+
+- [`docs/art`](/Users/matiaslandal/Desktop/Personal/codex/juego_sanmartin_vibecode/docs/art)
+  arte, sprites, prompts y pipeline visual.
+- [`docs/design`](/Users/matiaslandal/Desktop/Personal/codex/juego_sanmartin_vibecode/docs/design)
+  GDD y documento de personajes.
+- [`docs/planning`](/Users/matiaslandal/Desktop/Personal/codex/juego_sanmartin_vibecode/docs/planning)
+  plan del prototipo y tareas de implementacion.
+- [`docs/research`](/Users/matiaslandal/Desktop/Personal/codex/juego_sanmartin_vibecode/docs/research)
+  informes y relevamiento de base.
+- [`docs/specs`](/Users/matiaslandal/Desktop/Personal/codex/juego_sanmartin_vibecode/docs/specs)
+  especificaciones funcionales, tecnicas y runtime.
+
 ## Comandos utiles
 
 ```bash

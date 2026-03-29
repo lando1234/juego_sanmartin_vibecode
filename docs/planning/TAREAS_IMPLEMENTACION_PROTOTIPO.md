@@ -560,7 +560,7 @@ Objetivo:
 
 Antes de abrir codigo, el siguiente documento ideal es:
 
-`ESPECIFICACION_RUNTIME_PROTOTIPO.md`
+`docs/specs/ESPECIFICACION_RUNTIME_PROTOTIPO.md`
 
 Ese documento tiene que fijar:
 

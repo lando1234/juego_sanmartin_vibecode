@@ -18,10 +18,10 @@ type Rect = {
 
 let projectileSeed = 0;
 
-type PlayerAttackActionName = "attack_1" | "attack_2" | "attack_3";
+type PlayerCombatActionName = "attack_1" | "attack_2" | "attack_3" | "special";
 
 type PlayerAttackDefinition = {
-  name: PlayerAttackActionName;
+  name: PlayerCombatActionName;
   startupMs: number;
   activeMs: number;
   recoveryMs: number;
@@ -32,7 +32,9 @@ type PlayerAttackDefinition = {
   hitbox: HitboxState;
 };
 
-const playerAttackDefinitions: Record<PlayerAttackActionName, PlayerAttackDefinition> = {
+const SPECIAL_HP_COST = 12;
+
+const playerAttackDefinitions: Record<PlayerCombatActionName, PlayerAttackDefinition> = {
   attack_1: {
     name: "attack_1",
     startupMs: 50,
@@ -87,6 +89,24 @@ const playerAttackDefinitions: Record<PlayerAttackActionName, PlayerAttackDefini
       activeFrames: [2, 3],
     },
   },
+  special: {
+    name: "special",
+    startupMs: 90,
+    activeMs: 110,
+    recoveryMs: 280,
+    damage: 24,
+    knockback: 56,
+    comboWindowStartMs: 0,
+    comboWindowEndMs: 0,
+    hitbox: {
+      shape: "rectangle",
+      width: 138,
+      height: 46,
+      offsetX: 24,
+      offsetY: 0,
+      activeFrames: [2, 3],
+    },
+  },
 };
 
 function intersects(a: Rect, b: Rect) {
@@ -131,6 +151,15 @@ function applyDamageToEnemy(
   damage: number,
   knockback: number,
 ) {
+  if (state.player.recoverableHp > 0) {
+    const recovered = Math.min(
+      state.player.recoverableHp,
+      Math.max(1, Math.ceil(damage * 0.5)),
+    );
+    state.player.recoverableHp -= recovered;
+    state.player.hp = Math.min(state.player.maxHp, state.player.hp + recovered);
+  }
+
   const hasAttackPoise =
     enemy.activeAttack !== null &&
     enemy.activeAttack.timerMs > enemy.activeAttack.recoveryMs;
@@ -161,7 +190,7 @@ function applyDamageToEnemy(
   enemy.y = clampYToArena(state, enemy.y, enemy.depth);
 }
 
-function startPlayerAttack(state: GameState, action: PlayerAttackActionName) {
+function startPlayerAttack(state: GameState, action: PlayerCombatActionName) {
   const definition = playerAttackDefinitions[action];
   const totalMs =
     definition.startupMs + definition.activeMs + definition.recoveryMs;
@@ -177,7 +206,7 @@ function startPlayerAttack(state: GameState, action: PlayerAttackActionName) {
   state.player.attack.actionTimerMs = totalMs;
   state.player.attack.actionRecoveryMs = definition.recoveryMs;
   state.player.attack.attackChainIndex =
-    action === "attack_1" ? 1 : action === "attack_2" ? 2 : 3;
+    action === "attack_1" ? 1 : action === "attack_2" ? 2 : action === "attack_3" ? 3 : 0;
   state.player.attack.attackWindowMs =
     definition.comboWindowEndMs > 0
       ? definition.comboWindowEndMs - definition.comboWindowStartMs
@@ -187,6 +216,20 @@ function startPlayerAttack(state: GameState, action: PlayerAttackActionName) {
   state.player.attack.width = definition.hitbox.width;
   state.player.attack.range = definition.hitbox.width + definition.hitbox.offsetX;
   state.player.attack.struckEnemyIds = [];
+}
+
+function startPlayerSpecial(state: GameState) {
+  if (state.player.hp <= SPECIAL_HP_COST) {
+    return false;
+  }
+
+  state.player.hp -= SPECIAL_HP_COST;
+  state.player.recoverableHp = Math.min(
+    state.player.maxHp,
+    state.player.recoverableHp + SPECIAL_HP_COST,
+  );
+  startPlayerAttack(state, "special");
+  return true;
 }
 
 function tryStartGrab(state: GameState) {
@@ -279,6 +322,7 @@ function applyDamageToPlayer(
   state.player.queuedAction = null;
   state.player.actionTimerMs = 0;
   state.player.actionRecoveryMs = 0;
+  state.player.recoverableHp = 0;
   state.player.attack.activeMs = 0;
   state.player.attack.currentAction = null;
   state.player.attack.queuedAction = null;
@@ -531,9 +575,27 @@ export function updateCombat(state: GameState, dtMs: number) {
     state.input.grab = false;
   }
 
-  const currentPlayerAttack = state.player.attack.currentAction
-    ? playerAttackDefinitions[state.player.attack.currentAction]
-    : null;
+  if (
+    state.phase === "playing" &&
+    state.input.special &&
+    state.player.attack.currentAction === null &&
+    state.player.hurtCooldownMs === 0 &&
+    state.player.actionState !== "dash" &&
+    state.player.grabTargetId === null
+  ) {
+    startPlayerSpecial(state);
+  }
+  if (state.input.special) {
+    state.input.special = false;
+  }
+
+  const currentPlayerAttack =
+    state.player.attack.currentAction &&
+    state.player.attack.currentAction in playerAttackDefinitions
+      ? playerAttackDefinitions[
+          state.player.attack.currentAction as keyof typeof playerAttackDefinitions
+        ]
+      : null;
 
   if (state.phase === "playing" && currentPlayerAttack) {
     state.player.actionTimerMs = Math.max(0, state.player.actionTimerMs - dtMs);

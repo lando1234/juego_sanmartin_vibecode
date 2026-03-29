@@ -259,6 +259,65 @@ describe("combatSystem", () => {
     expect(target.hp).toBeLessThan(target.maxHp);
   });
 
+  it("spends recoverable health on special and restores it on hit", () => {
+    const state = createInitialGameState();
+    state.phase = "playing";
+    state.enemies = [createEnemy("durmiente", 230, state.player.y)];
+    const startingHp = state.player.hp;
+    state.input.special = true;
+
+    updateCombat(state, 16);
+
+    expect(state.player.actionState).toBe("special");
+    expect(state.player.hp).toBeLessThan(startingHp);
+    expect(state.player.recoverableHp).toBeGreaterThan(0);
+
+    updateCombat(state, 120);
+
+    expect(state.player.hp).toBe(startingHp);
+    expect(state.player.recoverableHp).toBe(0);
+  });
+
+  it("loses recoverable health if Ricky gets hit before cashing it back", () => {
+    const state = createInitialGameState();
+    state.phase = "playing";
+    state.player.recoverableHp = 12;
+    const enemy = createEnemy("colado", 236, state.player.y);
+    enemy.facing = "left";
+    enemy.activeAttack = {
+      name: "push",
+      timerMs: 80,
+      startupMs: 0,
+      activeMs: 80,
+      recoveryMs: 0,
+      damage: 8,
+      knockback: 10,
+      range: 28,
+      hitbox: {
+        shape: "rectangle",
+        width: 40,
+        height: 30,
+        offsetX: 20,
+        offsetY: 10,
+        activeFrames: [2, 3],
+      },
+      projectile: false,
+      projectileSpeed: 0,
+      aoe: false,
+      radius: null,
+      effect: null,
+      durationMs: null,
+      hits: 1,
+      damageApplied: false,
+      projectileSpawned: false,
+    };
+    state.enemies = [enemy];
+
+    updateCombat(state, 16);
+
+    expect(state.player.recoverableHp).toBe(0);
+  });
+
   it("keeps enemies inside the closed combat arena after knockback", () => {
     const engine = createGameEngine({ now: () => 1000 });
     spawnWave(engine);

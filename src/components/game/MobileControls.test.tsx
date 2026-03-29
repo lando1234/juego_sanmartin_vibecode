@@ -55,4 +55,16 @@ describe("MobileControls", () => {
     expect(onInput).toHaveBeenNthCalledWith(1, { grab: true });
     expect(onInput).toHaveBeenNthCalledWith(2, { grab: false });
   });
+
+  it("renders a special control and maps its pointer events", () => {
+    const onInput = vi.fn();
+    render(<MobileControls variant="overlay" onInput={onInput} />);
+
+    const specialButton = screen.getByRole("button", { name: "Especial" });
+    fireEvent.pointerDown(specialButton);
+    fireEvent.pointerUp(specialButton);
+
+    expect(onInput).toHaveBeenNthCalledWith(1, { special: true });
+    expect(onInput).toHaveBeenNthCalledWith(2, { special: false });
+  });
 });

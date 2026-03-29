@@ -9,6 +9,12 @@ type GameHudProps = {
 
 export function GameHud({ snapshot, variant = "panel" }: GameHudProps) {
   const hpPercent = (snapshot.player.hp / snapshot.player.maxHp) * 100;
+  const recoverableHp = Math.min(
+    snapshot.player.recoverableHp,
+    snapshot.player.maxHp - snapshot.player.hp,
+  );
+  const recoverablePercent =
+    ((snapshot.player.hp + recoverableHp) / snapshot.player.maxHp) * 100;
   const seconds = Math.floor(snapshot.hud.elapsedMs / 1000);
   const boss = snapshot.enemies.find((enemy) => enemy.isBoss && enemy.hp > 0);
   const availableItems = snapshot.items.filter((item) => !item.collected).length;
@@ -45,9 +51,15 @@ export function GameHud({ snapshot, variant = "panel" }: GameHudProps) {
               <span>Ricky</span>
               <span>{snapshot.player.hp} / {snapshot.player.maxHp} HP</span>
             </div>
-            <div className="h-3 overflow-hidden rounded-full bg-black/30">
+            <div className="relative h-3 overflow-hidden rounded-full bg-black/30">
+              {recoverableHp > 0 ? (
+                <div
+                  className="absolute h-3 rounded-full bg-[linear-gradient(90deg,rgba(255,194,97,0.42),rgba(255,236,170,0.78))] transition-[width] duration-150"
+                  style={{ width: `${recoverablePercent}%` }}
+                />
+              ) : null}
               <div
-                className="h-full rounded-full bg-[linear-gradient(90deg,#e06a2c,#ffbf5a)] transition-[width] duration-150"
+                className="relative h-full rounded-full bg-[linear-gradient(90deg,#e06a2c,#ffbf5a)] transition-[width] duration-150"
                 style={{ width: `${hpPercent}%` }}
               />
             </div>
@@ -99,9 +111,15 @@ export function GameHud({ snapshot, variant = "panel" }: GameHudProps) {
             <span className="uppercase tracking-[0.18em] text-[#f6d0a6]">Ricky</span>
             <span>{snapshot.player.hp} / {snapshot.player.maxHp} HP</span>
           </div>
-          <div className="h-4 overflow-hidden rounded-full bg-black/30">
+          <div className="relative h-4 overflow-hidden rounded-full bg-black/30">
+            {recoverableHp > 0 ? (
+              <div
+                className="absolute h-4 rounded-full bg-[linear-gradient(90deg,rgba(255,194,97,0.42),rgba(255,236,170,0.78))] transition-[width] duration-150"
+                style={{ width: `${recoverablePercent}%` }}
+              />
+            ) : null}
             <div
-              className="h-full rounded-full bg-[linear-gradient(90deg,#e06a2c,#ffbf5a)] transition-[width] duration-150"
+              className="relative h-full rounded-full bg-[linear-gradient(90deg,#e06a2c,#ffbf5a)] transition-[width] duration-150"
               style={{ width: `${hpPercent}%` }}
             />
           </div>

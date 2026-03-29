@@ -37,7 +37,6 @@ export function GameShell() {
   const engineRef = useRef<GameEngine | null>(null);
   const [snapshot, setSnapshot] = useState<GameSnapshot>(createInitialGameState);
   const [mobileBrowser, setMobileBrowser] = useState(false);
-  const [portraitMobile, setPortraitMobile] = useState(false);
 
   useEffect(() => {
     const engine = createGameEngine();
@@ -61,9 +60,7 @@ export function GameShell() {
 
   useEffect(() => {
     const sync = () => {
-      const isMobile = detectMobileBrowser(window);
-      setMobileBrowser(isMobile);
-      setPortraitMobile(isMobile && window.innerHeight > window.innerWidth);
+      setMobileBrowser(detectMobileBrowser(window));
     };
 
     sync();
@@ -110,7 +107,7 @@ export function GameShell() {
     : null;
 
   const shellContent = (
-    <div className="relative min-h-dvh w-full overflow-hidden bg-[radial-gradient(circle_at_top,rgba(255,240,205,0.86),rgba(241,216,168,0.72)_34%,rgba(214,175,112,0.42)_58%,rgba(68,48,35,0.98)_100%)] text-[#f7ead4]">
+    <div className="relative min-h-dvh w-full overflow-x-hidden bg-[radial-gradient(circle_at_top,rgba(255,240,205,0.86),rgba(241,216,168,0.72)_34%,rgba(214,175,112,0.42)_58%,rgba(68,48,35,0.98)_100%)] text-[#f7ead4]">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.14),transparent_20%,transparent_80%,rgba(0,0,0,0.16))]" />
       <div className="pointer-events-none absolute inset-0 opacity-50 [background-image:radial-gradient(rgba(255,255,255,0.16)_1px,transparent_1px)] [background-size:16px_16px]" />
 
@@ -198,12 +195,6 @@ export function GameShell() {
   );
 
   return (
-    <main className="relative min-h-dvh w-full overflow-hidden bg-[#120d0b]">
-      {portraitMobile ? (
-        <div className="mobile-landscape-shell">{shellContent}</div>
-      ) : (
-        shellContent
-      )}
-    </main>
+    <main className="relative min-h-dvh w-full overflow-x-hidden bg-[#120d0b]">{shellContent}</main>
   );
 }

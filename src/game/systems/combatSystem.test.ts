@@ -278,6 +278,38 @@ describe("combatSystem", () => {
     expect(state.player.recoverableHp).toBe(0);
   });
 
+  it("lets guarding enemies block frontal light attacks", () => {
+    const state = createInitialGameState();
+    state.phase = "playing";
+    const enemy = createEnemy("durmiente", 230, state.player.y);
+    enemy.facing = "left";
+    enemy.modifiers.guardChance = 1;
+    state.enemies = [enemy];
+    state.input.attack = true;
+
+    updateCombat(state, 16);
+    updateCombat(state, 60);
+
+    expect(state.enemies[0].hp).toBe(state.enemies[0].maxHp);
+    expect(state.enemies[0].state).toBe("recover");
+  });
+
+  it("lets poise enemies absorb a light hit without staggering", () => {
+    const state = createInitialGameState();
+    state.phase = "playing";
+    const enemy = createEnemy("mochilero", 232, state.player.y);
+    enemy.poiseHp = 1;
+    state.enemies = [enemy];
+    state.input.attack = true;
+
+    updateCombat(state, 16);
+    updateCombat(state, 60);
+
+    expect(state.enemies[0].hp).toBe(state.enemies[0].maxHp);
+    expect(state.enemies[0].hurtCooldownMs).toBe(0);
+    expect(state.enemies[0].poiseHp).toBe(0);
+  });
+
   it("loses recoverable health if Ricky gets hit before cashing it back", () => {
     const state = createInitialGameState();
     state.phase = "playing";

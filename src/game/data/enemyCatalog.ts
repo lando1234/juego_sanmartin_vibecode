@@ -131,6 +131,7 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     modifiers: {
       antiSpamBias: 0.85,
       preferredLaneOffset: -12,
+      guardChance: 0.35,
     },
   },
   mochilero: {
@@ -162,6 +163,7 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     modifiers: {
       antiSpamBias: 1.15,
       preferredLaneOffset: 8,
+      poiseHits: 2,
     },
   },
   vendedor_competencia: {
@@ -241,6 +243,7 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
     modifiers: {
       antiSpamBias: 1.2,
       preferredLaneOffset: -28,
+      guardChance: 0.24,
     },
   },
   fisura: {
@@ -327,9 +330,13 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
         },
         modifiers: {
           antiSpamBias: 1.3,
+          poiseHits: 2,
         },
       },
     ],
+    modifiers: {
+      poiseHits: 2,
+    },
   },
   boss_fisura_bici: {
     name: "Boss Fisura Bici",
@@ -424,8 +431,12 @@ export const enemyCatalog: Record<EnemyKind, EnemyDefinition> = {
           speedMultiplier: 1.5,
           aggression: 2,
           antiSpamBias: 1.5,
+          poiseHits: 999,
         },
       },
     ],
+    modifiers: {
+      poiseHits: 999,
+    },
   },
 };

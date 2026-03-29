@@ -44,6 +44,7 @@ export function createEnemy(kind: EnemyKind, x: number, y: number): EnemyState {
     intent: "hold",
     lastPlayerActionSeen: null,
     lastPlayerActionSeenMs: 0,
+    poiseHp: template.modifiers?.poiseHits ?? 0,
     activeAttack: null,
     thrownTimerMs: 0,
     thrownVx: 0,

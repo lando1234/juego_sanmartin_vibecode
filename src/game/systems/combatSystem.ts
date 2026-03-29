@@ -150,6 +150,7 @@ function applyDamageToEnemy(
   enemy: EnemyState,
   damage: number,
   knockback: number,
+  actionName: PlayerCombatActionName | "throw" = "attack_1",
 ) {
   if (state.player.recoverableHp > 0) {
     const recovered = Math.min(
@@ -158,6 +159,37 @@ function applyDamageToEnemy(
     );
     state.player.recoverableHp -= recovered;
     state.player.hp = Math.min(state.player.maxHp, state.player.hp + recovered);
+  }
+
+  const isHeavyPlayerAction =
+    actionName === "special" || actionName === "attack_3" || actionName === "throw";
+  const frontalHit =
+    (playerX < enemy.x && enemy.facing === "left") ||
+    (playerX >= enemy.x && enemy.facing === "right");
+  const canGuard =
+    !isHeavyPlayerAction &&
+    frontalHit &&
+    (enemy.state === "idle" || enemy.state === "circle") &&
+    (enemy.modifiers.guardChance ?? 0) > 0;
+  if (canGuard) {
+    const guardRoll = ((state.hud.elapsedMs / 16 + enemy.x) % 10) / 10;
+
+    if (guardRoll < (enemy.modifiers.guardChance ?? 0)) {
+      enemy.x += playerX < enemy.x ? 12 : -12;
+      enemy.state = "recover";
+      enemy.intent = "hold";
+      enemy.x = clampXToArena(state, enemy.x, enemy.width);
+      enemy.y = clampYToArena(state, enemy.y, enemy.depth);
+      return;
+    }
+  }
+
+  if (!isHeavyPlayerAction && enemy.poiseHp > 0) {
+    enemy.poiseHp = Math.max(0, enemy.poiseHp - 1);
+    enemy.x += playerX < enemy.x ? Math.max(8, Math.round(knockback * 0.25)) : -Math.max(8, Math.round(knockback * 0.25));
+    enemy.x = clampXToArena(state, enemy.x, enemy.width);
+    enemy.y = clampYToArena(state, enemy.y, enemy.depth);
+    return;
   }
 
   const hasAttackPoise =
@@ -185,6 +217,7 @@ function applyDamageToEnemy(
 
   enemy.hurtCooldownMs = 220;
   enemy.state = "hurt";
+  enemy.poiseHp = enemy.modifiers.poiseHits ?? 0;
   enemy.x += playerX < enemy.x ? knockback : -knockback;
   enemy.x = clampXToArena(state, enemy.x, enemy.width);
   enemy.y = clampYToArena(state, enemy.y, enemy.depth);
@@ -259,7 +292,7 @@ function tryStartGrab(state: GameState) {
   }
 
   if (candidate.role === "mini_boss") {
-    applyDamageToEnemy(state, state.player.x, candidate, 10, 18);
+    applyDamageToEnemy(state, state.player.x, candidate, 10, 18, "throw");
     state.player.actionRecoveryMs = Math.max(state.player.actionRecoveryMs, 120);
     return;
   }
@@ -538,7 +571,7 @@ function updateThrownEnemyCollisions(state: GameState) {
       continue;
     }
 
-    applyDamageToEnemy(state, thrownEnemy.x, collidedTarget, 18, 26);
+    applyDamageToEnemy(state, thrownEnemy.x, collidedTarget, 18, 26, "throw");
     thrownEnemy.thrownTimerMs = 0;
     thrownEnemy.thrownVx = 0;
     thrownEnemy.thrownVy = 0;
@@ -673,6 +706,7 @@ export function updateCombat(state: GameState, dtMs: number) {
             enemy,
             attackDamage,
             currentPlayerAttack.knockback,
+            currentPlayerAttack.name,
           );
           state.player.attack.struckEnemyIds.push(enemy.id);
         }

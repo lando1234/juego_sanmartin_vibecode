@@ -316,6 +316,7 @@ export type EnemyState = {
   intent: EnemyIntent;
   lastPlayerActionSeen: PlayerActionState | null;
   lastPlayerActionSeenMs: number;
+  poiseHp: number;
   activeAttack: ActiveEnemyAttackState | null;
   thrownTimerMs: number;
   thrownVx: number;

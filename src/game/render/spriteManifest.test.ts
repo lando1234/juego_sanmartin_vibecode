@@ -6,6 +6,9 @@ describe("spriteManifest", () => {
   it("uses multi-frame sequences for the main converted characters", () => {
     expect(spriteManifest.ricky.frames.idle).toHaveLength(2);
     expect(spriteManifest.ricky.frames.walk).toHaveLength(2);
+    expect(spriteManifest.ricky.frames.block).toEqual([
+      "/sprites/characters/ricky/block-01.png",
+    ]);
     expect(spriteManifest.ricky.frames.attack_2).toEqual([
       "/sprites/characters/ricky/attack-02.png",
     ]);
@@ -40,6 +43,9 @@ describe("spriteManifest", () => {
     ]);
     expect(getSpriteFramePaths("ricky", "dash")).toEqual([
       "/sprites/characters/ricky/dash-01.png",
+    ]);
+    expect(getSpriteFramePaths("ricky", "block")).toEqual([
+      "/sprites/characters/ricky/block-01.png",
     ]);
     expect(getSpriteFramePaths("ricky", "throw")).toEqual([
       "/sprites/characters/ricky/throw-01.png",

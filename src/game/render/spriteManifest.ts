@@ -25,6 +25,9 @@ export const spriteManifest = {
         "/sprites/characters/ricky/walk-01.png",
         "/sprites/characters/ricky/walk-02.png",
       ],
+      block: [
+        "/sprites/characters/ricky/block-01.png",
+      ],
       attack: [
         "/sprites/characters/ricky/attack-01.png",
       ],

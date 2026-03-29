@@ -81,8 +81,36 @@ describe("combatSystem", () => {
     state.enemies = [enemy];
 
     updateCombat(state, 16);
+    updateCombat(state, 60);
 
     expect(state.enemies[0].hp).toBeLessThan(state.enemies[0].maxHp);
+  });
+
+  it("chains into the second and third combo hit when the input is timed inside the window", () => {
+    const state = createInitialGameState();
+    state.phase = "playing";
+    state.input.attack = true;
+    state.enemies = [createEnemy("durmiente", 236, state.player.y)];
+
+    updateCombat(state, 16);
+    expect(state.player.actionState).toBe("attack_1");
+
+    state.input.attack = false;
+    updateCombat(state, 120);
+    state.input.attack = true;
+    updateCombat(state, 16);
+    state.input.attack = false;
+
+    updateCombat(state, 140);
+    expect(state.player.actionState).toBe("attack_2");
+
+    updateCombat(state, 120);
+    state.input.attack = true;
+    updateCombat(state, 16);
+    state.input.attack = false;
+
+    updateCombat(state, 180);
+    expect(state.player.actionState).toBe("attack_3");
   });
 
   it("lets enemies damage Ricky and can reach game over", () => {
@@ -137,6 +165,7 @@ describe("combatSystem", () => {
     state.input.attack = true;
 
     updateCombat(state, 16);
+    updateCombat(state, 60);
 
     expect(state.enemies[0].hp).toBeLessThan(state.enemies[0].maxHp);
     expect(state.enemies[0].activeAttack).not.toBeNull();

@@ -18,6 +18,77 @@ type Rect = {
 
 let projectileSeed = 0;
 
+type PlayerAttackActionName = "attack_1" | "attack_2" | "attack_3";
+
+type PlayerAttackDefinition = {
+  name: PlayerAttackActionName;
+  startupMs: number;
+  activeMs: number;
+  recoveryMs: number;
+  damage: number;
+  knockback: number;
+  comboWindowStartMs: number;
+  comboWindowEndMs: number;
+  hitbox: HitboxState;
+};
+
+const playerAttackDefinitions: Record<PlayerAttackActionName, PlayerAttackDefinition> = {
+  attack_1: {
+    name: "attack_1",
+    startupMs: 50,
+    activeMs: 75,
+    recoveryMs: 150,
+    damage: 22,
+    knockback: 24,
+    comboWindowStartMs: 85,
+    comboWindowEndMs: 220,
+    hitbox: {
+      shape: "rectangle",
+      width: 88,
+      height: 36,
+      offsetX: 18,
+      offsetY: 6,
+      activeFrames: [2, 3],
+    },
+  },
+  attack_2: {
+    name: "attack_2",
+    startupMs: 60,
+    activeMs: 85,
+    recoveryMs: 165,
+    damage: 26,
+    knockback: 30,
+    comboWindowStartMs: 95,
+    comboWindowEndMs: 235,
+    hitbox: {
+      shape: "rectangle",
+      width: 94,
+      height: 38,
+      offsetX: 20,
+      offsetY: 4,
+      activeFrames: [2, 3],
+    },
+  },
+  attack_3: {
+    name: "attack_3",
+    startupMs: 80,
+    activeMs: 95,
+    recoveryMs: 220,
+    damage: 34,
+    knockback: 44,
+    comboWindowStartMs: 0,
+    comboWindowEndMs: 0,
+    hitbox: {
+      shape: "rectangle",
+      width: 108,
+      height: 40,
+      offsetX: 24,
+      offsetY: 2,
+      activeFrames: [2, 3],
+    },
+  },
+};
+
 function intersects(a: Rect, b: Rect) {
   return (
     a.x < b.x + b.width &&
@@ -58,6 +129,7 @@ function applyDamageToEnemy(
   playerX: number,
   enemy: EnemyState,
   damage: number,
+  knockback: number,
 ) {
   const hasAttackPoise =
     enemy.activeAttack !== null &&
@@ -68,7 +140,7 @@ function applyDamageToEnemy(
   if (enemy.hp === 0) {
     enemy.hurtCooldownMs = 220;
     enemy.state = "defeated";
-    enemy.x += playerX < enemy.x ? 24 : -24;
+    enemy.x += playerX < enemy.x ? knockback : -knockback;
     enemy.x = clampXToArena(state, enemy.x, enemy.width);
     enemy.y = clampYToArena(state, enemy.y, enemy.depth);
     return;
@@ -76,7 +148,7 @@ function applyDamageToEnemy(
 
   if (hasAttackPoise) {
     const poiseKnockback =
-      enemy.role === "boss" ? 0 : enemy.role === "mini_boss" ? 4 : 10;
+      enemy.role === "boss" ? 0 : enemy.role === "mini_boss" ? 4 : Math.max(10, Math.round(knockback * 0.4));
     enemy.x += playerX < enemy.x ? poiseKnockback : -poiseKnockback;
     enemy.hurtCooldownMs = 0;
     return;
@@ -84,9 +156,37 @@ function applyDamageToEnemy(
 
   enemy.hurtCooldownMs = 220;
   enemy.state = "hurt";
-  enemy.x += playerX < enemy.x ? 24 : -24;
+  enemy.x += playerX < enemy.x ? knockback : -knockback;
   enemy.x = clampXToArena(state, enemy.x, enemy.width);
   enemy.y = clampYToArena(state, enemy.y, enemy.depth);
+}
+
+function startPlayerAttack(state: GameState, action: PlayerAttackActionName) {
+  const definition = playerAttackDefinitions[action];
+  const totalMs =
+    definition.startupMs + definition.activeMs + definition.recoveryMs;
+
+  state.player.actionState = action;
+  state.player.queuedAction = null;
+  state.player.actionTimerMs = totalMs;
+  state.player.actionRecoveryMs = definition.recoveryMs;
+  state.player.attack.activeMs = 0;
+  state.player.attack.cooldownMs = totalMs;
+  state.player.attack.currentAction = action;
+  state.player.attack.queuedAction = null;
+  state.player.attack.actionTimerMs = totalMs;
+  state.player.attack.actionRecoveryMs = definition.recoveryMs;
+  state.player.attack.attackChainIndex =
+    action === "attack_1" ? 1 : action === "attack_2" ? 2 : 3;
+  state.player.attack.attackWindowMs =
+    definition.comboWindowEndMs > 0
+      ? definition.comboWindowEndMs - definition.comboWindowStartMs
+      : 0;
+  state.player.attack.hitbox = { ...definition.hitbox };
+  state.player.attack.damage = definition.damage;
+  state.player.attack.width = definition.hitbox.width;
+  state.player.attack.range = definition.hitbox.width + definition.hitbox.offsetX;
+  state.player.attack.struckEnemyIds = [];
 }
 
 function applyDamageToPlayer(state: GameState, damage: number, knockback = 0, sourceFacing: Facing) {
@@ -98,6 +198,18 @@ function applyDamageToPlayer(state: GameState, damage: number, knockback = 0, so
     state.player.shieldMs > 0 ? Math.ceil(damage * 0.55) : damage;
   state.player.hp = Math.max(0, state.player.hp - incomingDamage);
   state.player.hurtCooldownMs = 380;
+  state.player.actionState = state.player.hp === 0 ? "defeated" : "hurt";
+  state.player.queuedAction = null;
+  state.player.actionTimerMs = 0;
+  state.player.actionRecoveryMs = 0;
+  state.player.attack.activeMs = 0;
+  state.player.attack.currentAction = null;
+  state.player.attack.queuedAction = null;
+  state.player.attack.actionTimerMs = 0;
+  state.player.attack.actionRecoveryMs = 0;
+  state.player.attack.attackChainIndex = 0;
+  state.player.attack.attackWindowMs = 0;
+  state.player.attack.struckEnemyIds = [];
   state.player.x += sourceFacing === "right" ? knockback : -knockback;
   state.player.x = clampXToArena(state, state.player.x, state.player.width);
   state.player.y = clampYToArena(state, state.player.y, state.player.depth);
@@ -270,10 +382,6 @@ function updateEnemyProjectiles(state: GameState, dtMs: number) {
 }
 
 export function updateCombat(state: GameState, dtMs: number) {
-  const attackDamage =
-    state.player.attack.damage + (state.player.attackBoostMs > 0 ? 10 : 0);
-
-  state.player.attack.activeMs = Math.max(0, state.player.attack.activeMs - dtMs);
   state.player.attack.cooldownMs = Math.max(
     0,
     state.player.attack.cooldownMs - dtMs,
@@ -287,43 +395,125 @@ export function updateCombat(state: GameState, dtMs: number) {
     enemy.hurtCooldownMs = Math.max(0, enemy.hurtCooldownMs - dtMs);
   }
 
+  const currentPlayerAttack = state.player.attack.currentAction
+    ? playerAttackDefinitions[state.player.attack.currentAction]
+    : null;
+
+  if (state.phase === "playing" && currentPlayerAttack) {
+    state.player.actionTimerMs = Math.max(0, state.player.actionTimerMs - dtMs);
+    state.player.attack.actionTimerMs = state.player.actionTimerMs;
+
+    const totalMs =
+      currentPlayerAttack.startupMs +
+      currentPlayerAttack.activeMs +
+      currentPlayerAttack.recoveryMs;
+    const elapsedMs = totalMs - state.player.actionTimerMs;
+    const isActive =
+      elapsedMs >= currentPlayerAttack.startupMs &&
+      elapsedMs <
+        currentPlayerAttack.startupMs + currentPlayerAttack.activeMs;
+    const recoveryRemainingMs = Math.max(
+      0,
+      state.player.actionTimerMs - 0,
+    );
+    const inRecovery =
+      elapsedMs >=
+      currentPlayerAttack.startupMs + currentPlayerAttack.activeMs;
+    const comboWindowOpen =
+      currentPlayerAttack.comboWindowEndMs > 0 &&
+      elapsedMs >= currentPlayerAttack.comboWindowStartMs &&
+      elapsedMs <= currentPlayerAttack.comboWindowEndMs;
+
+    state.player.attack.activeMs = isActive
+      ? currentPlayerAttack.startupMs +
+          currentPlayerAttack.activeMs -
+          elapsedMs
+      : 0;
+    state.player.actionRecoveryMs = inRecovery ? recoveryRemainingMs : 0;
+    state.player.attack.actionRecoveryMs = state.player.actionRecoveryMs;
+    state.player.attack.attackWindowMs = comboWindowOpen
+      ? currentPlayerAttack.comboWindowEndMs - elapsedMs
+      : 0;
+
+    if (
+      comboWindowOpen &&
+      state.input.attack &&
+      state.player.attack.attackChainIndex < 3
+    ) {
+      state.player.queuedAction = "attack";
+      state.player.attack.queuedAction = "attack";
+    }
+
+    if (isActive) {
+      const attackDamage =
+        currentPlayerAttack.damage +
+        (state.player.attackBoostMs > 0 ? 10 : 0);
+      const playerAttackRect = getAttackRect(
+        state.player.x,
+        state.player.y,
+        state.player.width,
+        state.player.depth,
+        state.player.facing,
+        currentPlayerAttack.hitbox,
+      );
+
+      for (const enemy of state.enemies) {
+        if (
+          enemy.hp <= 0 ||
+          enemy.hurtCooldownMs > 0 ||
+          state.player.attack.struckEnemyIds.includes(enemy.id)
+        ) {
+          continue;
+        }
+
+        const enemyRect = getBodyRect(enemy.x, enemy.y, enemy.width, enemy.depth);
+
+        if (intersects(playerAttackRect, enemyRect)) {
+          applyDamageToEnemy(
+            state,
+            state.player.x,
+            enemy,
+            attackDamage,
+            currentPlayerAttack.knockback,
+          );
+          state.player.attack.struckEnemyIds.push(enemy.id);
+        }
+      }
+    }
+
+    if (state.player.actionTimerMs === 0) {
+      if (
+        state.player.queuedAction === "attack" &&
+        state.player.attack.attackChainIndex < 3
+      ) {
+        startPlayerAttack(
+          state,
+          state.player.attack.attackChainIndex === 1 ? "attack_2" : "attack_3",
+        );
+      } else {
+        state.player.actionState = state.player.isMoving ? "walk" : "idle";
+        state.player.queuedAction = null;
+        state.player.actionTimerMs = 0;
+        state.player.actionRecoveryMs = 0;
+        state.player.attack.activeMs = 0;
+        state.player.attack.currentAction = null;
+        state.player.attack.queuedAction = null;
+        state.player.attack.actionTimerMs = 0;
+        state.player.attack.actionRecoveryMs = 0;
+        state.player.attack.attackChainIndex = 0;
+        state.player.attack.attackWindowMs = 0;
+        state.player.attack.struckEnemyIds = [];
+      }
+    }
+  }
+
   if (
     state.phase === "playing" &&
     state.input.attack &&
-    state.player.attack.cooldownMs === 0 &&
+    state.player.attack.currentAction === null &&
     state.player.hurtCooldownMs === 0
   ) {
-    state.player.attack.activeMs = 100;
-    state.player.attack.cooldownMs = 460;
-    state.player.attack.struckEnemyIds = [];
-  }
-
-  if (state.phase === "playing" && state.player.attack.activeMs > 0) {
-    const playerAttackRect = getAttackRect(
-      state.player.x,
-      state.player.y,
-      state.player.width,
-      state.player.depth,
-      state.player.facing,
-      state.player.attack.hitbox,
-    );
-
-    for (const enemy of state.enemies) {
-      if (
-        enemy.hp <= 0 ||
-        enemy.hurtCooldownMs > 0 ||
-        state.player.attack.struckEnemyIds.includes(enemy.id)
-      ) {
-        continue;
-      }
-
-      const enemyRect = getBodyRect(enemy.x, enemy.y, enemy.width, enemy.depth);
-
-      if (intersects(playerAttackRect, enemyRect)) {
-        applyDamageToEnemy(state, state.player.x, enemy, attackDamage);
-        state.player.attack.struckEnemyIds.push(enemy.id);
-      }
-    }
+    startPlayerAttack(state, "attack_1");
   }
 
   for (const enemy of state.enemies) {

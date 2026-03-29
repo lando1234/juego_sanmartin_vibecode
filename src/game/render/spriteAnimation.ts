@@ -28,7 +28,15 @@ export function resolvePlayerSpriteState(player: PlayerState): SpriteAnimationSt
     return "defeated";
   }
 
-  if (player.attack.activeMs > 0) {
+  if (
+    player.actionState === "attack_1" ||
+    player.actionState === "attack_2" ||
+    player.actionState === "attack_3" ||
+    player.actionState === "special" ||
+    player.actionState === "grab" ||
+    player.actionState === "throw" ||
+    player.attack.activeMs > 0
+  ) {
     return "attack";
   }
 

@@ -25,12 +25,19 @@ export function updateMovement(state: GameState, dtMs: number) {
   const speedMultiplier = state.player.speedBoostMs > 0 ? 1.22 : 1;
   const isStartingAttack =
     state.input.attack &&
-    state.player.attack.cooldownMs === 0 &&
+    state.player.attack.currentAction === null &&
     state.player.hurtCooldownMs === 0;
+  const playerIsCommittedToAction =
+    state.player.actionState === "attack_1" ||
+    state.player.actionState === "attack_2" ||
+    state.player.actionState === "attack_3" ||
+    state.player.actionState === "special" ||
+    state.player.actionState === "grab" ||
+    state.player.actionState === "throw";
   const attackMoveMultiplier =
-    isStartingAttack || state.player.attack.activeMs > 0
+    isStartingAttack || playerIsCommittedToAction
       ? 0.14
-      : state.player.attack.cooldownMs > 180
+      : state.player.actionRecoveryMs > 0
         ? 0.48
         : 1;
   const inputInvertMultiplier = state.player.invertControlsMs > 0 ? -1 : 1;
@@ -54,6 +61,10 @@ export function updateMovement(state: GameState, dtMs: number) {
     attackMoveMultiplier *
     normalizedIntent;
   state.player.isMoving = horizontalIntent !== 0 || verticalIntent !== 0;
+
+  if (!playerIsCommittedToAction && state.player.hurtCooldownMs === 0) {
+    state.player.actionState = state.player.isMoving ? "walk" : "idle";
+  }
 
   if (horizontalIntent < 0) {
     state.player.facing = "left";

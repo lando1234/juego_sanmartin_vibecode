@@ -59,9 +59,31 @@ function applyDamageToEnemy(
   enemy: EnemyState,
   damage: number,
 ) {
+  const hasAttackPoise =
+    enemy.activeAttack !== null &&
+    enemy.activeAttack.timerMs > enemy.activeAttack.recoveryMs;
+
   enemy.hp = Math.max(0, enemy.hp - damage);
+
+  if (enemy.hp === 0) {
+    enemy.hurtCooldownMs = 220;
+    enemy.state = "defeated";
+    enemy.x += playerX < enemy.x ? 24 : -24;
+    enemy.x = clampXToArena(state, enemy.x, enemy.width);
+    enemy.y = clampYToArena(state, enemy.y, enemy.depth);
+    return;
+  }
+
+  if (hasAttackPoise) {
+    const poiseKnockback =
+      enemy.role === "boss" ? 0 : enemy.role === "mini_boss" ? 4 : 10;
+    enemy.x += playerX < enemy.x ? poiseKnockback : -poiseKnockback;
+    enemy.hurtCooldownMs = 0;
+    return;
+  }
+
   enemy.hurtCooldownMs = 220;
-  enemy.state = enemy.hp === 0 ? "defeated" : "hurt";
+  enemy.state = "hurt";
   enemy.x += playerX < enemy.x ? 24 : -24;
   enemy.x = clampXToArena(state, enemy.x, enemy.width);
   enemy.y = clampYToArena(state, enemy.y, enemy.depth);
@@ -268,10 +290,11 @@ export function updateCombat(state: GameState, dtMs: number) {
   if (
     state.phase === "playing" &&
     state.input.attack &&
-    state.player.attack.cooldownMs === 0
+    state.player.attack.cooldownMs === 0 &&
+    state.player.hurtCooldownMs === 0
   ) {
-    state.player.attack.activeMs = 120;
-    state.player.attack.cooldownMs = 320;
+    state.player.attack.activeMs = 100;
+    state.player.attack.cooldownMs = 460;
     state.player.attack.struckEnemyIds = [];
   }
 

@@ -23,6 +23,16 @@ export function updateMovement(state: GameState, dtMs: number) {
   }
 
   const speedMultiplier = state.player.speedBoostMs > 0 ? 1.22 : 1;
+  const isStartingAttack =
+    state.input.attack &&
+    state.player.attack.cooldownMs === 0 &&
+    state.player.hurtCooldownMs === 0;
+  const attackMoveMultiplier =
+    isStartingAttack || state.player.attack.activeMs > 0
+      ? 0.14
+      : state.player.attack.cooldownMs > 180
+        ? 0.48
+        : 1;
   const inputInvertMultiplier = state.player.invertControlsMs > 0 ? -1 : 1;
   const horizontalIntent =
     (Number(state.input.right) - Number(state.input.left)) * inputInvertMultiplier;
@@ -32,9 +42,17 @@ export function updateMovement(state: GameState, dtMs: number) {
     horizontalIntent !== 0 && verticalIntent !== 0 ? Math.SQRT1_2 : 1;
 
   state.player.vx =
-    horizontalIntent * state.player.speed * speedMultiplier * normalizedIntent;
+    horizontalIntent *
+    state.player.speed *
+    speedMultiplier *
+    attackMoveMultiplier *
+    normalizedIntent;
   state.player.vy =
-    verticalIntent * state.player.speed * speedMultiplier * normalizedIntent;
+    verticalIntent *
+    state.player.speed *
+    speedMultiplier *
+    attackMoveMultiplier *
+    normalizedIntent;
   state.player.isMoving = horizontalIntent !== 0 || verticalIntent !== 0;
 
   if (horizontalIntent < 0) {

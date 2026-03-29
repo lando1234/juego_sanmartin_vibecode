@@ -108,7 +108,12 @@ function createEnemyAttackState(enemy: EnemyState, attack: EnemyAttackDefinition
 
 function updateApproach(enemy: EnemyState, state: GameState, dt: number, targetX: number, targetY: number) {
   const aggression = enemy.modifiers.aggression ?? 1;
-  const speed = enemy.speed * resolveSpeedMultiplier(enemy);
+  const playerIsCommitted =
+    state.player.attack.activeMs > 0 || state.player.attack.cooldownMs > 180;
+  const speed =
+    enemy.speed *
+    resolveSpeedMultiplier(enemy) *
+    (playerIsCommitted ? 1.16 : 1);
   enemy.vx = clamp(targetX, -1, 1) * speed;
   enemy.vy = clamp(targetY, -1, 1) * speed * (0.55 + (aggression - 1) * 0.06);
 
@@ -126,10 +131,16 @@ function updateApproach(enemy: EnemyState, state: GameState, dt: number, targetX
 
 function updateCircle(enemy: EnemyState, state: GameState, dt: number, targetX: number, targetY: number) {
   const aggression = enemy.modifiers.aggression ?? 1;
+  const playerIsCommitted =
+    state.player.attack.activeMs > 0 || state.player.attack.cooldownMs > 180;
   const slotOffset = enemy.engagementSlot === "back" ? -52 : 52;
   const desiredX = state.player.x + slotOffset - enemy.x;
   const desiredY = targetY + (enemy.engagementSlot === "back" ? 18 : -18);
-  const speed = enemy.speed * resolveSpeedMultiplier(enemy) * (0.88 + (aggression - 1) * 0.05);
+  const speed =
+    enemy.speed *
+    resolveSpeedMultiplier(enemy) *
+    (0.88 + (aggression - 1) * 0.05) *
+    (playerIsCommitted ? 1.14 : 1);
 
   enemy.vx = clamp(desiredX, -1, 1) * speed;
   enemy.vy = clamp(desiredY, -1, 1) * speed * 0.62;
@@ -143,6 +154,8 @@ export function updateEnemies(state: GameState, dtMs: number) {
   }
 
   const dt = dtMs / 1000;
+  const playerIsCommitted =
+    state.player.attack.activeMs > 0 || state.player.attack.cooldownMs > 180;
   const liveEnemies = state.enemies
     .filter((enemy) => enemy.hp > 0)
     .sort(
@@ -151,7 +164,10 @@ export function updateEnemies(state: GameState, dtMs: number) {
     );
   const engagedIds = new Set(
     liveEnemies
-      .slice(0, enemyAiRules.engagement.maxAttackers)
+      .slice(
+        0,
+        enemyAiRules.engagement.maxAttackers + (playerIsCommitted ? 1 : 0),
+      )
       .map((enemy) => enemy.id),
   );
 
@@ -208,12 +224,16 @@ export function updateEnemies(state: GameState, dtMs: number) {
 
     const isClose = distance.absoluteX < enemyAiRules.distanceLogic.close;
     const isFar = distance.absoluteX > enemyAiRules.distanceLogic.far;
-    const inAttackLane = distance.absoluteY <= 72;
+    const inAttackLane = distance.absoluteY <= (playerIsCommitted ? 88 : 72);
+    const ignoresEngagementCap =
+      playerIsCommitted &&
+      enemy.combatStyle !== "melee" &&
+      distance.absoluteX <= enemy.attackRange + 28;
     const canAttack =
       enemy.attackCooldownMs === 0 &&
       distance.absoluteX <= enemy.attackRange &&
       inAttackLane &&
-      engagedIds.has(enemy.id);
+      (engagedIds.has(enemy.id) || ignoresEngagementCap);
 
     if (canAttack) {
       enemy.activeAttack = createEnemyAttackState(enemy, chooseAttack(enemy, distance.absoluteX));

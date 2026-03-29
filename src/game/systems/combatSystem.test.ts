@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import { createGameEngine } from "@/game/core/createGameEngine";
+import { createEnemy } from "@/game/entities/createEnemy";
+import { createInitialGameState } from "@/game/state/createInitialGameState";
+import { updateCombat } from "@/game/systems/combatSystem";
 
 function spawnWave(engine: ReturnType<typeof createGameEngine>) {
   engine.sendCommand({ type: "start" });
@@ -71,19 +74,15 @@ describe("combatSystem", () => {
   });
 
   it("damages enemies when Ricky attacks in range", () => {
-    const engine = createGameEngine({ now: () => 1000 });
-    spawnWave(engine);
-    const enemy = engine.getSnapshot().enemies[0];
-    engine.sendCommand({
-      type: "debug-set-player-position",
-      payload: { x: enemy.x - 20, y: enemy.y },
-    });
+    const state = createInitialGameState();
+    state.phase = "playing";
+    state.input.attack = true;
+    const enemy = createEnemy("durmiente", 236, state.player.y);
+    state.enemies = [enemy];
 
-    const firstEnemy = engine.getSnapshot().enemies[0];
-    engine.sendInput({ attack: true });
-    engine.step(16);
+    updateCombat(state, 16);
 
-    expect(engine.getSnapshot().enemies[0].hp).toBeLessThan(firstEnemy.maxHp);
+    expect(state.enemies[0].hp).toBeLessThan(state.enemies[0].maxHp);
   });
 
   it("lets enemies damage Ricky and can reach game over", () => {
@@ -101,6 +100,47 @@ describe("combatSystem", () => {
 
     expect(engine.getSnapshot().player.hp).toBeLessThan(100);
     expect(["playing", "game_over"]).toContain(engine.getSnapshot().phase);
+  });
+
+  it("does not cancel an enemy attack just because Ricky lands a hit", () => {
+    const state = createInitialGameState();
+    state.phase = "playing";
+    const enemy = createEnemy("colado", 236, state.player.y);
+    enemy.activeAttack = {
+      name: "push",
+      timerMs: 220,
+      startupMs: 80,
+      activeMs: 80,
+      recoveryMs: 60,
+      damage: 8,
+      knockback: 10,
+      range: 28,
+      hitbox: {
+        shape: "rectangle",
+        width: 40,
+        height: 30,
+        offsetX: 20,
+        offsetY: 10,
+        activeFrames: [2, 3],
+      },
+      projectile: false,
+      projectileSpeed: 0,
+      aoe: false,
+      radius: null,
+      effect: null,
+      durationMs: null,
+      hits: 1,
+      damageApplied: false,
+      projectileSpawned: false,
+    };
+    state.enemies = [enemy];
+    state.input.attack = true;
+
+    updateCombat(state, 16);
+
+    expect(state.enemies[0].hp).toBeLessThan(state.enemies[0].maxHp);
+    expect(state.enemies[0].activeAttack).not.toBeNull();
+    expect(state.enemies[0].hurtCooldownMs).toBe(0);
   });
 
   it("keeps enemies inside the closed combat arena after knockback", () => {

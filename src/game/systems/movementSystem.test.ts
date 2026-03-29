@@ -65,6 +65,15 @@ describe("movementSystem", () => {
     expect(engine.getSnapshot().phase).toBe("paused");
   });
 
+  it("slows Ricky sharply while he is committed to an attack", () => {
+    const engine = createGameEngine({ now: () => 1000 });
+    engine.sendCommand({ type: "start" });
+    engine.sendInput({ attack: true, right: true });
+    engine.step(16);
+
+    expect(engine.getSnapshot().player.x).toBeLessThan(182);
+  });
+
   it("blocks progress past the combat gate while the wave is active", () => {
     const engine = createGameEngine({ now: () => 1000 });
     engine.sendCommand({ type: "start" });

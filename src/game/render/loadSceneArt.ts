@@ -1,13 +1,15 @@
-import type { ItemKind } from "@/game/types/gameTypes";
+import type { HazardType, ItemKind } from "@/game/types/gameTypes";
 
 export type SceneArtCache = {
   background: HTMLImageElement | null;
   items: Partial<Record<ItemKind, HTMLImageElement>>;
+  hazards: Partial<Record<HazardType, HTMLImageElement>>;
 };
 
 const sceneArtCache: SceneArtCache = {
   background: null,
   items: {},
+  hazards: {},
 };
 
 function loadImage(path: string) {
@@ -31,11 +33,28 @@ export async function loadSceneArt() {
     paraguas_fierro: "/sprites/items/paraguas-fierro.png",
   };
 
+  const hazardManifest: Partial<Record<HazardType, string>> = {
+    door_slam: "/sprites/hazards/door-slam-active.png",
+    sudden_brake: "/sprites/hazards/brake-shake-overlay.png",
+    passenger_push: "/sprites/hazards/passenger-push-lane.png",
+    floor_clutter: "/sprites/hazards/floor-clutter.png",
+    seat_block: "/sprites/hazards/seat-block.png",
+  };
+
   await Promise.all(
     Object.entries(itemManifest).map(async ([kind, path]) => {
       const itemKind = kind as ItemKind;
       if (!sceneArtCache.items[itemKind]) {
         sceneArtCache.items[itemKind] = await loadImage(path);
+      }
+    }),
+  );
+
+  await Promise.all(
+    Object.entries(hazardManifest).map(async ([kind, path]) => {
+      const hazardKind = kind as HazardType;
+      if (!sceneArtCache.hazards[hazardKind]) {
+        sceneArtCache.hazards[hazardKind] = await loadImage(path);
       }
     }),
   );

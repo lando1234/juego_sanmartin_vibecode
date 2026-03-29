@@ -68,4 +68,50 @@ describe("hazardSystem", () => {
 
     expect(state.player.x).toBeLessThan(startX);
   });
+
+  it("slows the player inside floor clutter", () => {
+    const state = createInitialGameState();
+    state.phase = "playing";
+    state.player.x = 260;
+    state.player.y = 170;
+    state.player.vx = 180;
+    state.player.vy = 90;
+    state.levelLayout.hazards = [
+      {
+        id: "test-clutter",
+        type: "floor_clutter",
+        x: 240,
+        y: 150,
+        width: 120,
+        depth: 90,
+        strength: 0.4,
+      },
+    ];
+
+    updateHazards(state, 16);
+
+    expect(state.player.vx).toBeLessThan(180);
+    expect(state.player.vy).toBeLessThan(90);
+  });
+
+  it("pushes the player out of a seat block obstacle", () => {
+    const state = createInitialGameState();
+    state.phase = "playing";
+    state.player.x = 300;
+    state.player.y = 160;
+    state.levelLayout.hazards = [
+      {
+        id: "test-seat",
+        type: "seat_block",
+        x: 280,
+        y: 140,
+        width: 120,
+        depth: 110,
+      },
+    ];
+
+    updateHazards(state, 16);
+
+    expect(state.player.x).not.toBe(300);
+  });
 });

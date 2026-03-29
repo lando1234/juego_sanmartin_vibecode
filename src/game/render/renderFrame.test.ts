@@ -77,4 +77,36 @@ describe("renderFrame", () => {
 
     expect(context.drawImage).toHaveBeenCalled();
   });
+
+  it("uses hazard sprites when they are available", () => {
+    const context = createMockContext();
+    const snapshot = createInitialGameState();
+    snapshot.phase = "playing";
+    snapshot.scene.activeHazards = [
+      {
+        id: "hazard-seat",
+        type: "seat_block",
+        x: 420,
+        y: 160,
+        width: 140,
+        depth: 90,
+        activeMs: 0,
+        cooldownMs: 0,
+        strength: 0,
+        timerMs: 0,
+        cooldownRemainingMs: 0,
+        active: true,
+      },
+    ];
+
+    renderFrame(context, snapshot, {}, {
+      background: null,
+      items: {},
+      hazards: {
+        seat_block: {} as CanvasImageSource,
+      },
+    });
+
+    expect(context.drawImage).toHaveBeenCalled();
+  });
 });

@@ -585,7 +585,7 @@ function createItems(levelIndex: number): ItemPlacement[] {
 }
 
 function createHazards(levelIndex: number, width: number, shiftX: number): HazardPlacement[] {
-  const pattern = levelIndex % 3;
+  const pattern = levelIndex % 5;
 
   if (pattern === 0) {
     return [
@@ -620,17 +620,48 @@ function createHazards(levelIndex: number, width: number, shiftX: number): Hazar
     ];
   }
 
+  if (pattern === 2) {
+    return [
+      {
+        id: `hazard-push-${levelIndex}`,
+        type: "passenger_push",
+        x: 980 + shiftX,
+        y: 54,
+        width: 360,
+        depth: 220,
+        activeMs: 900,
+        cooldownMs: 1250,
+        strength: 180,
+      },
+    ];
+  }
+
+  if (pattern === 3) {
+    return [
+      {
+        id: `hazard-clutter-${levelIndex}`,
+        type: "floor_clutter",
+        x: 1100 + shiftX,
+        y: 156,
+        width: 170,
+        depth: 74,
+        activeMs: 0,
+        cooldownMs: 0,
+        strength: 0.48,
+      },
+    ];
+  }
+
   return [
     {
-      id: `hazard-push-${levelIndex}`,
-      type: "passenger_push",
-      x: 980 + shiftX,
-      y: 54,
-      width: 360,
-      depth: 220,
-      activeMs: 900,
-      cooldownMs: 1250,
-      strength: 180,
+      id: `hazard-seat-${levelIndex}`,
+      type: "seat_block",
+      x: 1260 + shiftX,
+      y: 148,
+      width: 156,
+      depth: 92,
+      activeMs: 0,
+      cooldownMs: 0,
     },
   ];
 }

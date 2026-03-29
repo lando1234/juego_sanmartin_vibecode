@@ -210,6 +210,7 @@ function drawAttackTelegraph(
 
 function drawHazardTelegraph(
   context: CanvasRenderingContext2D,
+  sceneArt: SceneArtCache,
   type: GameSnapshot["scene"]["activeHazards"][number]["type"],
   x: number,
   y: number,
@@ -218,7 +219,27 @@ function drawHazardTelegraph(
   active: boolean,
   timeMs: number,
 ) {
+  const hazardSprite = sceneArt.hazards[type] ?? null;
   context.save();
+
+  if (hazardSprite) {
+    const spriteY =
+      type === "sudden_brake"
+        ? y - 24
+        : type === "seat_block" || type === "floor_clutter"
+          ? y + height * 0.18
+          : y - 10;
+    const spriteHeight =
+      type === "sudden_brake"
+        ? height + 48
+        : type === "seat_block" || type === "floor_clutter"
+          ? Math.max(46, height * 0.84)
+          : height + 20;
+    context.globalAlpha = active ? 0.88 : 0.5;
+    context.drawImage(hazardSprite, x, spriteY, width, spriteHeight);
+    context.restore();
+    return;
+  }
 
   if (type === "door_slam") {
     const pulse = 0.5 + Math.sin(timeMs / 120) * 0.5;
@@ -319,7 +340,7 @@ export function renderFrame(
   context: CanvasRenderingContext2D,
   snapshot: GameSnapshot,
   sprites: SpriteCache = {},
-  sceneArt: SceneArtCache = { background: null, items: {} },
+  sceneArt: SceneArtCache = { background: null, items: {}, hazards: {} },
 ) {
   const { canvas } = context;
   const timeMs = snapshot.hud.elapsedMs;
@@ -546,6 +567,7 @@ export function renderFrame(
     const hazardHeight = hazard.depth * LANE_DEPTH_SCALE;
     drawHazardTelegraph(
       context,
+      sceneArt,
       hazard.type,
       hazardX,
       hazardY - 10,

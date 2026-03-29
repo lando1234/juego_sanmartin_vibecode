@@ -2,6 +2,39 @@ import type { GameState, HazardState } from "@/game/types/gameTypes";
 
 import { clampXToArena, clampYToArena } from "./arenaBounds";
 
+function intersectsHazard(
+  entityX: number,
+  entityY: number,
+  entityWidth: number,
+  entityDepth: number,
+  hazard: HazardState,
+) {
+  return (
+    entityX < hazard.x + hazard.width &&
+    entityX + entityWidth > hazard.x &&
+    entityY < hazard.y + hazard.depth &&
+    entityY + entityDepth > hazard.y
+  );
+}
+
+function pushEntityOutOfHazard(
+  state: GameState,
+  hazard: HazardState,
+  entity: { x: number; y: number; width: number; depth: number },
+) {
+  if (!intersectsHazard(entity.x, entity.y, entity.width, entity.depth, hazard)) {
+    return false;
+  }
+
+  const overlapLeft = entity.x + entity.width - hazard.x;
+  const overlapRight = hazard.x + hazard.width - entity.x;
+  const pushLeft = overlapLeft < overlapRight;
+  entity.x += pushLeft ? -overlapLeft - 2 : overlapRight + 2;
+  entity.x = clampXToArena(state, entity.x, entity.width);
+  entity.y = clampYToArena(state, entity.y, entity.depth);
+  return true;
+}
+
 function cloneHazard(hazard: GameState["levelLayout"]["hazards"][number]): HazardState {
   return {
     ...hazard,
@@ -53,11 +86,13 @@ export function updateHazards(state: GameState, dtMs: number) {
     }
 
     if (hazard.type === "door_slam") {
-      const playerInside =
-        state.player.x < hazard.x + hazard.width &&
-        state.player.x + state.player.width > hazard.x &&
-        state.player.y < hazard.y + hazard.depth &&
-        state.player.y + state.player.depth > hazard.y;
+      const playerInside = intersectsHazard(
+        state.player.x,
+        state.player.y,
+        state.player.width,
+        state.player.depth,
+        hazard,
+      );
 
       if (playerInside && state.player.hurtCooldownMs === 0) {
         state.player.hp = Math.max(0, state.player.hp - (hazard.damage ?? 6));
@@ -77,11 +112,13 @@ export function updateHazards(state: GameState, dtMs: number) {
           continue;
         }
 
-        const enemyInside =
-          enemy.x < hazard.x + hazard.width &&
-          enemy.x + enemy.width > hazard.x &&
-          enemy.y < hazard.y + hazard.depth &&
-          enemy.y + enemy.depth > hazard.y;
+        const enemyInside = intersectsHazard(
+          enemy.x,
+          enemy.y,
+          enemy.width,
+          enemy.depth,
+          hazard,
+        );
 
         if (!enemyInside) {
           continue;
@@ -102,6 +139,7 @@ export function updateHazards(state: GameState, dtMs: number) {
 
     if (hazard.type === "sudden_brake") {
       state.player.x += (hazard.strength ?? -120) * dt;
+      state.player.vx *= 0.7;
       state.player.x = clampXToArena(state, state.player.x, state.player.width);
 
       for (const enemy of state.enemies) {
@@ -110,19 +148,23 @@ export function updateHazards(state: GameState, dtMs: number) {
         }
 
         enemy.x += (hazard.strength ?? -120) * dt * 0.8;
+        enemy.vx *= 0.72;
         enemy.x = clampXToArena(state, enemy.x, enemy.width);
       }
     }
 
     if (hazard.type === "passenger_push") {
-      const playerInside =
-        state.player.x < hazard.x + hazard.width &&
-        state.player.x + state.player.width > hazard.x &&
-        state.player.y < hazard.y + hazard.depth &&
-        state.player.y + state.player.depth > hazard.y;
+      const playerInside = intersectsHazard(
+        state.player.x,
+        state.player.y,
+        state.player.width,
+        state.player.depth,
+        hazard,
+      );
 
       if (playerInside) {
         state.player.x += (hazard.strength ?? 140) * dt;
+        state.player.vx += (hazard.strength ?? 140) * 0.18;
         state.player.x = clampXToArena(state, state.player.x, state.player.width);
       }
 
@@ -131,18 +173,63 @@ export function updateHazards(state: GameState, dtMs: number) {
           continue;
         }
 
-        const enemyInside =
-          enemy.x < hazard.x + hazard.width &&
-          enemy.x + enemy.width > hazard.x &&
-          enemy.y < hazard.y + hazard.depth &&
-          enemy.y + enemy.depth > hazard.y;
+        const enemyInside = intersectsHazard(
+          enemy.x,
+          enemy.y,
+          enemy.width,
+          enemy.depth,
+          hazard,
+        );
 
         if (!enemyInside) {
           continue;
         }
 
         enemy.x += (hazard.strength ?? 140) * dt * 0.85;
+        enemy.vx += (hazard.strength ?? 140) * 0.12;
         enemy.x = clampXToArena(state, enemy.x, enemy.width);
+      }
+    }
+
+    if (hazard.type === "floor_clutter") {
+      const playerInside = intersectsHazard(
+        state.player.x,
+        state.player.y,
+        state.player.width,
+        state.player.depth,
+        hazard,
+      );
+
+      if (playerInside) {
+        const slowdown = Math.max(0.2, hazard.strength ?? 0.48);
+        state.player.vx *= slowdown;
+        state.player.vy *= slowdown;
+      }
+
+      for (const enemy of state.enemies) {
+        if (enemy.hp <= 0) {
+          continue;
+        }
+
+        if (!intersectsHazard(enemy.x, enemy.y, enemy.width, enemy.depth, hazard)) {
+          continue;
+        }
+
+        const slowdown = Math.max(0.25, hazard.strength ?? 0.52);
+        enemy.vx *= slowdown;
+        enemy.vy *= slowdown;
+      }
+    }
+
+    if (hazard.type === "seat_block") {
+      pushEntityOutOfHazard(state, hazard, state.player);
+
+      for (const enemy of state.enemies) {
+        if (enemy.hp <= 0) {
+          continue;
+        }
+
+        pushEntityOutOfHazard(state, hazard, enemy);
       }
     }
   }

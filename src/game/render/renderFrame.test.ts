@@ -78,6 +78,64 @@ describe("renderFrame", () => {
     expect(context.drawImage).toHaveBeenCalled();
   });
 
+  it("uses the boss telegraph sprite during startup windows", () => {
+    const context = createMockContext();
+    const snapshot = createInitialGameState();
+    snapshot.phase = "playing";
+    const boss = createEnemy("boss_fisura_bici", 2160, 120);
+    boss.activeAttack = {
+      name: "drive_by",
+      timerMs: 520,
+      startupMs: 220,
+      activeMs: 110,
+      recoveryMs: 120,
+      damage: 10,
+      knockback: 0,
+      range: 30,
+      hitbox: {
+        shape: "rectangle",
+        width: 40,
+        height: 30,
+        offsetX: 20,
+        offsetY: 10,
+        activeFrames: [2, 3],
+      },
+      projectile: false,
+      projectileSpeed: 0,
+      aoe: false,
+      radius: null,
+      effect: null,
+      durationMs: null,
+      hits: 1,
+      damageApplied: false,
+      projectileSpawned: false,
+    };
+    snapshot.enemies = [boss];
+
+    const telegraphFrame = {} as CanvasImageSource;
+    renderFrame(context, snapshot, {
+      ricky: {
+        idle: [{} as CanvasImageSource],
+      },
+      boss_fisura_bici: {
+        idle: [{} as CanvasImageSource],
+        attack_telegraph: [telegraphFrame],
+        attack: [{} as CanvasImageSource],
+        hurt: [{} as CanvasImageSource],
+        defeated: [{} as CanvasImageSource],
+        walk: [{} as CanvasImageSource],
+      },
+    });
+
+    expect(context.drawImage).toHaveBeenCalledWith(
+      telegraphFrame,
+      expect.any(Number),
+      expect.any(Number),
+      expect.any(Number),
+      expect.any(Number),
+    );
+  });
+
   it("uses hazard sprites when they are available", () => {
     const context = createMockContext();
     const snapshot = createInitialGameState();

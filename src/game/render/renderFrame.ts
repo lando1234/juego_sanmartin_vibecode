@@ -636,6 +636,8 @@ export function renderFrame(
     );
     context.fill();
 
+    const enemySpriteState = resolveEnemySpriteState(enemy);
+
     if (enemy.activeAttack) {
       const attackProgress =
         enemy.activeAttack.timerMs <= enemy.activeAttack.startupMs
@@ -659,6 +661,16 @@ export function renderFrame(
         attackProgress,
         telegraphColor,
       );
+      if (enemySpriteState === "attack_telegraph") {
+        drawImpactFlash(
+          context,
+          enemyCenterX + (enemy.facing === "right" ? enemy.width * 0.18 : -enemy.width * 0.18),
+          enemyCenterY - enemyMetrics.height * 0.12,
+          enemy.isBoss ? 40 : 24,
+          "rgba(255, 124, 76, 0.18)",
+          "rgba(255, 214, 150, 0.3)",
+        );
+      }
       if (enemy.activeAttack.timerMs > enemy.activeAttack.startupMs) {
         drawImpactFlash(
           context,
@@ -669,18 +681,27 @@ export function renderFrame(
           "rgba(255, 227, 170, 0.35)",
         );
       }
-    } else if (enemy.modifiers.guardChance && enemy.state !== "hurt" && enemy.state !== "defeated") {
+    } else if (enemySpriteState === "guard") {
+      drawImpactFlash(
+        context,
+        enemyCenterX + (enemy.facing === "right" ? enemy.width * 0.16 : -enemy.width * 0.16),
+        enemyCenterY - 2,
+        enemy.isBoss ? 28 : 20,
+        "rgba(120, 176, 230, 0.12)",
+        "rgba(182, 219, 255, 0.26)",
+      );
+    }
+
+    if (enemySpriteState === "stagger_heavy") {
       drawImpactFlash(
         context,
         enemyCenterX,
         enemyCenterY,
-        enemy.isBoss ? 28 : 20,
-        "rgba(120, 176, 230, 0.08)",
-        "rgba(182, 219, 255, 0.2)",
+        enemy.isBoss ? 34 : 24,
+        "rgba(255, 150, 92, 0.2)",
+        "rgba(255, 227, 186, 0.34)",
       );
-    }
-
-    if (enemy.hurtCooldownMs > 0) {
+    } else if (enemy.hurtCooldownMs > 0) {
       drawImpactFlash(
         context,
         enemyCenterX,
@@ -691,7 +712,6 @@ export function renderFrame(
       );
     }
 
-    const enemySpriteState = resolveEnemySpriteState(enemy);
     const enemyTransform = getSpriteTransform(
       enemySpriteState,
       timeMs + enemy.x,

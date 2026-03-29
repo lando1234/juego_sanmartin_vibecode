@@ -125,6 +125,13 @@ describe("renderFrame", () => {
         defeated: [{} as CanvasImageSource],
         walk: [{} as CanvasImageSource],
       },
+    }, {
+      background: null,
+      items: {},
+      hazards: {},
+      ui: {
+        danger_telegraph: telegraphFrame as HTMLImageElement,
+      },
     });
 
     expect(context.drawImage).toHaveBeenCalledWith(
@@ -163,6 +170,7 @@ describe("renderFrame", () => {
       hazards: {
         seat_block: {} as CanvasImageSource,
       },
+      ui: {},
     });
 
     expect(context.drawImage).toHaveBeenCalled();

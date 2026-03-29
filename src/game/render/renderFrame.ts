@@ -169,8 +169,29 @@ function drawImpactFlash(
   context.restore();
 }
 
+function drawEffectSprite(
+  context: CanvasRenderingContext2D,
+  sprite: CanvasImageSource | null | undefined,
+  centerX: number,
+  centerY: number,
+  width: number,
+  height: number,
+  alpha = 1,
+) {
+  if (!sprite) {
+    return false;
+  }
+
+  context.save();
+  context.globalAlpha = alpha;
+  context.drawImage(sprite, centerX - width / 2, centerY - height / 2, width, height);
+  context.restore();
+  return true;
+}
+
 function drawAttackTelegraph(
   context: CanvasRenderingContext2D,
+  sprite: CanvasImageSource | null | undefined,
   centerX: number,
   centerY: number,
   facing: "left" | "right",
@@ -179,6 +200,20 @@ function drawAttackTelegraph(
   progress: number,
   color: string,
 ) {
+  if (
+    drawEffectSprite(
+      context,
+      sprite,
+      centerX + (facing === "right" ? width * 0.22 : -width * 0.22),
+      centerY - 8,
+      width * (0.88 + progress * 0.24),
+      height * (0.36 + progress * 0.08),
+      0.5 + progress * 0.24,
+    )
+  ) {
+    return;
+  }
+
   const dir = facing === "right" ? 1 : -1;
   const reach = width * (0.5 + progress * 0.65);
   const arcHeight = height * (0.16 + progress * 0.12);
@@ -340,7 +375,7 @@ export function renderFrame(
   context: CanvasRenderingContext2D,
   snapshot: GameSnapshot,
   sprites: SpriteCache = {},
-  sceneArt: SceneArtCache = { background: null, items: {}, hazards: {} },
+  sceneArt: SceneArtCache = { background: null, items: {}, hazards: {}, ui: {} },
 ) {
   const { canvas } = context;
   const timeMs = snapshot.hud.elapsedMs;
@@ -565,9 +600,9 @@ export function renderFrame(
     const hazardX = hazard.x - snapshot.camera.x;
     const hazardY = toScreenDepth(hazard.y);
     const hazardHeight = hazard.depth * LANE_DEPTH_SCALE;
-    drawHazardTelegraph(
-      context,
-      sceneArt,
+      drawHazardTelegraph(
+        context,
+        sceneArt,
       hazard.type,
       hazardX,
       hazardY - 10,
@@ -653,6 +688,7 @@ export function renderFrame(
               : "rgba(255, 203, 112, 0.86)";
       drawAttackTelegraph(
         context,
+        sceneArt.ui.danger_telegraph,
         enemyCenterX,
         enemyCenterY,
         enemy.facing,
@@ -802,18 +838,54 @@ export function renderFrame(
   }
 
   if (snapshot.player.attack.currentAction === "special" || snapshot.player.shieldMs > 0) {
-    drawImpactFlash(
+    const usedSpecialEffect =
+      snapshot.player.attack.currentAction === "special" &&
+      drawEffectSprite(
+        context,
+        sceneArt.ui.special_flash,
+        playerCenterX + (snapshot.player.facing === "right" ? 24 : -24),
+        playerCenterY - 8,
+        124,
+        124,
+        0.42,
+      );
+    if (!usedSpecialEffect || snapshot.player.shieldMs > 0) {
+      drawImpactFlash(
+        context,
+        playerCenterX,
+        playerCenterY,
+        snapshot.player.width * 0.5,
+        snapshot.player.attack.currentAction === "special"
+          ? "rgba(255, 187, 104, 0.18)"
+          : "rgba(131, 190, 255, 0.14)",
+        snapshot.player.attack.currentAction === "special"
+          ? "rgba(255, 233, 183, 0.32)"
+          : "rgba(191, 226, 255, 0.28)",
+      );
+    }
+  }
+
+  if (snapshot.runStats.comboCurrent > 1 && snapshot.runStats.comboTimerMs > 0) {
+    const comboAlpha = clamp(snapshot.runStats.comboTimerMs / 900, 0.28, 0.7);
+    const usedComboSprite = drawEffectSprite(
       context,
-      playerCenterX,
-      playerCenterY,
-      snapshot.player.width * 0.5,
-      snapshot.player.attack.currentAction === "special"
-        ? "rgba(255, 187, 104, 0.18)"
-        : "rgba(131, 190, 255, 0.14)",
-      snapshot.player.attack.currentAction === "special"
-        ? "rgba(255, 233, 183, 0.32)"
-        : "rgba(191, 226, 255, 0.28)",
+      sceneArt.ui.combo_burst,
+      playerCenterX + (snapshot.player.facing === "right" ? 64 : -64),
+      playerCenterY - 28,
+      110,
+      78,
+      comboAlpha,
     );
+    if (!usedComboSprite) {
+      drawImpactFlash(
+        context,
+        playerCenterX + (snapshot.player.facing === "right" ? 58 : -58),
+        playerCenterY - 24,
+        18,
+        "rgba(255, 187, 104, 0.18)",
+        "rgba(255, 233, 183, 0.32)",
+      );
+    }
   }
 
   if (snapshot.player.grabTargetId) {

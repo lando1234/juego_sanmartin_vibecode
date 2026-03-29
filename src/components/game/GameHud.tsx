@@ -85,8 +85,12 @@ export function GameHud({ snapshot, variant = "panel" }: GameHudProps) {
             <div className="relative h-3 overflow-hidden rounded-full bg-black/30">
               {recoverableHp > 0 ? (
                 <div
-                  className="absolute h-3 rounded-full bg-[linear-gradient(90deg,rgba(255,194,97,0.42),rgba(255,236,170,0.78))] transition-[width] duration-150"
-                  style={{ width: `${recoverablePercent}%` }}
+                  className="absolute h-3 rounded-full bg-[length:auto_100%] bg-center bg-repeat-x transition-[width] duration-150"
+                  style={{
+                    width: `${recoverablePercent}%`,
+                    backgroundImage:
+                      "url('/sprites/ui/recoverable-health-highlight.png'), linear-gradient(90deg,rgba(255,194,97,0.42),rgba(255,236,170,0.78))",
+                  }}
                 />
               ) : null}
               <div
@@ -166,8 +170,12 @@ export function GameHud({ snapshot, variant = "panel" }: GameHudProps) {
           <div className="relative h-4 overflow-hidden rounded-full bg-black/30">
             {recoverableHp > 0 ? (
               <div
-                className="absolute h-4 rounded-full bg-[linear-gradient(90deg,rgba(255,194,97,0.42),rgba(255,236,170,0.78))] transition-[width] duration-150"
-                style={{ width: `${recoverablePercent}%` }}
+                className="absolute h-4 rounded-full bg-[length:auto_100%] bg-center bg-repeat-x transition-[width] duration-150"
+                style={{
+                  width: `${recoverablePercent}%`,
+                  backgroundImage:
+                    "url('/sprites/ui/recoverable-health-highlight.png'), linear-gradient(90deg,rgba(255,194,97,0.42),rgba(255,236,170,0.78))",
+                }}
               />
             ) : null}
             <div

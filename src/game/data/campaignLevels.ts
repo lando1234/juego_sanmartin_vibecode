@@ -814,7 +814,23 @@ export function applyLevelToState(
   state.hud.completionSummary = null;
   state.hud.pickupMessage = null;
   state.hud.activePickup = null;
+  state.hud.stationResult = null;
+  state.runStats.stationScoreStart = state.runStats.score;
+  state.runStats.stationStartElapsedMs = state.hud.elapsedMs;
+  state.runStats.comboCurrent = 0;
+  state.runStats.comboBest = 0;
+  state.runStats.comboTimerMs = 0;
+  state.runStats.stationDamageTaken = 0;
+  state.runStats.stationSpecialsUsed = 0;
+  state.runStats.stationThrowsUsed = 0;
+  state.runStats.stationGrabsUsed = 0;
+  state.runStats.stationDashesUsed = 0;
+  state.runStats.stationBasicAttacksUsed = 0;
+  state.runStats.stationHazardHitsTaken = 0;
+  state.runStats.stationHazardKills = 0;
+  state.runStats.stationKills = 0;
   if (!preserveElapsedRun) {
     state.hud.elapsedMs = 0;
+    state.runStats.stationStartElapsedMs = 0;
   }
 }

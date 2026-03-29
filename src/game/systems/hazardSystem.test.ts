@@ -45,6 +45,7 @@ describe("hazardSystem", () => {
 
     expect(state.player.hp).toBeLessThan(state.player.maxHp);
     expect(state.player.hurtCooldownMs).toBeGreaterThan(0);
+    expect(state.runStats.stationHazardHitsTaken).toBe(1);
   });
 
   it("pushes the player during a sudden brake hazard", () => {

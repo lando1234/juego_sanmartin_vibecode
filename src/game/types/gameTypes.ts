@@ -19,6 +19,9 @@ export type HazardType =
   | "passenger_push"
   | "floor_clutter";
 
+export type GameMode = "campaign" | "survival";
+export type StationRank = "C" | "B" | "A" | "S";
+
 export type Facing = "left" | "right";
 export type EnemyKind =
   | "colado"
@@ -296,6 +299,37 @@ export type HudState = {
     effect: string;
     remainingMs: number | null;
   } | null;
+  stationResult: StationResult | null;
+};
+
+export type StationResult = {
+  rank: StationRank;
+  scoreDelta: number;
+  timeMs: number;
+  damageTaken: number;
+  comboBest: number;
+  varietyScore: number;
+  spamPenalty: number;
+  hazardHitsTaken: number;
+  hazardKills: number;
+};
+
+export type RunStatsState = {
+  score: number;
+  stationScoreStart: number;
+  stationStartElapsedMs: number;
+  comboCurrent: number;
+  comboBest: number;
+  comboTimerMs: number;
+  stationDamageTaken: number;
+  stationSpecialsUsed: number;
+  stationThrowsUsed: number;
+  stationGrabsUsed: number;
+  stationDashesUsed: number;
+  stationBasicAttacksUsed: number;
+  stationHazardHitsTaken: number;
+  stationHazardKills: number;
+  stationKills: number;
 };
 
 export type ItemState = {
@@ -383,6 +417,7 @@ export type LevelLayout = {
 };
 
 export type GameState = {
+  mode: GameMode;
   phase: GamePhase;
   currentLevelIndex: number;
   totalLevels: number;
@@ -398,7 +433,11 @@ export type GameState = {
   lastDtMs: number;
   startedAtMs: number | null;
   updatedAtMs: number | null;
+  survivalWave: number;
+  survivalWavesCleared: number;
+  survivalMinibossesCleared: number;
   hud: HudState;
+  runStats: RunStatsState;
 };
 
 export type GameSnapshot = Readonly<GameState>;
@@ -407,6 +446,7 @@ export type GameCommand =
   | { type: "start" }
   | { type: "pause-toggle" }
   | { type: "next-level" }
+  | { type: "set-mode"; payload: { mode: GameMode } }
   | { type: "reset" }
   | { type: "input"; payload: Partial<InputState> }
   | { type: "debug-set-player-position"; payload: { x: number; y?: number } }

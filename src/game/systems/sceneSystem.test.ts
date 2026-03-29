@@ -104,6 +104,8 @@ describe("sceneSystem", () => {
     runUntil(engine, () => engine.getSnapshot().phase === "victory");
 
     expect(engine.getSnapshot().hud.completionTitle).toBeTruthy();
+    expect(engine.getSnapshot().hud.stationResult).toBeTruthy();
+    expect(engine.getSnapshot().hud.stationResult?.rank).toMatch(/[CSAB]/);
 
     engine.sendCommand({ type: "next-level" });
 

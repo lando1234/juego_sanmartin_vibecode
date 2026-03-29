@@ -111,6 +111,21 @@ describe("combatSystem", () => {
 
     updateCombat(state, 180);
     expect(state.player.actionState).toBe("attack_3");
+    expect(state.runStats.stationBasicAttacksUsed).toBeGreaterThan(0);
+  });
+
+  it("tracks score and combo progression when Ricky lands hits", () => {
+    const state = createInitialGameState();
+    state.phase = "playing";
+    state.input.attack = true;
+    state.enemies = [createEnemy("colado", 236, state.player.y)];
+
+    updateCombat(state, 16);
+    updateCombat(state, 60);
+
+    expect(state.runStats.score).toBeGreaterThan(0);
+    expect(state.runStats.comboCurrent).toBeGreaterThan(0);
+    expect(state.runStats.comboBest).toBeGreaterThan(0);
   });
 
   it("lets enemies damage Ricky and can reach game over", () => {

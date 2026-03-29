@@ -33,6 +33,7 @@ type PlayerAttackDefinition = {
 };
 
 const SPECIAL_HP_COST = 12;
+const COMBO_RESET_MS = 1700;
 
 const playerAttackDefinitions: Record<PlayerCombatActionName, PlayerAttackDefinition> = {
   attack_1: {
@@ -108,6 +109,64 @@ const playerAttackDefinitions: Record<PlayerCombatActionName, PlayerAttackDefini
     },
   },
 };
+
+function getKillScore(enemy: EnemyState) {
+  if (enemy.role === "boss") {
+    return 280;
+  }
+
+  if (enemy.role === "mini_boss") {
+    return 140;
+  }
+
+  if (enemy.role === "special") {
+    return 80;
+  }
+
+  return 45;
+}
+
+function registerPlayerActionUse(
+  state: GameState,
+  action: "attack" | "special" | "grab" | "throw" | "dash",
+) {
+  if (action === "attack") {
+    state.runStats.stationBasicAttacksUsed += 1;
+    return;
+  }
+
+  if (action === "special") {
+    state.runStats.stationSpecialsUsed += 1;
+    return;
+  }
+
+  if (action === "grab") {
+    state.runStats.stationGrabsUsed += 1;
+    return;
+  }
+
+  if (action === "throw") {
+    state.runStats.stationThrowsUsed += 1;
+    return;
+  }
+
+  state.runStats.stationDashesUsed += 1;
+}
+
+function registerPlayerHit(state: GameState, enemy: EnemyState, damage: number) {
+  state.runStats.comboCurrent += 1;
+  state.runStats.comboTimerMs = COMBO_RESET_MS;
+  state.runStats.comboBest = Math.max(
+    state.runStats.comboBest,
+    state.runStats.comboCurrent,
+  );
+  state.runStats.score += damage * 3;
+
+  if (enemy.hp === 0) {
+    state.runStats.stationKills += 1;
+    state.runStats.score += getKillScore(enemy);
+  }
+}
 
 function intersects(a: Rect, b: Rect) {
   return (
@@ -197,6 +256,7 @@ function applyDamageToEnemy(
     enemy.activeAttack.timerMs > enemy.activeAttack.recoveryMs;
 
   enemy.hp = Math.max(0, enemy.hp - damage);
+  registerPlayerHit(state, enemy, damage);
 
   if (enemy.hp === 0) {
     enemy.hurtCooldownMs = 220;
@@ -249,6 +309,10 @@ function startPlayerAttack(state: GameState, action: PlayerCombatActionName) {
   state.player.attack.width = definition.hitbox.width;
   state.player.attack.range = definition.hitbox.width + definition.hitbox.offsetX;
   state.player.attack.struckEnemyIds = [];
+
+  if (action === "attack_1") {
+    registerPlayerActionUse(state, "attack");
+  }
 }
 
 function startPlayerSpecial(state: GameState) {
@@ -256,6 +320,7 @@ function startPlayerSpecial(state: GameState) {
     return false;
   }
 
+  registerPlayerActionUse(state, "special");
   state.player.hp -= SPECIAL_HP_COST;
   state.player.recoverableHp = Math.min(
     state.player.maxHp,
@@ -285,6 +350,8 @@ function tryStartGrab(state: GameState) {
     state.player.actionRecoveryMs = Math.max(state.player.actionRecoveryMs, 110);
     return;
   }
+
+  registerPlayerActionUse(state, "grab");
 
   if (candidate.role === "boss") {
     state.player.actionRecoveryMs = Math.max(state.player.actionRecoveryMs, 90);
@@ -320,6 +387,7 @@ function throwHeldEnemy(state: GameState) {
     state.input.left ? -1 : state.input.right ? 1 : state.player.facing === "right" ? 1 : -1;
 
   state.player.facing = throwDirection > 0 ? "right" : "left";
+  registerPlayerActionUse(state, "throw");
   state.player.grabTargetId = null;
   state.player.actionState = "throw";
   state.player.actionTimerMs = 180;
@@ -350,6 +418,7 @@ function applyDamageToPlayer(
   const incomingDamage =
     state.player.shieldMs > 0 ? Math.ceil(damage * 0.55) : damage;
   state.player.hp = Math.max(0, state.player.hp - incomingDamage);
+  state.runStats.stationDamageTaken += incomingDamage;
   state.player.hurtCooldownMs = 380;
   state.player.actionState = state.player.hp === 0 ? "defeated" : "hurt";
   state.player.queuedAction = null;
@@ -580,6 +649,11 @@ function updateThrownEnemyCollisions(state: GameState) {
 }
 
 export function updateCombat(state: GameState, dtMs: number) {
+  state.runStats.comboTimerMs = Math.max(0, state.runStats.comboTimerMs - dtMs);
+  if (state.runStats.comboTimerMs === 0) {
+    state.runStats.comboCurrent = 0;
+  }
+
   state.player.attack.cooldownMs = Math.max(
     0,
     state.player.attack.cooldownMs - dtMs,

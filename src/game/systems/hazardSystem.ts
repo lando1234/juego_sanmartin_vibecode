@@ -61,6 +61,8 @@ export function updateHazards(state: GameState, dtMs: number) {
 
       if (playerInside && state.player.hurtCooldownMs === 0) {
         state.player.hp = Math.max(0, state.player.hp - (hazard.damage ?? 6));
+        state.runStats.stationDamageTaken += hazard.damage ?? 6;
+        state.runStats.stationHazardHitsTaken += 1;
         state.player.hurtCooldownMs = 320;
         state.player.x += hazard.strength ?? -20;
         state.player.x = clampXToArena(state, state.player.x, state.player.width);
@@ -88,6 +90,10 @@ export function updateHazards(state: GameState, dtMs: number) {
         enemy.hp = Math.max(0, enemy.hp - (hazard.damage ?? 6));
         enemy.hurtCooldownMs = 260;
         enemy.state = enemy.hp === 0 ? "defeated" : "hurt";
+        if (enemy.hp === 0) {
+          state.runStats.stationHazardKills += 1;
+          state.runStats.score += 30;
+        }
         enemy.x += hazard.strength ?? -20;
         enemy.x = clampXToArena(state, enemy.x, enemy.width);
         enemy.y = clampYToArena(state, enemy.y, enemy.depth);

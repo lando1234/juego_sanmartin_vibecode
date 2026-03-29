@@ -2,6 +2,69 @@ import { getCampaignLevel } from "@/game/data/campaignLevels";
 import { createEnemy } from "@/game/entities/createEnemy";
 import type { GameState } from "@/game/types/gameTypes";
 
+function computeStationResult(state: GameState) {
+  const scoreDelta = Math.max(0, state.runStats.score - state.runStats.stationScoreStart);
+  const timeMs = Math.max(1000, state.hud.elapsedMs - state.runStats.stationStartElapsedMs);
+  const actionVarietyCount = [
+    state.runStats.stationBasicAttacksUsed > 0,
+    state.runStats.stationSpecialsUsed > 0,
+    state.runStats.stationThrowsUsed > 0,
+    state.runStats.stationGrabsUsed > 0,
+    state.runStats.stationDashesUsed > 0,
+    state.runStats.stationHazardKills > 0,
+  ].filter(Boolean).length;
+  const varietyScore = actionVarietyCount * 22;
+  const timeBonus = Math.max(0, 160 - Math.floor(timeMs / 1000) * 3);
+  const comboBonus = state.runStats.comboBest * 18;
+  const damagePenalty = state.runStats.stationDamageTaken * 4;
+  const hazardPenalty = state.runStats.stationHazardHitsTaken * 14;
+  const spamPenalty = Math.max(
+    0,
+    state.runStats.stationBasicAttacksUsed - (actionVarietyCount * 3 + 7),
+  ) * 6;
+  const scoreForRank =
+    scoreDelta +
+    varietyScore +
+    timeBonus +
+    comboBonus -
+    damagePenalty -
+    hazardPenalty -
+    spamPenalty;
+
+  const rank =
+    scoreForRank >= 430
+      ? "S"
+      : scoreForRank >= 300
+        ? "A"
+        : scoreForRank >= 180
+          ? "B"
+          : "C";
+
+  return {
+    rank,
+    scoreDelta,
+    timeMs,
+    damageTaken: state.runStats.stationDamageTaken,
+    comboBest: state.runStats.comboBest,
+    varietyScore,
+    spamPenalty,
+    hazardHitsTaken: state.runStats.stationHazardHitsTaken,
+    hazardKills: state.runStats.stationHazardKills,
+  } as const;
+}
+
+function formatStationSummary(state: GameState) {
+  const result = computeStationResult(state);
+  state.hud.stationResult = { ...result };
+  state.hud.completionSummary = [
+    `${state.hud.completionSummary ?? ""}`.trim(),
+    `Rango ${result.rank} · Puntaje ${result.scoreDelta} · Combo x${result.comboBest || 1}.`,
+    `Daño recibido ${result.damageTaken} · Variedad +${result.varietyScore}${result.spamPenalty > 0 ? ` · Spam -${result.spamPenalty}` : ""}.`,
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
 export function updateScene(state: GameState) {
   const currentLevel = getCampaignLevel(state.currentLevelIndex);
 
@@ -106,5 +169,6 @@ export function updateScene(state: GameState) {
     state.phase = "victory";
     state.hud.completionTitle = currentLevel.completionTitle;
     state.hud.completionSummary = currentLevel.completionSummary;
+    formatStationSummary(state);
   }
 }

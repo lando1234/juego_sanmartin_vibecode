@@ -95,6 +95,12 @@ export function createGameEngine(options: EngineOptions = {}): GameEngine {
     hud: {
       ...state.hud,
       hints: [...state.hud.hints],
+      stationResult: state.hud.stationResult
+        ? { ...state.hud.stationResult }
+        : null,
+    },
+    runStats: {
+      ...state.runStats,
     },
   });
 

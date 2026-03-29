@@ -7,7 +7,7 @@ import {
 } from "@/game/data/campaignLevels";
 import { enemyHitboxTemplate } from "@/game/data/enemyCatalog";
 import { resetEnemySeed } from "@/game/entities/createEnemy";
-import type { GameState } from "@/game/types/gameTypes";
+import type { GameMode, GameState } from "@/game/types/gameTypes";
 
 const baseHints = [
   "Moverse: WASD o flechas",
@@ -18,11 +18,12 @@ const baseHints = [
   "Pausa: P",
 ];
 
-export function createInitialGameState(): GameState {
+export function createInitialGameState(mode: GameMode = "campaign"): GameState {
   resetEnemySeed();
   const firstLevel = getCampaignLevel(0);
 
   const state: GameState = {
+    mode,
     phase: "title",
     currentLevelIndex: 0,
     totalLevels: campaignLevels.length,
@@ -118,6 +119,9 @@ export function createInitialGameState(): GameState {
     lastDtMs: 0,
     startedAtMs: null,
     updatedAtMs: null,
+    survivalWave: 0,
+    survivalWavesCleared: 0,
+    survivalMinibossesCleared: 0,
     hud: {
       levelName: firstLevel.name,
       elapsedMs: 0,
@@ -128,6 +132,24 @@ export function createInitialGameState(): GameState {
       completionSummary: null,
       pickupMessage: null,
       activePickup: null,
+      stationResult: null,
+    },
+    runStats: {
+      score: 0,
+      stationScoreStart: 0,
+      stationStartElapsedMs: 0,
+      comboCurrent: 0,
+      comboBest: 0,
+      comboTimerMs: 0,
+      stationDamageTaken: 0,
+      stationSpecialsUsed: 0,
+      stationThrowsUsed: 0,
+      stationGrabsUsed: 0,
+      stationDashesUsed: 0,
+      stationBasicAttacksUsed: 0,
+      stationHazardHitsTaken: 0,
+      stationHazardKills: 0,
+      stationKills: 0,
     },
   };
 

@@ -122,6 +122,34 @@ export function GameOverlay({
               {snapshot.hud.completionSummary ??
                 "El tren sigue cargado y todavía queda camino por delante."}
             </p>
+            {snapshot.hud.stationResult ? (
+              <div className="grid gap-2 rounded-[24px] border border-white/12 bg-black/20 p-4 text-sm text-[#f7ead4]/82 md:grid-cols-4">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f4c992]">
+                    Rango
+                  </p>
+                  <p className="text-xl font-black text-white">{snapshot.hud.stationResult.rank}</p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f4c992]">
+                    Puntaje
+                  </p>
+                  <p>{snapshot.hud.stationResult.scoreDelta}</p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f4c992]">
+                    Combo
+                  </p>
+                  <p>x{snapshot.hud.stationResult.comboBest || 1}</p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f4c992]">
+                    Daño
+                  </p>
+                  <p>{snapshot.hud.stationResult.damageTaken}</p>
+                </div>
+              </div>
+            ) : null}
             <div className="flex flex-wrap gap-3">
               <button
                 type="button"

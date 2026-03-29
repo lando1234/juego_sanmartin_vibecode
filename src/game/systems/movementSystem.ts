@@ -94,6 +94,7 @@ export function updateMovement(state: GameState, dtMs: number) {
     state.player.dashVectorX = dashHorizontal * dashMagnitude;
     state.player.dashVectorY = dashVertical * dashMagnitude;
     state.player.queuedAction = null;
+    state.runStats.stationDashesUsed += 1;
     state.input.dash = false;
   }
 
